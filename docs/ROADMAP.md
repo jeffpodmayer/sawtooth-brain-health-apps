@@ -3,7 +3,7 @@
 The build, broken into small steps. Each step is about one session and teaches
 one thing. Tick a box only when its "Check" passes.
 
-**Current step:** 1.6
+**Current step:** 1.7
 
 How to use this file:
 
@@ -36,7 +36,7 @@ How to use this file:
   - Learn: how a unit test is written and run; what `tsc --noEmit` catches
   - Check: one sample test passes with `npm test`; `npm run typecheck` shows no errors
 
-- [ ] **1.6 Create the two Supabase projects**
+- [x] **1.6 Create the two Supabase projects**
   - Learn: what a Supabase project contains (database, auth, storage, keys); which key is public and which is secret
   - Check: `development` and `production` both exist; you can open each one's table editor
 

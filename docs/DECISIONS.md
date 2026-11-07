@@ -369,3 +369,31 @@ checks no files in this project (the root `tsconfig.json` only links to
 
 - Each test module in `src/tests/<test-name>/` holds its own scoring tests.
 - `src/shared/sample.test.ts` is a placeholder; delete it once real tests exist.
+
+## ADR-017: Supabase region and organizations
+
+- **Status:** Accepted · **Date:** 2026-11-07
+
+**Context:** ADR-004 names the two Supabase projects but not where they run
+or how they're grouped. Supabase bills per organization, and a project's
+region can't be changed later.
+
+**Decision:**
+
+- Both projects are in West US (Oregon), the closest region to Winthrop and
+  to clients in WA and ID. Data stays in the US.
+- Each project is in its own organization: `Sawtooth Development` holds
+  `development`, and `Sawtooth Production` holds `production`.
+- Both organizations are on the Free plan. Only `Sawtooth Production` moves
+  to Pro at launch (roadmap 12.4).
+- Each project has its own generated database password, kept in Jeff's
+  password manager, never in the repo or any `.env` file.
+- Automatic RLS for new tables is turned on where Supabase offers it.
+
+**Consequences:**
+
+- Upgrading production never changes development's cost.
+- Free projects pause after about a week without use. Restore them from the
+  dashboard; no data is lost.
+- Team members (e.g. clinicians in 8.2) are added per organization, so
+  access to each environment is separate.
