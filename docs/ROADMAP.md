@@ -3,7 +3,7 @@
 The build, broken into small steps. Each step is about one session and teaches
 one thing. Tick a box only when its "Check" passes.
 
-**Current step:** 1.3
+**Current step:** 1.4
 
 How to use this file:
 
@@ -24,7 +24,7 @@ How to use this file:
   - Learn: what Vite generates (index.html, src/main.tsx, package.json); first commit and push
   - Check: `npm run dev` shows the starter page; the repo is on GitHub (public, see ADR-013)
 
-- [ ] **1.3 Add the docs and create the `dev` branch**
+- [x] **1.3 Add the docs and create the `dev` branch**
   - Learn: what a branch is; why `dev` and `main` are separate
   - Check: CLAUDE.md, docs/ and the test SPEC/script files are committed; both branches are on GitHub
 

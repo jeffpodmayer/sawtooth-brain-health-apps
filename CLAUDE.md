@@ -110,7 +110,7 @@ docs/            ROADMAP.md, DECISIONS.md
 
 - `dev` branch → Cloudflare preview → Supabase `development` project (fake data only).
 - `main` branch → production subdomain → Supabase `production` project.
-- Release: test on `dev` → apply migrations to production → merge `dev` into `main`.
+- Release (at the end of each phase): test on `dev` → apply migrations to production → merge `dev` into `main`.
 - `seed.sql` never runs against production.
 
 **Accessibility**

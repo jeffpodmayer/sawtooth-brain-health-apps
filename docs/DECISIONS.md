@@ -305,3 +305,24 @@ The repo holds code and docs only; client data lives in Supabase.
   (roadmap 12.2). Making the repo private later won't remove copies already made.
 - A committed secret is exposed at once: treat any leaked key as compromised
   and replace it.
+
+## ADR-014: Merge to main at the end of each phase
+
+- **Status:** Accepted · **Date:** 2026-11-07
+
+**Context:** ADR-004 sets the release order but not how often to release.
+Jeff wants to avoid merging after every step.
+
+**Decision:**
+
+- All work and commits go on `dev`, including roadmap and doc updates.
+- Merge `dev` into `main` at the end of each roadmap phase, or sooner for an
+  urgent fix.
+- Each merge follows the ADR-004 release order: test on `dev` → apply
+  migrations to production → merge.
+
+**Consequences:**
+
+- `main` (and later production) can be up to a phase behind `dev`.
+- Fewer releases means fewer production migrations to run, but each one
+  may hold more changes, so test them on `dev` first.
