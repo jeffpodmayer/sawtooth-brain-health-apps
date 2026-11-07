@@ -46,7 +46,8 @@ How to use this file:
 
 - [ ] **1.8 Deploy with Cloudflare Pages**
   - Learn: branch deploys; per-environment variables in Cloudflare
-  - Check: a push to `dev` updates the preview address (development settings); `main` deploys with production settings
+  - Check: a push to `dev` updates the preview address (development settings); `main` deploys, and the production variables are set in Cloudflare
+  - Note: `main` first shows the production URL after the end-of-phase merge (after 1.9, ADR-014)
 
 - [ ] **1.9 Lock the preview address**
   - Learn: Cloudflare Access; why preview links are public by default
