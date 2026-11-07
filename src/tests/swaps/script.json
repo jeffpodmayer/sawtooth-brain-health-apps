@@ -1,0 +1,294 @@
+{
+  "testId": "swaps",
+  "scriptVersion": "0.1.0",
+  "source": "SWAPS Standard General Instructions (rvsd 7.12.21) and SWAPS Recall form, Cullum 2012",
+  "notes": [
+    "Spoken lines are played in order; each line is one audio clip named by its id.",
+    "Joining a section's spoken lines with single spaces gives the source wording, minus the adaptations listed below.",
+    "An arrow replaces the previous arrow. A highlight stays until the next highlight or until input is enabled.",
+    "Targets: item:N is grid item N (1-81, left to right, top to bottom); key:<symbol> is the number inside that symbol in the key; row:N is a visible grid row; recall:<symbol> is a recall symbol.",
+    "The recall form's final colon is spoken as a full stop (punctuation only)."
+  ],
+  "adaptations": [
+    {
+      "id": "SW1",
+      "status": "pending",
+      "change": "add",
+      "appText": "This number goes with this symbol.",
+      "basedOn": "Demo lines: 'This number (point to the number inside symbol) goes with this symbol, so I would put it here like this.'"
+    },
+    {
+      "id": "SW2",
+      "status": "pending",
+      "change": "replace",
+      "sourceText": "Write in the numbers",
+      "appText": "Fill in the numbers"
+    }
+  ],
+  "sections": {
+    "intro": [
+      {
+        "id": "in-01",
+        "type": "spoken",
+        "text": "Here we have different symbols paired with numbers."
+      },
+      {
+        "id": "in-02",
+        "type": "spoken",
+        "text": "Each symbol has its own number."
+      },
+      {
+        "id": "in-03",
+        "type": "spoken",
+        "text": "Your job is to fill in the correct number that goes with each symbol."
+      }
+    ],
+    "demo": [
+      {
+        "id": "de-01",
+        "type": "action",
+        "action": "highlight",
+        "target": "item:1"
+      },
+      { "id": "de-02", "type": "spoken", "text": "Here is a symbol." },
+      {
+        "id": "de-03",
+        "type": "action",
+        "action": "arrow",
+        "target": "item:1"
+      },
+      { "id": "de-04", "type": "spoken", "text": "This number" },
+      {
+        "id": "de-05",
+        "type": "action",
+        "action": "arrow",
+        "target": "key:heart"
+      },
+      {
+        "id": "de-06",
+        "type": "spoken",
+        "text": "goes with this symbol, so I would put it here like this."
+      },
+      {
+        "id": "de-07",
+        "type": "action",
+        "action": "fill",
+        "target": "item:1",
+        "value": 7
+      },
+      {
+        "id": "de-08",
+        "type": "action",
+        "action": "highlight",
+        "target": "item:2"
+      },
+      { "id": "de-09", "type": "spoken", "text": "Here is the next symbol." },
+      {
+        "id": "de-10",
+        "type": "action",
+        "action": "arrow",
+        "target": "item:2"
+      },
+      { "id": "de-11", "type": "spoken", "text": "This number" },
+      {
+        "id": "de-12",
+        "type": "action",
+        "action": "arrow",
+        "target": "key:triangle"
+      },
+      {
+        "id": "de-13",
+        "type": "spoken",
+        "text": "goes with this symbol, so I would put it here like this."
+      },
+      {
+        "id": "de-14",
+        "type": "action",
+        "action": "fill",
+        "target": "item:2",
+        "value": 1
+      },
+      {
+        "id": "de-15",
+        "type": "action",
+        "action": "highlight",
+        "target": "item:3"
+      },
+      { "id": "de-16", "type": "spoken", "text": "This symbol" },
+      {
+        "id": "de-17",
+        "type": "action",
+        "action": "arrow",
+        "target": "item:3"
+      },
+      { "id": "de-18", "type": "spoken", "text": "goes with this number," },
+      {
+        "id": "de-19",
+        "type": "action",
+        "action": "arrow",
+        "target": "key:flag"
+      },
+      {
+        "id": "de-20",
+        "type": "spoken",
+        "text": "so I would put it here like this."
+      },
+      {
+        "id": "de-21",
+        "type": "action",
+        "action": "fill",
+        "target": "item:3",
+        "value": 6
+      }
+    ],
+    "practice": [
+      {
+        "id": "pr-01",
+        "type": "spoken",
+        "text": "Now you do the rest of these, in the gray box."
+      },
+      { "id": "pr-02", "type": "spoken", "text": "Stop here." },
+      {
+        "id": "pr-03",
+        "type": "action",
+        "action": "arrow",
+        "target": "item:6"
+      },
+      {
+        "id": "pr-04",
+        "type": "action",
+        "action": "select",
+        "target": "item:4"
+      },
+      { "id": "pr-05", "type": "action", "action": "enableInput" }
+    ],
+    "practiceFeedback": [
+      {
+        "id": "pf-01",
+        "type": "action",
+        "action": "clear",
+        "target": "current"
+      },
+      {
+        "id": "pf-02",
+        "type": "spoken",
+        "text": "This number",
+        "adaptation": "SW1"
+      },
+      {
+        "id": "pf-03",
+        "type": "action",
+        "action": "arrow",
+        "target": "key:correct"
+      },
+      {
+        "id": "pf-04",
+        "type": "spoken",
+        "text": "goes with this symbol.",
+        "adaptation": "SW1"
+      },
+      {
+        "id": "pf-05",
+        "type": "action",
+        "action": "select",
+        "target": "current"
+      },
+      { "id": "pf-06", "type": "action", "action": "enableInput" }
+    ],
+    "test": [
+      { "id": "te-01", "type": "spoken", "text": "Good." },
+      {
+        "id": "te-02",
+        "type": "spoken",
+        "text": "Now that you know how to do it, I want you to continue filling in the number that goes with each symbol."
+      },
+      {
+        "id": "te-03",
+        "type": "spoken",
+        "text": "Be sure to work from left to right, without skipping any."
+      },
+      {
+        "id": "te-04",
+        "type": "spoken",
+        "text": "When you finish this line go on to the next one."
+      },
+      {
+        "id": "te-05",
+        "type": "action",
+        "action": "highlight",
+        "target": "row:1"
+      },
+      {
+        "id": "te-06",
+        "type": "action",
+        "action": "highlight",
+        "target": "row:2"
+      },
+      {
+        "id": "te-07",
+        "type": "spoken",
+        "text": "When I say begin, start here"
+      },
+      {
+        "id": "te-08",
+        "type": "action",
+        "action": "arrow",
+        "target": "item:7"
+      },
+      {
+        "id": "te-09",
+        "type": "spoken",
+        "text": "and work as quickly as you can, without making mistakes, until I tell you to stop."
+      },
+      { "id": "te-10", "type": "spoken", "text": "Ready?" },
+      { "id": "te-11", "type": "action", "action": "pause", "ms": 1000 },
+      { "id": "te-12", "type": "spoken", "text": "Begin!" },
+      {
+        "id": "te-13",
+        "type": "action",
+        "action": "select",
+        "target": "item:7"
+      },
+      {
+        "id": "te-14",
+        "type": "action",
+        "action": "startTimer",
+        "seconds": 60
+      },
+      { "id": "te-15", "type": "action", "action": "enableInput" }
+    ],
+    "recall": [
+      {
+        "id": "rc-01",
+        "type": "spoken",
+        "text": "Fill in the numbers that go with each symbol from the test you recently completed that looked like this.",
+        "adaptation": "SW2",
+        "sourceText": "Write in the numbers that go with each symbol from the test you recently completed that looked like this."
+      },
+      {
+        "id": "rc-02",
+        "type": "action",
+        "action": "highlight",
+        "target": "recall:all"
+      },
+      {
+        "id": "rc-03",
+        "type": "spoken",
+        "text": "It is ok to guess if you are not sure."
+      },
+      {
+        "id": "rc-04",
+        "type": "action",
+        "action": "select",
+        "target": "recall:square"
+      },
+      {
+        "id": "rc-05",
+        "type": "action",
+        "action": "startTimer",
+        "seconds": 60
+      },
+      { "id": "rc-06", "type": "action", "action": "enableInput" }
+    ]
+  }
+}

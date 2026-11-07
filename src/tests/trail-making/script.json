@@ -1,0 +1,179 @@
+{
+  "testId": "trail-making",
+  "scriptVersion": "0.1.0",
+  "source": "NACC UDS v4.0 Form C2 instructions, January 2025 (Trail Making Test, Parts A and B)",
+  "notes": [
+    "Spoken lines are played in order; each line is one audio clip named by its id.",
+    "Joining a section's spoken lines with single spaces gives the source wording, minus the adaptations listed below.",
+    "An arrow replaces the previous arrow. In instruction sections, arrows clear when clicks are enabled. In the error section, the arrow stays until the next correct click.",
+    "'say' is a pronunciation hint for audio only. The displayed and stored text is always 'text'."
+  ],
+  "adaptations": [
+    {
+      "id": "W1",
+      "status": "pending",
+      "change": "replace",
+      "sourceText": "Please take the pencil and draw a line",
+      "appText": "Please click to draw a line"
+    },
+    {
+      "id": "W2",
+      "status": "pending",
+      "change": "remove",
+      "sourceText": [
+        "Please try not to lift the pencil as you move from one number to the next.",
+        "Please try not to lift the pencil as you move from one circle to the next.",
+        "Please try not to lift the pencil as you move from one number or letter to the next."
+      ]
+    },
+    {
+      "id": "W3",
+      "status": "pending",
+      "change": "add",
+      "appText": "Begin."
+    }
+  ],
+  "sections": {
+    "sampleA": [
+      {
+        "id": "sa-01",
+        "type": "spoken",
+        "text": "There are numbers in circles on this page."
+      },
+      {
+        "id": "sa-02",
+        "type": "spoken",
+        "text": "Please click to draw a line from one number to the next, in order.",
+        "adaptation": "W1",
+        "sourceText": "Please take the pencil and draw a line from one number to the next, in order."
+      },
+      { "id": "sa-03", "type": "spoken", "text": "Start at 1," },
+      { "id": "sa-04", "type": "action", "action": "arrow", "target": "1" },
+      { "id": "sa-05", "type": "spoken", "text": "then go to 2," },
+      { "id": "sa-06", "type": "action", "action": "arrow", "target": "2" },
+      { "id": "sa-07", "type": "spoken", "text": "then go to 3" },
+      { "id": "sa-08", "type": "action", "action": "arrow", "target": "3" },
+      { "id": "sa-09", "type": "spoken", "text": "and so on." },
+      {
+        "id": "sa-10",
+        "type": "spoken",
+        "text": "Work as quickly as you can."
+      },
+      { "id": "sa-11", "type": "spoken", "text": "Begin here" },
+      { "id": "sa-12", "type": "action", "action": "arrow", "target": "1" },
+      { "id": "sa-13", "type": "spoken", "text": "and end here." },
+      { "id": "sa-14", "type": "action", "action": "arrow", "target": "8" },
+      { "id": "sa-15", "type": "action", "action": "enableClicks" }
+    ],
+    "partA": [
+      {
+        "id": "pa-01",
+        "type": "spoken",
+        "text": "On this page there are more numbers in circles."
+      },
+      {
+        "id": "pa-02",
+        "type": "spoken",
+        "text": "Please click to draw a line from one circle to the next, in order.",
+        "adaptation": "W1",
+        "sourceText": "Please take the pencil and draw a line from one circle to the next, in order."
+      },
+      { "id": "pa-03", "type": "spoken", "text": "Start at 1" },
+      { "id": "pa-04", "type": "action", "action": "arrow", "target": "1" },
+      { "id": "pa-05", "type": "spoken", "text": "and end here." },
+      { "id": "pa-06", "type": "action", "action": "arrow", "target": "25" },
+      {
+        "id": "pa-07",
+        "type": "spoken",
+        "text": "Work as quickly as you can."
+      },
+      { "id": "pa-08", "type": "spoken", "text": "Begin.", "adaptation": "W3" },
+      { "id": "pa-09", "type": "action", "action": "startTimer" },
+      { "id": "pa-10", "type": "action", "action": "enableClicks" }
+    ],
+    "sampleB": [
+      {
+        "id": "sb-01",
+        "type": "spoken",
+        "text": "There are numbers and letters in circles on this page."
+      },
+      {
+        "id": "sb-02",
+        "type": "spoken",
+        "text": "Please click to draw a line, alternating in order between the numbers and letters.",
+        "adaptation": "W1",
+        "sourceText": "Please take the pencil and draw a line, alternating in order between the numbers and letters."
+      },
+      { "id": "sb-03", "type": "spoken", "text": "Start at number 1," },
+      { "id": "sb-04", "type": "action", "action": "arrow", "target": "1" },
+      {
+        "id": "sb-05",
+        "type": "spoken",
+        "text": "then go to the first letter, A,",
+        "say": "then go to the first letter, ay,"
+      },
+      { "id": "sb-06", "type": "action", "action": "arrow", "target": "A" },
+      {
+        "id": "sb-07",
+        "type": "spoken",
+        "text": "then go to the next number, 2,"
+      },
+      { "id": "sb-08", "type": "action", "action": "arrow", "target": "2" },
+      {
+        "id": "sb-09",
+        "type": "spoken",
+        "text": "and then the next letter, B,"
+      },
+      { "id": "sb-10", "type": "action", "action": "arrow", "target": "B" },
+      { "id": "sb-11", "type": "spoken", "text": "and so on." },
+      {
+        "id": "sb-12",
+        "type": "spoken",
+        "text": "Work as quickly as you can."
+      },
+      { "id": "sb-13", "type": "action", "action": "enableClicks" }
+    ],
+    "partB": [
+      {
+        "id": "pb-01",
+        "type": "spoken",
+        "text": "On this page, there are more numbers and letters in circles."
+      },
+      {
+        "id": "pb-02",
+        "type": "spoken",
+        "text": "Please click to draw a line from one circle to the next, alternating in order between the numbers and letters.",
+        "adaptation": "W1",
+        "sourceText": "Please take the pencil and draw a line from one circle to the next, alternating in order between the numbers and letters."
+      },
+      { "id": "pb-03", "type": "spoken", "text": "Start at 1" },
+      { "id": "pb-04", "type": "action", "action": "arrow", "target": "1" },
+      { "id": "pb-05", "type": "spoken", "text": "and end here." },
+      { "id": "pb-06", "type": "action", "action": "arrow", "target": "13" },
+      {
+        "id": "pb-07",
+        "type": "spoken",
+        "text": "Work as quickly as you can."
+      },
+      { "id": "pb-08", "type": "spoken", "text": "Begin.", "adaptation": "W3" },
+      { "id": "pb-09", "type": "action", "action": "startTimer" },
+      { "id": "pb-10", "type": "action", "action": "enableClicks" }
+    ],
+    "error": [
+      { "id": "er-01", "type": "action", "action": "slashLine" },
+      { "id": "er-02", "type": "spoken", "text": "That one was not correct." },
+      {
+        "id": "er-03",
+        "type": "action",
+        "action": "arrow",
+        "target": "lastCorrect"
+      },
+      {
+        "id": "er-04",
+        "type": "spoken",
+        "text": "Please start here and continue."
+      },
+      { "id": "er-05", "type": "action", "action": "enableClicks" }
+    ]
+  }
+}
