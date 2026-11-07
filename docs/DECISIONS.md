@@ -348,3 +348,24 @@ what color text goes on an accent button.
 
 - Screens use the theme names, never raw hex codes.
 - Changing a color means editing one line in `src/index.css`.
+
+## ADR-016: Test file location and typecheck command
+
+- **Status:** Accepted · **Date:** 2026-11-07
+
+**Context:** Vitest needed a place for test files, and plain `tsc --noEmit`
+checks no files in this project (the root `tsconfig.json` only links to
+`tsconfig.app.json` and `tsconfig.node.json`).
+
+**Decision:**
+
+- Test files sit next to the code they test, named `<name>.test.ts`
+  (e.g. `score.ts` and `score.test.ts`). No separate tests folder.
+- `npm test` runs `vitest run` (once, no watch mode).
+- `npm run typecheck` runs `tsc -b --noEmit`, which follows the links and
+  checks both `src/` and `vite.config.ts`. TypeScript 6 is strict by default.
+
+**Consequences:**
+
+- Each test module in `src/tests/<test-name>/` holds its own scoring tests.
+- `src/shared/sample.test.ts` is a placeholder; delete it once real tests exist.

@@ -3,7 +3,7 @@
 The build, broken into small steps. Each step is about one session and teaches
 one thing. Tick a box only when its "Check" passes.
 
-**Current step:** 1.5
+**Current step:** 1.6
 
 How to use this file:
 
@@ -32,7 +32,7 @@ How to use this file:
   - Learn: Tailwind setup; turning the design system into theme colors and sizes
   - Check: a test page shows Atkinson Hyperlegible, the background #F7F6F2 and a 56px accent button
 
-- [ ] **1.5 Add Vitest and a typecheck script**
+- [x] **1.5 Add Vitest and a typecheck script**
   - Learn: how a unit test is written and run; what `tsc --noEmit` catches
   - Check: one sample test passes with `npm test`; `npm run typecheck` shows no errors
 
