@@ -1,3 +1,5 @@
+import { env } from "./shared/env";
+
 function App() {
   return (
     <main className="mx-auto max-w-2xl p-8">
@@ -13,6 +15,7 @@ function App() {
       >
         Accent button
       </button>
+      <p className="mt-8 text-ink-muted">Supabase: {env.supabaseUrl}</p>
     </main>
   );
 }

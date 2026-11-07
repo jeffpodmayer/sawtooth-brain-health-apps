@@ -3,7 +3,7 @@
 The build, broken into small steps. Each step is about one session and teaches
 one thing. Tick a box only when its "Check" passes.
 
-**Current step:** 1.7
+**Current step:** 1.8
 
 How to use this file:
 
@@ -40,7 +40,7 @@ How to use this file:
   - Learn: what a Supabase project contains (database, auth, storage, keys); which key is public and which is secret
   - Check: `development` and `production` both exist; you can open each one's table editor
 
-- [ ] **1.7 Connect the app to Supabase with environment variables**
+- [x] **1.7 Connect the app to Supabase with environment variables**
   - Learn: `.env.local`; why anything starting with `VITE_` ends up public in the browser; `.gitignore`
   - Check: the app reads the development project's URL from the env file; `.env.local` is not in git; no secret key anywhere in `src/`
 
