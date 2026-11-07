@@ -397,3 +397,25 @@ region can't be changed later.
   dashboard; no data is lost.
 - Team members (e.g. clinicians in 8.2) are added per organization, so
   access to each environment is separate.
+
+## ADR-018: Cloudflare Pages setup
+
+- **Status:** Accepted · **Date:** 2026-11-07
+
+**Context:** Cloudflare's dashboard now creates Workers by default. Pages
+has separate Production and Preview variables, which match ADR-004 directly.
+
+**Decision:**
+
+- A Pages project (not a Worker) named `sawtooth-assessments`.
+- `main` deploys to `sawtooth-assessments.pages.dev` with Production
+  variables. Only `dev` gets a preview (`dev.sawtooth-assessments.pages.dev`),
+  with Preview variables pointing at the `development` Supabase project.
+- Build: `npm run build`, output `dist`, Node version from `.node-version`.
+- Browser variables are type Text: they are public by design.
+
+**Consequences:**
+
+- Other branches don't deploy. Add them under Branch control if ever needed.
+- Changing a variable needs a new build to take effect (`VITE_` values are
+  built in).

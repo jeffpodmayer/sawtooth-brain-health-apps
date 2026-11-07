@@ -3,7 +3,7 @@
 The build, broken into small steps. Each step is about one session and teaches
 one thing. Tick a box only when its "Check" passes.
 
-**Current step:** 1.8
+**Current step:** 1.9
 
 How to use this file:
 
@@ -44,7 +44,7 @@ How to use this file:
   - Learn: `.env.local`; why anything starting with `VITE_` ends up public in the browser; `.gitignore`
   - Check: the app reads the development project's URL from the env file; `.env.local` is not in git; no secret key anywhere in `src/`
 
-- [ ] **1.8 Deploy with Cloudflare Pages**
+- [x] **1.8 Deploy with Cloudflare Pages**
   - Learn: branch deploys; per-environment variables in Cloudflare
   - Check: a push to `dev` updates the preview address (development settings); `main` deploys, and the production variables are set in Cloudflare
   - Note: `main` first shows the production URL after the end-of-phase merge (after 1.9, ADR-014)
