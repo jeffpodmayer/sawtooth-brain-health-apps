@@ -326,3 +326,25 @@ Jeff wants to avoid merging after every step.
 - `main` (and later production) can be up to a phase behind `dev`.
 - Fewer releases means fewer production migrations to run, but each one
   may hold more changes, so test them on `dev` first.
+
+## ADR-015: Theme names and button text color
+
+- **Status:** Accepted · **Date:** 2026-11-07
+
+**Context:** ADR-012 lists the colors but not what to call them in code, or
+what color text goes on an accent button.
+
+**Decision:**
+
+- Tailwind theme colors (in `src/index.css`): `page` (#F7F6F2), `ink` (#1B2430),
+  `ink-muted` (#4A5562), `accent` (#0F5F63), `success-bg` (#E3F1EE),
+  `success-ink` (#0B4E51). Names describe purpose, not appearance.
+- Text on accent buttons is white (contrast about 7.5:1).
+- Use Tailwind's built-in sizes: `text-4xl`/`text-5xl` for headings (36/48px),
+  `h-12`/`h-14`/`h-16` for buttons (48/56/64px). Body text is 20px.
+- Font: `@fontsource/atkinson-hyperlegible` (the original), regular and bold only.
+
+**Consequences:**
+
+- Screens use the theme names, never raw hex codes.
+- Changing a color means editing one line in `src/index.css`.

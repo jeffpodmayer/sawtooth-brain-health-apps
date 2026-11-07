@@ -3,7 +3,7 @@
 The build, broken into small steps. Each step is about one session and teaches
 one thing. Tick a box only when its "Check" passes.
 
-**Current step:** 1.4
+**Current step:** 1.5
 
 How to use this file:
 
@@ -28,7 +28,7 @@ How to use this file:
   - Learn: what a branch is; why `dev` and `main` are separate
   - Check: CLAUDE.md, docs/ and the test SPEC/script files are committed; both branches are on GitHub
 
-- [ ] **1.4 Add Tailwind, the font and the design colors**
+- [x] **1.4 Add Tailwind, the font and the design colors**
   - Learn: Tailwind setup; turning the design system into theme colors and sizes
   - Check: a test page shows Atkinson Hyperlegible, the background #F7F6F2 and a 56px accent button
 
