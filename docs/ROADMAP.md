@@ -3,7 +3,7 @@
 The build, broken into small steps. Each step is about one session and teaches
 one thing. Tick a box only when its "Check" passes.
 
-**Current step:** 1.2
+**Current step:** 1.3
 
 How to use this file:
 
@@ -20,7 +20,7 @@ How to use this file:
   - Learn: what Node, npm, git and the Supabase CLI each do
   - Check: `node -v` shows v24; `git --version` works; `npx supabase --version` works
 
-- [ ] **1.2 Create the app and put it on GitHub**
+- [x] **1.2 Create the app and put it on GitHub**
   - Learn: what Vite generates (index.html, src/main.tsx, package.json); first commit and push
   - Check: `npm run dev` shows the starter page; the repo is on GitHub (public, see ADR-013)
 
