@@ -544,3 +544,40 @@ so RLS can't catch a sequence pointing at another practice's client.
 
 - The database rejects cross-practice links, whatever code wrote them.
 - Each new table repeats the pattern, which adds a few lines per table.
+
+## ADR-024: Tests in a sequence and their results
+
+- **Status:** Accepted · **Date:** 2026-11-07
+
+**Context:** ADR-008 says a sequence has many test results, never overwritten,
+each with scores, test version, screen size and the full log. A sequence also
+needs to know which tests to run, in what order, before any result exists.
+
+**Decision:**
+
+- One table, `sequence_tests`: one row per test in a sequence, created as
+  `pending` with the sequence. The result columns are filled once, when the
+  test completes or is stopped. A test appears at most once per sequence;
+  `position` (from 1) sets the order.
+- The row's `status` is `pending`, `completed`, `stopped` or `not_given`.
+  It is separate from the per-part statuses inside `scores` (e.g. `timedOut`),
+  which each test's SPEC defines. A timed-out test is `completed`.
+- `scores` and `raw_data` are `jsonb`, shaped by each test. The database never
+  reads inside them.
+- `screen_width` and `screen_height` (CSS pixels, full screen) are their own
+  columns, filled by the shared layer, not the test. The plug-in contract is unchanged.
+- A check requires all result fields when the test ran, and none when it didn't.
+- A stopped test must have `stop_reason` and `stopped_by` (a clinician in the
+  same practice). Reasons: `gave_up`, `interrupted`, `unable_to_complete`
+  (the last added to ADR-009's list).
+- The row points at `enabled_tests`, so a practice can only be given tests it
+  has enabled, and can't un-enable a test already used (ADR-023 pattern).
+
+**Consequences:**
+
+- A second result for the same test (e.g. a retake after reopening a link,
+  roadmap 7.1) would need a new migration.
+- The Trail Making SPEC's stop reason "Alphabet check not passed (997)" is not
+  allowed yet. Add it by migration once the clinicians confirm the alphabet
+  pre-test plan (by roadmap 9.1 at the latest).
+- Why a whole sequence was discontinued belongs on `sequences` (roadmap 9.1).

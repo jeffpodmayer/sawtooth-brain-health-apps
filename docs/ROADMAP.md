@@ -3,7 +3,7 @@
 The build, broken into small steps. Each step is about one session and teaches
 one thing. Tick a box only when its "Check" passes.
 
-**Current step:** 2.5
+**Current step:** 2.6
 
 How to use this file:
 
@@ -74,7 +74,7 @@ Exact columns are decided at the start of each step.
   - Learn: generating link tokens nobody can guess; limiting a status column to set values
   - Check: link tokens are unique across the whole app; an unknown status value is rejected
 
-- [ ] **2.5 Tests in a sequence and their results**
+- [x] **2.5 Tests in a sequence and their results**
   - Learn: `jsonb` for scores and raw data; storing test version, stop reason and screen size
   - Check: a fake completed result and a fake stopped (partial) result both save
 
