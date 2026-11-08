@@ -469,3 +469,26 @@ merge is done, whether it's reviewed, or whether work happens on other branches.
   to production → merge `dev` into `main`.
 - Revisit branches and pull requests when another developer joins or
   automated checks (Playwright + GitHub Actions, ADR-011) are added.
+
+## ADR-021: RLS on in every table's first migration
+
+- **Status:** Accepted · **Date:** 2026-11-07
+
+**Context:** Policies are written in roadmap 2.7, but tables are created from
+2.1 on. The publishable key is public, so any table without RLS can be read
+by anyone. The dashboard's automatic RLS setting may differ between projects
+(production was recreated in 2.1 to match ADR-017's region).
+
+**Decision:**
+
+- Each migration that creates a table also runs
+  `alter table … enable row level security;` on it.
+- Until policies exist, only the owner (dashboard, CLI, Edge Functions with
+  the secret key) can read or write those tables.
+- Migration files are named verb + table, e.g. `create_practices`.
+
+**Consequences:**
+
+- Nothing in the browser can read a table until its policy is written, so
+  each table needs its policy (2.7) before the app uses it.
+- RLS doesn't depend on a dashboard setting; the migrations are the record.

@@ -3,7 +3,7 @@
 The build, broken into small steps. Each step is about one session and teaches
 one thing. Tick a box only when its "Check" passes.
 
-**Current step:** 2.1
+**Current step:** 2.2
 
 How to use this file:
 
@@ -58,7 +58,7 @@ How to use this file:
 Every change in this phase is a migration file, applied to `development` first.
 Exact columns are decided at the start of each step.
 
-- [ ] **2.1 Link the CLI and write the first migration: `practices`**
+- [x] **2.1 Link the CLI and write the first migration: `practices`**
   - Learn: what a migration is; `supabase link`, `migration new`, `db push`; uuid primary keys
   - Check: the `practices` table exists in development; the migration file is committed
 

@@ -38,8 +38,9 @@ npm test               # Vitest (scoring + script wording)
 npm run typecheck      # tsc -b --noEmit (checks src/ and vite.config.ts)
 npm run lint           # ESLint
 npm run audio          # build audio clips from each test's script.json
-npx supabase migration new <name>   # new migration file
-npx supabase db push                # apply migrations to the linked project
+npx supabase migration new <name>      # new migration file
+npx supabase db push --remote          # apply migrations to the linked project (without --remote, CLI v3 targets local Docker)
+npx supabase migration list --remote   # compare local migration files with the linked project
 npx supabase functions deploy <name>
 ```
 
