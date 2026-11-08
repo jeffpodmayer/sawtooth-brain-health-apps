@@ -11,7 +11,6 @@ export type TimedPart = "partA" | "partB";
 export type LoggedClick = {
   timeMs: number;
   circle: string | null;
-  duringVoice: boolean;
 };
 
 export type GivenPartScore = {
@@ -54,7 +53,7 @@ export function scorePart(
   let endClickMs: number | null = null;
 
   for (const click of clicks) {
-    if (click.circle === null || click.duringVoice || click.timeMs > cutoffMs) {
+    if (click.circle === null || click.timeMs > cutoffMs) {
       continue;
     }
 

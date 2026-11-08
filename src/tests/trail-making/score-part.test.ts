@@ -2,8 +2,8 @@ import { describe, expect, it } from "vitest";
 import { expectedOrder } from "./order";
 import { scorePart, type LoggedClick } from "./score-part";
 
-function click(timeMs: number, circle: string | null, duringVoice = false): LoggedClick {
-  return { timeMs, circle, duringVoice };
+function click(timeMs: number, circle: string | null): LoggedClick {
+  return { timeMs, circle };
 }
 
 // The first `count` circles of a part, clicked correctly one second apart.
@@ -47,8 +47,8 @@ describe("scorePart", () => {
     expect(scorePart("partA", clicks, 2000).errors).toBe(0);
   });
 
-  it("skips clicks outside a circle and during the voice", () => {
-    const clicks = [click(1000, null), click(2000, "9", true), click(3000, "1")];
+  it("skips clicks outside a circle", () => {
+    const clicks = [click(1000, null), click(3000, "1")];
     const score = scorePart("partA", clicks, 4000);
     expect(score.errors).toBe(0);
     expect(score.correctClicks).toBe(1);

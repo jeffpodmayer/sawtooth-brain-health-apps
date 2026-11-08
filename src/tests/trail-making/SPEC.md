@@ -198,7 +198,9 @@ test ended before its outcome was known. A `notGiven` part has only `status` and
 
 - **Click log** for each timed part: time (ms from "Begin."), position on the page,
   which circle (if any), and the outcome: correct, error, or ignored (outside a
-  circle, double-click, during the voice).
+  circle, double-click). Clicks during the voice are blocked and not logged.
+- **Stop time:** if the clinician stopped a timed part, ms from "Begin." to the
+  stop, so the server can re-score the partial result.
 - **Pointer movement** during timed parts, sampled about 20 times a second (T13).
 - **Audio log:** when each clip started and ended.
 - **Screen:** screen size, page scale, browser name and version.
@@ -211,6 +213,8 @@ test ended before its outcome was known. A `notGiven` part has only `status` and
 - The voice stops, clicking stops and the current part is marked `stopped` with
   its partial counts and elapsed time.
 - If the stop comes during a sample, that part is `notGiven`.
+- If the stop comes during a timed part's instructions, before the timer starts,
+  that part is `notGiven`.
 - Parts not yet reached are `notGiven`.
 - The stop reason (Gave up, Interrupted, Alphabet check not passed) is saved.
 - The sheet is saved as it stood. The partial result goes through the shared stop hook.

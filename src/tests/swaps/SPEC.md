@@ -217,6 +217,8 @@ in each box is the one scored.
 - **Answer log** for the test and recall: every number click, with box or symbol, number
   and time from the start of that part. Kept for review and server re-scoring only; no
   per-answer timing goes into `scores` (S18).
+- **Stop time:** if the clinician stopped the test or recall, ms from the start of
+  that part to the stop, so the server can re-score the partial result.
 - **Final answers** for all 75 test boxes and the 7 recall symbols.
 - **Audio log:** when each clip started and ended.
 - **Screen:** screen size, page scale, browser name and version.
@@ -227,9 +229,12 @@ in each box is the one scored.
 
 ## Stopped by the clinician
 
-- **During the introduction, demo or practice:** test and recall are `notGiven`.
+- **During the introduction, demo, practice or test instructions (before the timer
+  starts):** test and recall are `notGiven`.
 - **During the test:** the test is `stopped` with its partial counts and elapsed time;
   recall is `notGiven`.
+- **During the recall instruction (before its timer starts):** the test result
+  stands; recall is `notGiven`.
 - **During recall:** the test result stands; recall is `stopped` with the answers so far.
 - The voice stops, answering stops, the stop reason is saved, and the sheet is saved as
   it stood. The partial result goes through the shared stop hook.

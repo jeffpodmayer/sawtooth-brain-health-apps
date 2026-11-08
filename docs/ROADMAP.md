@@ -320,6 +320,7 @@ or the seed file.
   - Learn: checking a token on the server; re-scoring on the server with the same scoring code
   - Check: a result saves to the right sequence; a result with an edited score is rejected or flagged; a result for someone else's token is refused
   - Note: add a database rule so a saved result can't be overwritten and a closed sequence can't reopen (ADR-008), and require `completed_at` to be on or after `started_at` (Phase 2 code review)
+  - Note: add `.ts` to the scoring modules' relative imports so Deno can load them, and reject logs with negative or invalid times (Phase 3 code review)
 
 - [ ] **7.6 Upload the sheet**
   - Learn: uploading to Storage through an Edge Function
@@ -385,6 +386,7 @@ see their own practice.
   - Learn: recording an action with who did it and why
   - Check: "End current test" and "End whole sequence" both require a reason (Gave up / Interrupted); the action saves with the clinician's ID
   - Note: a stop must be saved before the client's partial result arrives, so the status check (9.3) has something to read. `sequence_tests` doesn't allow that yet; add a stop-request state by migration (Phase 2 code review)
+  - Note: a test only learns that it was stopped, not why, so Trail Making can't yet record Part B as `notGiven` with code 997. Settle how once the clinicians confirm the alphabet check (Phase 3 code review)
 
 - [ ] **9.2 Real-time stop to the client's tab**
   - Learn: Supabase real-time channels; letting a client listen without letting it read tables (approach decided at the start of this step)
