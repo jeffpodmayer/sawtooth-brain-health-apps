@@ -218,8 +218,8 @@ Steps 5.7 and 5.8 need the clinicians' answers on the wording conflicts (see the
   - Check: no instruction text on any page; arrows appear after the matching words; circles can't be clicked while the voice speaks; the timer starts when "Begin." ends; no replay button
 
 - [ ] **5.7 Instructions from `script.json`**
-  - Learn: running a script line by line (spoken lines play and show text; action lines trigger arrows)
-  - Check: wording on screen matches the script exactly; the timer starts at the agreed clip end; no replay button
+  - Learn: running a script line by line (spoken lines play; action lines trigger arrows)
+  - Check: lines play in script order, with no instruction text on screen; the timer starts at the agreed clip end; no replay button
 
 - [ ] **5.8 Practice rounds**
   - Learn: a small state machine (instructions → practice → test)
@@ -267,7 +267,7 @@ the stop wording and the recall instruction (see the brief).
 
 - [ ] **6.5 Demo animation**
   - Learn: syncing animation steps with clip endings
-  - Check: arrows, highlighted boxes and numbers filling in line up with each spoken demo line; demo text on screen follows the clinicians' answer
+  - Check: arrows, highlighted boxes and numbers filling in line up with each spoken demo line; no demo text on screen
 
 - [ ] **6.6 Practice items**
   - Learn: reusing test behavior with feedback added

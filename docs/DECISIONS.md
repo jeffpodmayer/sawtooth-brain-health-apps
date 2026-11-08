@@ -124,7 +124,7 @@ to try the app without real data.
 
 ## ADR-006: Exact script wording, pre-generated audio
 
-- **Status:** Accepted · **Date:** 2026-11-05 · Development voice changed by ADR-029
+- **Status:** Accepted · **Date:** 2026-11-05 · Development voice changed by ADR-029 · On-screen instructions changed by ADR-030
 
 **Context:** Published norms assume the standard instructions. A voice that
 differs between computers, or paraphrased wording, would make results less comparable.
@@ -702,3 +702,27 @@ voices through the API.
 - Pronunciation hints (roadmap 4.5) must be re-checked on the final voice.
 - Development clips aren't final and never go to real clients.
 - ElevenLabs says default voices expire on December 31, 2026. After that, regenerating development clips may need a different placeholder voice.
+
+## ADR-030: Test instructions are voice only
+
+- **Status:** Accepted, clinicians not yet asked · **Date:** 2026-11-08 · Changes the on-screen instructions in ADR-006
+
+**Context:** ADR-006 says instructions are spoken and shown on screen, as the
+clinicians asked in the planning meeting. Both SPECs were later written as voice
+only, with arrows and highlighted boxes showing what the voice means. Roadmap 5.6
+and 5.7 disagreed. The clinicians haven't answered this question yet.
+
+**Decision:**
+
+- Inside Trail Making and SWAPS, instructions are spoken only. No instruction or
+  demo text appears on screen.
+- `script.json` remains the source of the exact wording for the audio.
+- Screens around the tests, such as the sound check, can still show text.
+
+**Consequences:**
+
+- Build Phases 5 and 6 as voice only. The question stays open in both SPECs.
+- If the clinicians want text on screen, 5.7 and 6.5 change, and each screen
+  needs room for it.
+- A client who misses a spoken instruction has no text to fall back on, since
+  instructions can't be replayed. Raise this when the clinicians are asked.
