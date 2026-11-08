@@ -3,7 +3,7 @@
 The build, broken into small steps. Each step is about one session and teaches
 one thing. Tick a box only when its "Check" passes.
 
-**Current step:** 4.7
+**Current step:** 4.8
 
 How to use this file:
 
@@ -176,7 +176,7 @@ The voice is a core feature. Build it early and check Safari early.
   - Learn: Howler.js preloading; using a clip's end to trigger the next step
   - Check: a demo page plays three clips back to back, each starting when the last one ends
 
-- [ ] **4.7 First click and sound check**
+- [x] **4.7 First click and sound check**
   - Learn: why browsers block sound until a click; unlocking audio
   - Check: the "Can you hear this?" screen works in Chrome and Safari after one click
 

@@ -1,0 +1,18 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`script.json matches the approved copy 1`] = `
+{
+  "scriptVersion": "0.1.0",
+  "sections": {
+    "check": [
+      {
+        "id": "sc-01",
+        "text": "Can you hear this?",
+        "type": "spoken",
+      },
+    ],
+  },
+  "source": "App wording for the client's sound check. Not official test wording.",
+  "testId": "sound-check",
+}
+`;

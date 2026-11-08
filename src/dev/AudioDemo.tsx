@@ -1,11 +1,13 @@
 import { useState } from "react";
 import { createAudioPlayer } from "../shared/audio-player";
+import SoundCheck from "../client/sound-check/SoundCheck";
 
 const lineIds = ["sa-01", "sa-02", "sa-03"];
 const player = createAudioPlayer("trail-making", lineIds);
 
 function AudioDemo() {
   const [current, setCurrent] = useState<string | null>(null);
+  const [heard, setHeard] = useState(false);
 
   async function playAll() {
     await player.ready;
@@ -15,6 +17,8 @@ function AudioDemo() {
     }
     setCurrent(null);
   }
+
+  if (!heard) return <SoundCheck onHeard={() => setHeard(true)} />;
 
   return (
     <main className="mx-auto max-w-2xl p-8">

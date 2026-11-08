@@ -1,0 +1,10 @@
+{
+  "testId": "sound-check",
+  "scriptVersion": "0.1.0",
+  "source": "App wording for the client's sound check. Not official test wording.",
+  "sections": {
+    "check": [
+      { "id": "sc-01", "type": "spoken", "text": "Can you hear this?" }
+    ]
+  }
+}
