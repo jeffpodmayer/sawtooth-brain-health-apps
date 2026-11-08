@@ -3,7 +3,7 @@
 The build, broken into small steps. Each step is about one session and teaches
 one thing. Tick a box only when its "Check" passes.
 
-**Current step:** 4.3
+**Current step:** 4.4
 
 How to use this file:
 
@@ -160,7 +160,7 @@ The voice is a core feature. Build it early and check Safari early.
   - Learn: describing a file's shape with a type and rejecting bad files
   - Check: both tests' `script.json` files load; a line with a missing ID or an unknown type ("spoken"/"action") is rejected
 
-- [ ] **4.3 Generate one clip**
+- [x] **4.3 Generate one clip**
   - Learn: calling a text-to-speech API from a Node script; saving an audio file
   - Check: `npm run audio` turns one spoken line into `public/audio/<test-name>/<line-id>.mp3`, and it plays
 

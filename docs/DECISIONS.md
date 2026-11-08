@@ -690,7 +690,7 @@ voices through the API.
 
 **Decision:**
 
-- Development clips use a free ElevenLabs voice, "Brian" (`ByWUwXA3MMLREYmxtB32`).
+- Development clips use a free ElevenLabs default voice, "Adam" (`pNInz6obpgDQGcFmaJgB`).
 - "Justin Time" stays the planned final voice, generated in the paid month
   (roadmap 12.3).
 - The service and voice ID are set in `scripts/audio-settings.ts`, committed to
@@ -701,3 +701,4 @@ voices through the API.
 - Changing the voice is a one-line edit, but every clip must be regenerated.
 - Pronunciation hints (roadmap 4.5) must be re-checked on the final voice.
 - Development clips aren't final and never go to real clients.
+- ElevenLabs says default voices expire on December 31, 2026. After that, regenerating development clips may need a different placeholder voice.

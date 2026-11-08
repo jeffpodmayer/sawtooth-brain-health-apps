@@ -3,5 +3,7 @@
 
 export const audioSettings = {
   service: "elevenlabs",
-  voiceId: "ByWUwXA3MMLREYmxtB32",
+  voiceId: "pNInz6obpgDQGcFmaJgB",
+  modelId: "eleven_multilingual_v2",
+  outputFormat: "mp3_44100_128",
 } as const;

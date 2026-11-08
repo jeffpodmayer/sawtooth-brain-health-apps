@@ -9,6 +9,7 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "test": "vitest run",
+    "audio": "node --env-file=.env.local scripts/build-audio.ts",
     "typecheck": "tsc -b --noEmit"
   },
   "dependencies": {
