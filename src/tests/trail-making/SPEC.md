@@ -146,6 +146,8 @@ samples and the timed parts:
 - **Stop:** the correct click on the End circle (25 in Part A, 13 in Part B).
 - **Time limit:** at 150 s (Part A) or 300 s (Part B), clicking stops, the time is
   recorded as the limit and the part is marked timed out (T5). The test moves on.
+- **Nothing counts after the limit or a stop.** A click logged after either isn't
+  scored, even if the browser's timer fired a moment late.
 - Times are stored in milliseconds. Reporting format is in "Scoring."
 - Samples are untimed. No timer or countdown is ever shown (T4).
 
@@ -184,12 +186,13 @@ such as B minus A (T11).
 | `status`        | `completed`, `timedOut`, `stopped` or `notGiven`                                                 |
 | `code`          | `996` or `997` when not given for those reasons, otherwise empty                                 |
 | `timeMs`        | Start ("Begin." ends) to the End-circle click. Time limit if timed out. Elapsed time if stopped. |
-| `timeSeconds`   | ⏳ `timeMs` in whole seconds, as on the NACC form                                                |
+| `timeSeconds`   | ⏳ `timeMs` in seconds, to the nearest tenth (e.g. 28.3)                                         |
 | `correctLines`  | Correct connections made, 0–24 (NACC score)                                                      |
 | `correctClicks` | Correct circle clicks including circle 1, 0–25 (T12)                                             |
 | `errors`        | Error clicks (commission errors). Ignored clicks don't count.                                    |
 
-Plus, per sample: `passed` (yes/no) and `tries` (1–3).
+Plus, per sample: `passed` (yes/no) and `tries` (1–3). A sample is empty (null) if the
+test ended before its outcome was known. A `notGiven` part has only `status` and `code`.
 
 ## Recording (`rawData`)
 
@@ -247,7 +250,8 @@ Plus, per sample: `passed` (yes/no) and `tries` (1–3).
 8. Will you do the alphabet check on the video call before the test? If the client
    doesn't pass, you'd end the test after Part A with "Alphabet check not passed."
 9. Do you want codes 996 and 997 in the results and the CSV?
-10. Report time in whole seconds, like the NACC form, or tenths of a second?
+10. Report time in whole seconds, like the NACC form, or tenths of a second? (Working
+    answer: tenths.)
 11. Which norms will you use? They come from paper testing (see below).
 
 ## Digital vs. paper: what may change

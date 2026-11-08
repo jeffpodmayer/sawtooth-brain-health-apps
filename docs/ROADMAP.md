@@ -3,7 +3,7 @@
 The build, broken into small steps. Each step is about one session and teaches
 one thing. Tick a box only when its "Check" passes.
 
-**Current step:** 3.5
+**Current step:** 3.6
 
 How to use this file:
 
@@ -125,7 +125,7 @@ the code. Edge cases come from each test's SPEC.md.
   - Learn: writing tests first from a list of rules; one function, one job
   - Check: tests pass for a correct click, a wrong circle, an out-of-order circle, re-clicking the last correct circle (ignored) and a click after the end
 
-- [ ] **3.5 Trail Making: the result from a click log**
+- [x] **3.5 Trail Making: the result from a click log**
   - Learn: turning a list of events into a score; handling "finished", "timed out" and "stopped"
   - Check: tests pass for a full run, a timeout (records the max time: 150 s A, 300 s B) and a clinician stop (partial score kept)
   - Note: write Trail Making's own score type here, in its test folder, then check `partA`, `partB`, `sampleA` and `sampleB` in `seed.sql` against it (decided at 3.1)
