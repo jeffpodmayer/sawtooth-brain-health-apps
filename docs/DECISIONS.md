@@ -629,3 +629,26 @@ A reset deletes every login but leaves storage buckets and files in place.
 - Anyone with the development project's address and publishable key could sign
   in and change fake data. Never reuse this password or seed on production.
 - Once a migration has reached production, it is no longer edited.
+
+## ADR-027: Table permissions are explicit
+
+- **Status:** Accepted · **Date:** 2026-11-08
+
+**Context:** Supabase's default setting gives `anon` and `authenticated` full
+access to new tables, leaving RLS as the only protection. The Phase 2 code review
+found the grants written in 2.7 had no effect, on either project.
+
+**Decision:**
+
+- `anon` has no access to any table. `authenticated` gets only the access listed
+  in the migrations, which RLS then limits to the clinician's own practice.
+- `service_role` (Edge Functions) keeps full access.
+- New tables start closed to the browser roles. Any table the dashboard needs
+  must grant it in its own migration.
+- Clinicians can set only `practice_id` and `code` when adding a client.
+
+**Consequences:**
+
+- A forgotten grant shows up as "permission denied", not as exposed data.
+- This doesn't depend on the "expose new tables" project setting, for tables
+  created by migrations.
