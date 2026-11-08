@@ -262,8 +262,8 @@ in each box is the one scored.
    wrong. (In the meeting it was untimed, with every symbol answered.) OK?
 5. The script says "until I tell you to stop," but at 60 seconds the app just moves on,
    with no "Stop." OK, or would you like a spoken "Stop."?
-6. If a client changes a wrong answer to the right one, the final (right) answer counts
-   toward the score, and one correction is recorded. OK?
+6. Answered 2026-11-08: if a client changes an answer, only the final answer is
+   scored, a corrected answer isn't an error, and every correction is recorded.
 7. Which norms will you use? They come from paper testing (see below).
 
 ## Digital vs. paper: what may change
