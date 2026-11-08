@@ -523,3 +523,24 @@ database change is a migration, but development also needs a few rows to test wi
 - "Who did this" always points to a real clinician, even after they leave.
 - Removing a clinician completely needs a deliberate cleanup, never one click.
 - Rows added in development by hand are recreated by the seed file in 2.9.
+
+## ADR-023: Foreign keys stay inside one practice
+
+- **Status:** Accepted · **Date:** 2026-11-07
+
+**Context:** A plain foreign key only checks that a row exists, not that it
+belongs to the same practice. Edge Functions use the secret key and skip RLS,
+so RLS can't catch a sequence pointing at another practice's client.
+
+**Decision:**
+
+- A foreign key to a table that has `practice_id` includes `practice_id`:
+  e.g. `foreign key (client_id, practice_id) references clients (id, practice_id)`.
+- The table pointed at gets `unique (id, practice_id)`, named
+  `<table>_id_practice_id_key`, so the key has something to point at.
+- Plain foreign keys remain for `practices` itself and for `auth.users`.
+
+**Consequences:**
+
+- The database rejects cross-practice links, whatever code wrote them.
+- Each new table repeats the pattern, which adds a few lines per table.

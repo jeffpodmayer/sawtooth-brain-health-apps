@@ -3,7 +3,7 @@
 The build, broken into small steps. Each step is about one session and teaches
 one thing. Tick a box only when its "Check" passes.
 
-**Current step:** 2.4
+**Current step:** 2.5
 
 How to use this file:
 
@@ -70,7 +70,7 @@ Exact columns are decided at the start of each step.
   - Learn: a unique rule across two columns (`practice_id` + client code)
   - Check: a duplicate client code in the same practice is rejected; the same code in another practice is allowed
 
-- [ ] **2.4 Sequences**
+- [x] **2.4 Sequences**
   - Learn: generating link tokens nobody can guess; limiting a status column to set values
   - Check: link tokens are unique across the whole app; an unknown status value is rejected
 
@@ -297,6 +297,7 @@ or the seed file.
 - [ ] **7.1 First Edge Function: check a link**
   - Learn: Edge Functions (Deno); using the secret key safely on the server; CORS
   - Check: a valid token returns the practice name and the tests to run; an unknown, completed or discontinued token is refused; nothing else about the client is returned
+  - Note: decide with the clinicians what happens if a client reopens a link partway (ADR-005 leaves interruptions out of scope); results saved so far are in 2.5's table
 
 - [ ] **7.2 The client's first screen**
   - Learn: the `/t/<link-token>` route; going full screen from a click
