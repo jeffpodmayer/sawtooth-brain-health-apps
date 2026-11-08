@@ -3,7 +3,7 @@
 The build, broken into small steps. Each step is about one session and teaches
 one thing. Tick a box only when its "Check" passes.
 
-**Current step:** 2.9
+**Current step:** 2.10
 
 How to use this file:
 
@@ -90,7 +90,7 @@ Exact columns are decided at the start of each step.
   - Learn: Supabase Storage buckets; storage rules by `<practice_id>/` folder
   - Check: a clinician can't read or upload a file in another practice's folder
 
-- [ ] **2.9 Seed data for development**
+- [x] **2.9 Seed data for development**
   - Learn: `seed.sql`; resetting a database
   - Check: resetting development fills fake clients and results; nothing in the seed looks like a real person
 

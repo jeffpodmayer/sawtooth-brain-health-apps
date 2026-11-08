@@ -601,3 +601,31 @@ contain a client's name by mistake.
 - Unlike results (ADR-008), a note's earlier wording can't be recovered.
   Raise this in the legal review (12.1).
 - A deleted note is gone for good, with no record it existed.
+
+## ADR-026: Development seed and resets
+
+- **Status:** Accepted · **Date:** 2026-11-08
+
+**Context:** Roadmap 2.9 replaces the hand-made development rows with `seed.sql`.
+A reset deletes every login but leaves storage buckets and files in place.
+
+**Decision:**
+
+- The seed creates its own logins, all fake (`@example.com`). No real email goes
+  in the seed, and development sign-ins use these logins.
+- The three logins share one readable password, `fake-dev-password`, committed in
+  the seed. Accepted because development holds fake data only.
+- The development project's id stays out of the repo. Resets name it explicitly
+  (`--remote=<ref>`), so a reset can't follow the CLI's link to production.
+- The two practices keep fixed ids, so sheet files stay in the right folders.
+- Migrations must replay on a reset. The sheets bucket insert was changed to
+  `on conflict (id) do nothing` after being applied to development, before it
+  reached production.
+
+**Consequences:**
+
+- A reset removes any login or row added by hand, including clinicians' logins
+  added in 8.2. Add anything that must survive to the seed.
+- Anyone with the development project's address and publishable key could sign
+  in and change fake data. Never reuse this password or seed on production.
+- Once a migration has reached production, it is no longer edited.
