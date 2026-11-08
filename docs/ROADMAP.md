@@ -3,7 +3,7 @@
 The build, broken into small steps. Each step is about one session and teaches
 one thing. Tick a box only when its "Check" passes.
 
-**Current step:** 4.8
+**Current step:** 4.9
 
 How to use this file:
 
@@ -180,7 +180,7 @@ The voice is a core feature. Build it early and check Safari early.
   - Learn: why browsers block sound until a click; unlocking audio
   - Check: the "Can you hear this?" screen works in Chrome and Safari after one click
 
-- [ ] **4.8 Placeholder voice and missing-clip check**
+- [x] **4.8 Placeholder voice and missing-clip check**
   - Learn: falling back to the browser's voice in development only; failing a build on purpose
   - Check: in development a missing clip uses the browser voice; a production build fails if any clip is missing
 

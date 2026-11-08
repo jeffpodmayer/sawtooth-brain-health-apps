@@ -2,9 +2,10 @@
 
 import { useState } from "react";
 import { createAudioPlayer } from "../../shared/audio-player";
+import type { SpokenLine } from "../../shared/test-script";
 import script from "./script.json";
 
-const line = script.sections.check[0];
+const line = script.sections.check[0] as SpokenLine;
 const buttonClass =
   "h-14 rounded-lg bg-accent px-8 font-bold text-white focus-visible:outline-4 focus-visible:outline-offset-4 focus-visible:outline-accent disabled:opacity-50";
 
@@ -16,7 +17,7 @@ type SoundCheckProps = {
 };
 
 function SoundCheck({ onHeard }: SoundCheckProps) {
-  const [player] = useState(() => createAudioPlayer("sound-check", [line.id]));
+  const [player] = useState(() => createAudioPlayer("sound-check", [line]));
   const [started, setStarted] = useState(false);
   const [playing, setPlaying] = useState(false);
 

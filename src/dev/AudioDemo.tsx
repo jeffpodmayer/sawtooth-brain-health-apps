@@ -1,9 +1,14 @@
 import { useState } from "react";
 import { createAudioPlayer } from "../shared/audio-player";
+import { checkScript, type SpokenLine } from "../shared/test-script";
+import script from "../tests/trail-making/script.json";
 import SoundCheck from "../client/sound-check/SoundCheck";
 
 const lineIds = ["sa-01", "sa-02", "sa-03"];
-const player = createAudioPlayer("trail-making", lineIds);
+const lines = Object.values(checkScript(script).sections)
+  .flat()
+  .filter((line): line is SpokenLine => lineIds.includes(line.id));
+const player = createAudioPlayer("trail-making", lines);
 
 function AudioDemo() {
   const [current, setCurrent] = useState<string | null>(null);
