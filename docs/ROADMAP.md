@@ -3,7 +3,7 @@
 The build, broken into small steps. Each step is about one session and teaches
 one thing. Tick a box only when its "Check" passes.
 
-**Current step:** 3.3
+**Current step:** 3.4
 
 How to use this file:
 
@@ -117,7 +117,7 @@ the code. Edge cases come from each test's SPEC.md.
   - Learn: wrapping `performance.now()` so tests can pass in fixed times
   - Check: a test runs with a fake clock and gets the same answer every time
 
-- [ ] **3.3 Trail Making: the expected order**
+- [x] **3.3 Trail Making: the expected order**
   - Learn: keeping test data (orders, labels) separate from logic
   - Check: tests confirm Part A is 1–25 and Part B is 1-A-2-B … 13; samples are 1–8 and 1-A … 4-D
 
