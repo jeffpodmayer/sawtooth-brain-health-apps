@@ -419,3 +419,29 @@ has separate Production and Preview variables, which match ADR-004 directly.
 - Other branches don't deploy. Add them under Branch control if ever needed.
 - Changing a variable needs a new build to take effect (`VITE_` values are
   built in).
+
+## ADR-019: Cloudflare Access on the preview
+
+- **Status:** Accepted · **Date:** 2026-11-07
+
+**Context:** ADR-004 says the preview address is locked with Cloudflare Access,
+but not who is let in or how it's set up. Pages previews are public by default.
+
+**Decision:**
+
+- Turned on from the Pages project: Settings → General → Preview access →
+  Restrict previews. This made a Zero Trust Access application covering
+  `*.sawtooth-assessments.pages.dev` (the `dev` preview and one-off build links).
+- Production (`sawtooth-assessments.pages.dev`) is not covered and stays
+  public, since clients reach it without logging in.
+- One Allow policy, matching listed email addresses. Only Jeff's email is on it
+  for now. Visitors sign in with a one-time code sent by email.
+- Zero Trust is on the Free plan (up to 50 users). The team name,
+  `sawtooth-assessments-pages`, was set automatically.
+- Clinicians' emails are added to the policy at roadmap 5.12, not before.
+
+**Consequences:**
+
+- Anyone new who needs the preview must be added to the policy in Zero Trust.
+- When the custom domain is added (Phase 11), check it's managed separately
+  and the preview lock is unchanged.

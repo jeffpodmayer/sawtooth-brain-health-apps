@@ -3,7 +3,7 @@
 The build, broken into small steps. Each step is about one session and teaches
 one thing. Tick a box only when its "Check" passes.
 
-**Current step:** 1.9
+**Current step:** 2.1 (first: the end-of-Phase-1 merge of `dev` into `main`)
 
 How to use this file:
 
@@ -49,7 +49,7 @@ How to use this file:
   - Check: a push to `dev` updates the preview address (development settings); `main` deploys, and the production variables are set in Cloudflare
   - Note: `main` first shows the production URL after the end-of-phase merge (after 1.9, ADR-014)
 
-- [ ] **1.9 Lock the preview address**
+- [x] **1.9 Lock the preview address**
   - Learn: Cloudflare Access; why preview links are public by default
   - Check: opening the preview in a private window asks for a login
 
@@ -237,6 +237,7 @@ Steps 5.7 and 5.8 need the clinicians' answers on the wording conflicts (see the
 - [ ] **5.12 Clinician look on the preview**
   - Learn: running a feedback round
   - Check: each clinician has tried it in at least one browser; feedback is in the running list
+  - Note: first add each clinician's email to the preview's Cloudflare Access policy (only Jeff's is on it, see 1.9)
 
 ## Phase 6 — SWAPS test
 
