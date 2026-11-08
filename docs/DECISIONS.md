@@ -592,7 +592,7 @@ contain a client's name by mistake.
 
 **Decision:**
 
-- A test can have many notes. A clinician can edit their own (enforced in 2.7).
+- A test can have many notes. A clinician can edit or delete their own (enforced in 2.7).
 - Editing overwrites the earlier wording. No history is kept for the MVP.
 - The author and original time can't change (database trigger).
 
@@ -600,3 +600,4 @@ contain a client's name by mistake.
 
 - Unlike results (ADR-008), a note's earlier wording can't be recovered.
   Raise this in the legal review (12.1).
+- A deleted note is gone for good, with no record it existed.

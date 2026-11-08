@@ -3,7 +3,7 @@
 The build, broken into small steps. Each step is about one session and teaches
 one thing. Tick a box only when its "Check" passes.
 
-**Current step:** 2.7
+**Current step:** 2.8
 
 How to use this file:
 
@@ -82,7 +82,7 @@ Exact columns are decided at the start of each step.
   - Learn: recording who did what and when (clinician id + timestamp)
   - Check: a note saves with the clinician who wrote it
 
-- [ ] **2.7 Row-level security**
+- [x] **2.7 Row-level security**
   - Learn: how RLS policies work; a helper function that returns the signed-in clinician's practice
   - Check: with a second fake practice, its clinician sees zero Sawtooth rows; a signed-out user sees nothing in any table
 
