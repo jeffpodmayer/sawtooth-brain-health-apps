@@ -3,7 +3,7 @@
 The build, broken into small steps. Each step is about one session and teaches
 one thing. Tick a box only when its "Check" passes.
 
-**Current step:** 3.4
+**Current step:** 3.5
 
 How to use this file:
 
@@ -121,7 +121,7 @@ the code. Edge cases come from each test's SPEC.md.
   - Learn: keeping test data (orders, labels) separate from logic
   - Check: tests confirm Part A is 1–25 and Part B is 1-A-2-B … 13; samples are 1–8 and 1-A … 4-D
 
-- [ ] **3.4 Trail Making: judging each click**
+- [x] **3.4 Trail Making: judging each click**
   - Learn: writing tests first from a list of rules; one function, one job
   - Check: tests pass for a correct click, a wrong circle, an out-of-order circle, re-clicking the last correct circle (ignored) and a click after the end
 

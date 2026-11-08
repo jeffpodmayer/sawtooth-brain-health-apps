@@ -138,6 +138,7 @@ samples and the timed parts:
 - **Clicking the last correct circle again** is ignored (treated as a double-click).
 - **Clicking a circle already connected earlier** is an error.
 - **Clicks outside every circle** do nothing.
+- **Clicks after the End circle** are ignored. The part is already over.
 
 ## Timing
 
