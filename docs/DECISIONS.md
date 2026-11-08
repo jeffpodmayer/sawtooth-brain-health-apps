@@ -445,3 +445,27 @@ but not who is let in or how it's set up. Pages previews are public by default.
 - Anyone new who needs the preview must be added to the policy in Zero Trust.
 - When the custom domain is added (Phase 11), check it's managed separately
   and the preview lock is unchanged.
+
+## ADR-020: Code review before main, and working on dev
+
+- **Status:** Accepted · **Date:** 2026-11-07
+
+**Context:** ADR-014 sets when `dev` is merged into `main`, but not how the
+merge is done, whether it's reviewed, or whether work happens on other branches.
+
+**Decision:**
+
+- Merges into `main` are fast-forward only (`git merge --ff-only dev`), so
+  `main` and `dev` share the same history. No merge commits.
+- Phase merges that change code get a code review first (e.g. `/code-review`
+  on `main...dev`). Fix or accept each finding before merging. Doc-only
+  merges skip the review. The first reviewed merge is the end of Phase 2.
+- Work happens directly on `dev`. A branch off `dev` is used only for an
+  experimental step that might be thrown away. Never branch off `main` to build.
+
+**Consequences:**
+
+- The release routine becomes: test on `dev` → code review → apply migrations
+  to production → merge `dev` into `main`.
+- Revisit branches and pull requests when another developer joins or
+  automated checks (Playwright + GitHub Actions, ADR-011) are added.
