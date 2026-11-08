@@ -3,7 +3,7 @@
 The build, broken into small steps. Each step is about one session and teaches
 one thing. Tick a box only when its "Check" passes.
 
-**Current step:** 3.2
+**Current step:** 3.3
 
 How to use this file:
 
@@ -113,7 +113,7 @@ the code. Edge cases come from each test's SPEC.md.
   - Learn: TypeScript types and interfaces; the plug-in contract as code
   - Check: `src/shared/` has the test module and result types from CLAUDE.md; `npm run typecheck` passes
 
-- [ ] **3.2 A clock you can fake**
+- [x] **3.2 A clock you can fake**
   - Learn: wrapping `performance.now()` so tests can pass in fixed times
   - Check: a test runs with a fake clock and gets the same answer every time
 
