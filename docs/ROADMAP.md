@@ -3,7 +3,7 @@
 The build, broken into small steps. Each step is about one session and teaches
 one thing. Tick a box only when its "Check" passes.
 
-**Current step:** 2.1 (first: the end-of-Phase-1 merge of `dev` into `main`)
+**Current step:** 2.1
 
 How to use this file:
 
