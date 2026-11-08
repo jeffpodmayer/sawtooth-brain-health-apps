@@ -3,7 +3,7 @@
 The build, broken into small steps. Each step is about one session and teaches
 one thing. Tick a box only when its "Check" passes.
 
-**Current step:** 4.4
+**Current step:** 4.5
 
 How to use this file:
 
@@ -164,7 +164,7 @@ The voice is a core feature. Build it early and check Safari early.
   - Learn: calling a text-to-speech API from a Node script; saving an audio file
   - Check: `npm run audio` turns one spoken line into `public/audio/<test-name>/<line-id>.mp3`, and it plays
 
-- [ ] **4.4 Only regenerate changed lines**
+- [x] **4.4 Only regenerate changed lines**
   - Learn: content hashes and a manifest file
   - Check: a second run makes zero API calls; editing one line regenerates only that clip
 
