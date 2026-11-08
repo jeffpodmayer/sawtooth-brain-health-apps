@@ -42,6 +42,7 @@ npx supabase migration new <name>      # new migration file
 npx supabase db push --remote          # apply migrations to the linked project (without --remote, CLI v3 targets local Docker)
 npx supabase migration list --remote   # compare local migration files with the linked project
 npx supabase db reset --remote=<development-ref>   # wipe development, rebuild it and load seed.sql; deletes all logins. Development only.
+npx supabase db push --remote=<production-ref>   # apply migrations to production (the CLI stays linked to development; preview first with --dry-run)
 npx supabase functions deploy <name>
 ```
 

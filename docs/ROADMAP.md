@@ -3,7 +3,7 @@
 The build, broken into small steps. Each step is about one session and teaches
 one thing. Tick a box only when its "Check" passes.
 
-**Current step:** 2.10
+**Current step:** 3.1
 
 How to use this file:
 
@@ -94,13 +94,14 @@ Exact columns are decided at the start of each step.
   - Learn: `seed.sql`; resetting a database
   - Check: resetting development fills fake clients and results; nothing in the seed looks like a real person
 
-- [ ] **2.10 Apply the migrations to production**
+- [x] **2.10 Apply the migrations to production**
   - Learn: switching the CLI between projects; the release routine
   - Check: `supabase migration list --remote` matches on both projects; production has no seed data
 
 - [ ] **2.11 (Optional) Local Supabase with Docker**
   - Learn: running Supabase on your own computer; testing migrations without touching the cloud
   - Check: `supabase start` runs; migrations and seed apply locally
+  - Note: skipped by choice (2026-11-08). Development resets already test migrations from scratch, so Docker isn't needed.
 
 ## Phase 3 — Scoring logic with tests
 
