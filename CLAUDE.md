@@ -35,6 +35,7 @@ depends on it.
 npm run dev            # local dev server
 npm run build          # production build
 npm test               # Vitest (scoring + script wording)
+npm test -- -u         # approve a script.json change (updates the saved copies; review the .snap diff in git)
 npm run typecheck      # tsc -b --noEmit (checks src/ and vite.config.ts)
 npm run lint           # ESLint
 npm run audio          # build audio clips from each test's script.json

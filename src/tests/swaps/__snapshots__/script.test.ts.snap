@@ -1,0 +1,359 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`script.json matches the approved copy 1`] = `
+{
+  "adaptations": [
+    {
+      "appText": "This number goes with this symbol.",
+      "basedOn": "Demo lines: 'This number (point to the number inside symbol) goes with this symbol, so I would put it here like this.'",
+      "change": "add",
+      "id": "SW1",
+      "status": "pending",
+    },
+    {
+      "appText": "Fill in the numbers",
+      "change": "replace",
+      "id": "SW2",
+      "sourceText": "Write in the numbers",
+      "status": "pending",
+    },
+  ],
+  "notes": [
+    "Spoken lines are played in order; each line is one audio clip named by its id.",
+    "Joining a section's spoken lines with single spaces gives the source wording, minus the adaptations listed below.",
+    "An arrow replaces the previous arrow. A highlight stays until the next highlight or until input is enabled.",
+    "Targets: item:N is grid item N (1-81, left to right, top to bottom); key:<symbol> is the number inside that symbol in the key; row:N is a visible grid row; recall:<symbol> is a recall symbol.",
+    "The recall form's final colon is spoken as a full stop (punctuation only).",
+  ],
+  "scriptVersion": "0.1.0",
+  "sections": {
+    "demo": [
+      {
+        "action": "highlight",
+        "id": "de-01",
+        "target": "item:1",
+        "type": "action",
+      },
+      {
+        "id": "de-02",
+        "text": "Here is a symbol.",
+        "type": "spoken",
+      },
+      {
+        "action": "arrow",
+        "id": "de-03",
+        "target": "item:1",
+        "type": "action",
+      },
+      {
+        "id": "de-04",
+        "text": "This number",
+        "type": "spoken",
+      },
+      {
+        "action": "arrow",
+        "id": "de-05",
+        "target": "key:heart",
+        "type": "action",
+      },
+      {
+        "id": "de-06",
+        "text": "goes with this symbol, so I would put it here like this.",
+        "type": "spoken",
+      },
+      {
+        "action": "fill",
+        "id": "de-07",
+        "target": "item:1",
+        "type": "action",
+        "value": 7,
+      },
+      {
+        "action": "highlight",
+        "id": "de-08",
+        "target": "item:2",
+        "type": "action",
+      },
+      {
+        "id": "de-09",
+        "text": "Here is the next symbol.",
+        "type": "spoken",
+      },
+      {
+        "action": "arrow",
+        "id": "de-10",
+        "target": "item:2",
+        "type": "action",
+      },
+      {
+        "id": "de-11",
+        "text": "This number",
+        "type": "spoken",
+      },
+      {
+        "action": "arrow",
+        "id": "de-12",
+        "target": "key:triangle",
+        "type": "action",
+      },
+      {
+        "id": "de-13",
+        "text": "goes with this symbol, so I would put it here like this.",
+        "type": "spoken",
+      },
+      {
+        "action": "fill",
+        "id": "de-14",
+        "target": "item:2",
+        "type": "action",
+        "value": 1,
+      },
+      {
+        "action": "highlight",
+        "id": "de-15",
+        "target": "item:3",
+        "type": "action",
+      },
+      {
+        "id": "de-16",
+        "text": "This symbol",
+        "type": "spoken",
+      },
+      {
+        "action": "arrow",
+        "id": "de-17",
+        "target": "item:3",
+        "type": "action",
+      },
+      {
+        "id": "de-18",
+        "text": "goes with this number,",
+        "type": "spoken",
+      },
+      {
+        "action": "arrow",
+        "id": "de-19",
+        "target": "key:flag",
+        "type": "action",
+      },
+      {
+        "id": "de-20",
+        "text": "so I would put it here like this.",
+        "type": "spoken",
+      },
+      {
+        "action": "fill",
+        "id": "de-21",
+        "target": "item:3",
+        "type": "action",
+        "value": 6,
+      },
+    ],
+    "intro": [
+      {
+        "id": "in-01",
+        "text": "Here we have different symbols paired with numbers.",
+        "type": "spoken",
+      },
+      {
+        "id": "in-02",
+        "text": "Each symbol has its own number.",
+        "type": "spoken",
+      },
+      {
+        "id": "in-03",
+        "text": "Your job is to fill in the correct number that goes with each symbol.",
+        "type": "spoken",
+      },
+    ],
+    "practice": [
+      {
+        "id": "pr-01",
+        "text": "Now you do the rest of these, in the gray box.",
+        "type": "spoken",
+      },
+      {
+        "id": "pr-02",
+        "text": "Stop here.",
+        "type": "spoken",
+      },
+      {
+        "action": "arrow",
+        "id": "pr-03",
+        "target": "item:6",
+        "type": "action",
+      },
+      {
+        "action": "select",
+        "id": "pr-04",
+        "target": "item:4",
+        "type": "action",
+      },
+      {
+        "action": "enableInput",
+        "id": "pr-05",
+        "type": "action",
+      },
+    ],
+    "practiceFeedback": [
+      {
+        "action": "clear",
+        "id": "pf-01",
+        "target": "current",
+        "type": "action",
+      },
+      {
+        "adaptation": "SW1",
+        "id": "pf-02",
+        "text": "This number",
+        "type": "spoken",
+      },
+      {
+        "action": "arrow",
+        "id": "pf-03",
+        "target": "key:correct",
+        "type": "action",
+      },
+      {
+        "adaptation": "SW1",
+        "id": "pf-04",
+        "text": "goes with this symbol.",
+        "type": "spoken",
+      },
+      {
+        "action": "select",
+        "id": "pf-05",
+        "target": "current",
+        "type": "action",
+      },
+      {
+        "action": "enableInput",
+        "id": "pf-06",
+        "type": "action",
+      },
+    ],
+    "recall": [
+      {
+        "adaptation": "SW2",
+        "id": "rc-01",
+        "sourceText": "Write in the numbers that go with each symbol from the test you recently completed that looked like this.",
+        "text": "Fill in the numbers that go with each symbol from the test you recently completed that looked like this.",
+        "type": "spoken",
+      },
+      {
+        "action": "highlight",
+        "id": "rc-02",
+        "target": "recall:all",
+        "type": "action",
+      },
+      {
+        "id": "rc-03",
+        "text": "It is ok to guess if you are not sure.",
+        "type": "spoken",
+      },
+      {
+        "action": "select",
+        "id": "rc-04",
+        "target": "recall:square",
+        "type": "action",
+      },
+      {
+        "action": "startTimer",
+        "id": "rc-05",
+        "seconds": 60,
+        "type": "action",
+      },
+      {
+        "action": "enableInput",
+        "id": "rc-06",
+        "type": "action",
+      },
+    ],
+    "test": [
+      {
+        "id": "te-01",
+        "text": "Good.",
+        "type": "spoken",
+      },
+      {
+        "id": "te-02",
+        "text": "Now that you know how to do it, I want you to continue filling in the number that goes with each symbol.",
+        "type": "spoken",
+      },
+      {
+        "id": "te-03",
+        "text": "Be sure to work from left to right, without skipping any.",
+        "type": "spoken",
+      },
+      {
+        "id": "te-04",
+        "text": "When you finish this line go on to the next one.",
+        "type": "spoken",
+      },
+      {
+        "action": "highlight",
+        "id": "te-05",
+        "target": "row:1",
+        "type": "action",
+      },
+      {
+        "action": "highlight",
+        "id": "te-06",
+        "target": "row:2",
+        "type": "action",
+      },
+      {
+        "id": "te-07",
+        "text": "When I say begin, start here",
+        "type": "spoken",
+      },
+      {
+        "action": "arrow",
+        "id": "te-08",
+        "target": "item:7",
+        "type": "action",
+      },
+      {
+        "id": "te-09",
+        "text": "and work as quickly as you can, without making mistakes, until I tell you to stop.",
+        "type": "spoken",
+      },
+      {
+        "id": "te-10",
+        "text": "Ready?",
+        "type": "spoken",
+      },
+      {
+        "action": "pause",
+        "id": "te-11",
+        "ms": 1000,
+        "type": "action",
+      },
+      {
+        "id": "te-12",
+        "text": "Begin!",
+        "type": "spoken",
+      },
+      {
+        "action": "select",
+        "id": "te-13",
+        "target": "item:7",
+        "type": "action",
+      },
+      {
+        "action": "startTimer",
+        "id": "te-14",
+        "seconds": 60,
+        "type": "action",
+      },
+      {
+        "action": "enableInput",
+        "id": "te-15",
+        "type": "action",
+      },
+    ],
+  },
+  "source": "SWAPS Standard General Instructions (rvsd 7.12.21) and SWAPS Recall form, Cullum 2012",
+  "testId": "swaps",
+}
+`;

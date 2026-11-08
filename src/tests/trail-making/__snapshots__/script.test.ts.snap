@@ -1,0 +1,342 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`script.json matches the approved copy 1`] = `
+{
+  "adaptations": [
+    {
+      "appText": "Please click to draw a line",
+      "change": "replace",
+      "id": "W1",
+      "sourceText": "Please take the pencil and draw a line",
+      "status": "pending",
+    },
+    {
+      "change": "remove",
+      "id": "W2",
+      "sourceText": [
+        "Please try not to lift the pencil as you move from one number to the next.",
+        "Please try not to lift the pencil as you move from one circle to the next.",
+        "Please try not to lift the pencil as you move from one number or letter to the next.",
+      ],
+      "status": "pending",
+    },
+    {
+      "appText": "Begin.",
+      "change": "add",
+      "id": "W3",
+      "status": "pending",
+    },
+  ],
+  "notes": [
+    "Spoken lines are played in order; each line is one audio clip named by its id.",
+    "Joining a section's spoken lines with single spaces gives the source wording, minus the adaptations listed below.",
+    "An arrow replaces the previous arrow. In instruction sections, arrows clear when clicks are enabled. In the error section, the arrow stays until the next correct click.",
+    "'say' is a pronunciation hint for audio only. The displayed and stored text is always 'text'.",
+  ],
+  "scriptVersion": "0.1.0",
+  "sections": {
+    "error": [
+      {
+        "action": "slashLine",
+        "id": "er-01",
+        "type": "action",
+      },
+      {
+        "id": "er-02",
+        "text": "That one was not correct.",
+        "type": "spoken",
+      },
+      {
+        "action": "arrow",
+        "id": "er-03",
+        "target": "lastCorrect",
+        "type": "action",
+      },
+      {
+        "id": "er-04",
+        "text": "Please start here and continue.",
+        "type": "spoken",
+      },
+      {
+        "action": "enableClicks",
+        "id": "er-05",
+        "type": "action",
+      },
+    ],
+    "partA": [
+      {
+        "id": "pa-01",
+        "text": "On this page there are more numbers in circles.",
+        "type": "spoken",
+      },
+      {
+        "adaptation": "W1",
+        "id": "pa-02",
+        "sourceText": "Please take the pencil and draw a line from one circle to the next, in order.",
+        "text": "Please click to draw a line from one circle to the next, in order.",
+        "type": "spoken",
+      },
+      {
+        "id": "pa-03",
+        "text": "Start at 1",
+        "type": "spoken",
+      },
+      {
+        "action": "arrow",
+        "id": "pa-04",
+        "target": "1",
+        "type": "action",
+      },
+      {
+        "id": "pa-05",
+        "text": "and end here.",
+        "type": "spoken",
+      },
+      {
+        "action": "arrow",
+        "id": "pa-06",
+        "target": "25",
+        "type": "action",
+      },
+      {
+        "id": "pa-07",
+        "text": "Work as quickly as you can.",
+        "type": "spoken",
+      },
+      {
+        "adaptation": "W3",
+        "id": "pa-08",
+        "text": "Begin.",
+        "type": "spoken",
+      },
+      {
+        "action": "startTimer",
+        "id": "pa-09",
+        "type": "action",
+      },
+      {
+        "action": "enableClicks",
+        "id": "pa-10",
+        "type": "action",
+      },
+    ],
+    "partB": [
+      {
+        "id": "pb-01",
+        "text": "On this page, there are more numbers and letters in circles.",
+        "type": "spoken",
+      },
+      {
+        "adaptation": "W1",
+        "id": "pb-02",
+        "sourceText": "Please take the pencil and draw a line from one circle to the next, alternating in order between the numbers and letters.",
+        "text": "Please click to draw a line from one circle to the next, alternating in order between the numbers and letters.",
+        "type": "spoken",
+      },
+      {
+        "id": "pb-03",
+        "text": "Start at 1",
+        "type": "spoken",
+      },
+      {
+        "action": "arrow",
+        "id": "pb-04",
+        "target": "1",
+        "type": "action",
+      },
+      {
+        "id": "pb-05",
+        "text": "and end here.",
+        "type": "spoken",
+      },
+      {
+        "action": "arrow",
+        "id": "pb-06",
+        "target": "13",
+        "type": "action",
+      },
+      {
+        "id": "pb-07",
+        "text": "Work as quickly as you can.",
+        "type": "spoken",
+      },
+      {
+        "adaptation": "W3",
+        "id": "pb-08",
+        "text": "Begin.",
+        "type": "spoken",
+      },
+      {
+        "action": "startTimer",
+        "id": "pb-09",
+        "type": "action",
+      },
+      {
+        "action": "enableClicks",
+        "id": "pb-10",
+        "type": "action",
+      },
+    ],
+    "sampleA": [
+      {
+        "id": "sa-01",
+        "text": "There are numbers in circles on this page.",
+        "type": "spoken",
+      },
+      {
+        "adaptation": "W1",
+        "id": "sa-02",
+        "sourceText": "Please take the pencil and draw a line from one number to the next, in order.",
+        "text": "Please click to draw a line from one number to the next, in order.",
+        "type": "spoken",
+      },
+      {
+        "id": "sa-03",
+        "text": "Start at 1,",
+        "type": "spoken",
+      },
+      {
+        "action": "arrow",
+        "id": "sa-04",
+        "target": "1",
+        "type": "action",
+      },
+      {
+        "id": "sa-05",
+        "text": "then go to 2,",
+        "type": "spoken",
+      },
+      {
+        "action": "arrow",
+        "id": "sa-06",
+        "target": "2",
+        "type": "action",
+      },
+      {
+        "id": "sa-07",
+        "text": "then go to 3",
+        "type": "spoken",
+      },
+      {
+        "action": "arrow",
+        "id": "sa-08",
+        "target": "3",
+        "type": "action",
+      },
+      {
+        "id": "sa-09",
+        "text": "and so on.",
+        "type": "spoken",
+      },
+      {
+        "id": "sa-10",
+        "text": "Work as quickly as you can.",
+        "type": "spoken",
+      },
+      {
+        "id": "sa-11",
+        "text": "Begin here",
+        "type": "spoken",
+      },
+      {
+        "action": "arrow",
+        "id": "sa-12",
+        "target": "1",
+        "type": "action",
+      },
+      {
+        "id": "sa-13",
+        "text": "and end here.",
+        "type": "spoken",
+      },
+      {
+        "action": "arrow",
+        "id": "sa-14",
+        "target": "8",
+        "type": "action",
+      },
+      {
+        "action": "enableClicks",
+        "id": "sa-15",
+        "type": "action",
+      },
+    ],
+    "sampleB": [
+      {
+        "id": "sb-01",
+        "text": "There are numbers and letters in circles on this page.",
+        "type": "spoken",
+      },
+      {
+        "adaptation": "W1",
+        "id": "sb-02",
+        "sourceText": "Please take the pencil and draw a line, alternating in order between the numbers and letters.",
+        "text": "Please click to draw a line, alternating in order between the numbers and letters.",
+        "type": "spoken",
+      },
+      {
+        "id": "sb-03",
+        "text": "Start at number 1,",
+        "type": "spoken",
+      },
+      {
+        "action": "arrow",
+        "id": "sb-04",
+        "target": "1",
+        "type": "action",
+      },
+      {
+        "id": "sb-05",
+        "say": "then go to the first letter, ay,",
+        "text": "then go to the first letter, A,",
+        "type": "spoken",
+      },
+      {
+        "action": "arrow",
+        "id": "sb-06",
+        "target": "A",
+        "type": "action",
+      },
+      {
+        "id": "sb-07",
+        "text": "then go to the next number, 2,",
+        "type": "spoken",
+      },
+      {
+        "action": "arrow",
+        "id": "sb-08",
+        "target": "2",
+        "type": "action",
+      },
+      {
+        "id": "sb-09",
+        "text": "and then the next letter, B,",
+        "type": "spoken",
+      },
+      {
+        "action": "arrow",
+        "id": "sb-10",
+        "target": "B",
+        "type": "action",
+      },
+      {
+        "id": "sb-11",
+        "text": "and so on.",
+        "type": "spoken",
+      },
+      {
+        "id": "sb-12",
+        "text": "Work as quickly as you can.",
+        "type": "spoken",
+      },
+      {
+        "action": "enableClicks",
+        "id": "sb-13",
+        "type": "action",
+      },
+    ],
+  },
+  "source": "NACC UDS v4.0 Form C2 instructions, January 2025 (Trail Making Test, Parts A and B)",
+  "testId": "trail-making",
+}
+`;

@@ -3,7 +3,7 @@
 The build, broken into small steps. Each step is about one session and teaches
 one thing. Tick a box only when its "Check" passes.
 
-**Current step:** 3.9
+**Current step:** 4.1
 
 How to use this file:
 
@@ -144,7 +144,7 @@ the code. Edge cases come from each test's SPEC.md.
   - Check: tests pass for 7/7, 0/7 and a mix; a blank answer is scored as wrong and counted
   - Note: add recall to SWAPS's score type, then check `recall` in `seed.sql` against it (decided at 3.1)
 
-- [ ] **3.9 Wording tests for `script.json`**
+- [x] **3.9 Wording tests for `script.json`**
   - Learn: using tests to guard exact wording; snapshot tests
   - Check: changing one word in either `script.json` makes `npm test` fail until the change is approved
 
