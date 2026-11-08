@@ -124,7 +124,7 @@ to try the app without real data.
 
 ## ADR-006: Exact script wording, pre-generated audio
 
-- **Status:** Accepted · **Date:** 2026-11-05
+- **Status:** Accepted · **Date:** 2026-11-05 · Development voice changed by ADR-029
 
 **Context:** Published norms assume the standard instructions. A voice that
 differs between computers, or paraphrased wording, would make results less comparable.
@@ -679,3 +679,25 @@ give the shared layer no way to ask. The contract also didn't say what format
 - The dates come from the client's computer clock, so a wrong clock gives a wrong
   date. Scores and timings aren't affected.
 - The `ResultStore` interface isn't part of this. It's written in roadmap 5.1.
+
+## ADR-029: Free placeholder voice during development
+
+- **Status:** Accepted · **Date:** 2026-11-08 · Changes the development voice in ADR-006
+
+**Context:** ADR-006 planned the "Justin Time" library voice on the free plan
+during development. ElevenLabs' docs say free accounts can't use Voice Library
+voices through the API.
+
+**Decision:**
+
+- Development clips use a free ElevenLabs voice, "Brian" (`ByWUwXA3MMLREYmxtB32`).
+- "Justin Time" stays the planned final voice, generated in the paid month
+  (roadmap 12.3).
+- The service and voice ID are set in `scripts/audio-settings.ts`, committed to
+  git. The API key stays in `.env.local`.
+
+**Consequences:**
+
+- Changing the voice is a one-line edit, but every clip must be regenerated.
+- Pronunciation hints (roadmap 4.5) must be re-checked on the final voice.
+- Development clips aren't final and never go to real clients.

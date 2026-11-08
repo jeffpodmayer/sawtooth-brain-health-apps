@@ -3,7 +3,7 @@
 The build, broken into small steps. Each step is about one session and teaches
 one thing. Tick a box only when its "Check" passes.
 
-**Current step:** 4.1
+**Current step:** 4.2
 
 How to use this file:
 
@@ -152,7 +152,7 @@ the code. Edge cases come from each test's SPEC.md.
 
 The voice is a core feature. Build it early and check Safari early.
 
-- [ ] **4.1 ElevenLabs account and API key**
+- [x] **4.1 ElevenLabs account and API key**
   - Learn: keeping a build-time key on your own computer only (no `VITE_` prefix, never in `src/`)
   - Check: the key is in `.env.local` without `VITE_`; `.env.local` is gitignored; the voice ID and service are single settings
 
