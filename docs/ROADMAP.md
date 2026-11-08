@@ -3,7 +3,7 @@
 The build, broken into small steps. Each step is about one session and teaches
 one thing. Tick a box only when its "Check" passes.
 
-**Current step:** 2.6
+**Current step:** 2.7
 
 How to use this file:
 
@@ -78,7 +78,7 @@ Exact columns are decided at the start of each step.
   - Learn: `jsonb` for scores and raw data; storing test version, stop reason and screen size
   - Check: a fake completed result and a fake stopped (partial) result both save
 
-- [ ] **2.6 Clinician notes**
+- [x] **2.6 Clinician notes**
   - Learn: recording who did what and when (clinician id + timestamp)
   - Check: a note saves with the clinician who wrote it
 

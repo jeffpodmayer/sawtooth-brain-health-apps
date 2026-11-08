@@ -581,3 +581,22 @@ needs to know which tests to run, in what order, before any result exists.
   allowed yet. Add it by migration once the clinicians confirm the alphabet
   pre-test plan (by roadmap 9.1 at the latest).
 - Why a whole sequence was discontinued belongs on `sequences` (roadmap 9.1).
+
+## ADR-025: Clinician notes can be edited, without history
+
+- **Status:** Accepted · **Date:** 2026-11-08
+
+**Context:** ADR-008 says clinicians can add notes to each test, but not whether
+a note can change. Clinicians will want to fix their own notes, and a note could
+contain a client's name by mistake.
+
+**Decision:**
+
+- A test can have many notes. A clinician can edit their own (enforced in 2.7).
+- Editing overwrites the earlier wording. No history is kept for the MVP.
+- The author and original time can't change (database trigger).
+
+**Consequences:**
+
+- Unlike results (ADR-008), a note's earlier wording can't be recovered.
+  Raise this in the legal review (12.1).
