@@ -10,7 +10,7 @@ rule in CLAUDE.md.
 
 ## ADR-001: One app, tests as plug-ins
 
-- **Status:** Accepted · **Date:** by 2026-11-05 (naming 2026-11-06)
+- **Status:** Accepted · **Date:** by 2026-11-05 (naming 2026-11-06) · Component props extended by ADR-028
 
 **Context:** The practice will add more tests over time. Each test has its own
 rules, but they all share links, audio, timing, saving and the dashboard.
@@ -652,3 +652,30 @@ found the grants written in 2.7 had no effect, on either project.
 - A forgotten grant shows up as "permission denied", not as exposed data.
 - This doesn't depend on the "expose new tables" project setting, for tables
   created by migrations.
+
+## ADR-028: How a test is stopped, and its calendar times
+
+- **Status:** Accepted · **Date:** 2026-11-08
+
+**Context:** ADR-001 gives a test the props `{ sequenceId, onComplete }` and says
+the shared layer can stop a test and collect its partial result. Those two props
+give the shared layer no way to ask. The contract also didn't say what format
+`startedAt` and `completedAt` use.
+
+**Decision:**
+
+- A test also takes a `stopRequested` prop. When it turns true, the test stops
+  its voice and clicks and calls `onComplete` with its partial result.
+- `onComplete` is a test's only way out, whether it finished, timed out or was
+  stopped. The stop reason doesn't pass through the test (ADR-024).
+- `startedAt` and `completedAt` are ISO 8601 text in UTC. They are calendar
+  times, so `new Date()` is allowed for them. Anything measured still uses
+  `performance.now()`.
+- Shared types treat `scores` and `rawData` as any object. Each test's own shapes
+  live in its folder and use `type`, since an `interface` doesn't fit.
+
+**Consequences:**
+
+- The dates come from the client's computer clock, so a wrong clock gives a wrong
+  date. Scores and timings aren't affected.
+- The `ResultStore` interface isn't part of this. It's written in roadmap 5.1.

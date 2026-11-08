@@ -80,7 +80,7 @@ docs/            ROADMAP.md, DECISIONS.md
 **Tests as plug-ins**
 
 - Each test exports `id`, `name`, `version` and a React component taking
-  `{ sequenceId, onComplete }`.
+  `{ sequenceId, stopRequested, onComplete }`.
 - `onComplete` returns `{ testId, testVersion, sequenceId, startedAt, completedAt, scores, rawData }`.
 - The shared layer must be able to stop a test and collect its partial result.
 - Shared code never knows how a test is scored. Test code never imports

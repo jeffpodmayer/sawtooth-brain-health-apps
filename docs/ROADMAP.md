@@ -3,7 +3,7 @@
 The build, broken into small steps. Each step is about one session and teaches
 one thing. Tick a box only when its "Check" passes.
 
-**Current step:** 3.1
+**Current step:** 3.2
 
 How to use this file:
 
@@ -109,7 +109,7 @@ Pure TypeScript only: no React, no Supabase, no clock inside a scoring function.
 For each step: write the tests from SPEC.md first, watch them fail, then write
 the code. Edge cases come from each test's SPEC.md.
 
-- [ ] **3.1 Shared types for tests and results**
+- [x] **3.1 Shared types for tests and results**
   - Learn: TypeScript types and interfaces; the plug-in contract as code
   - Check: `src/shared/` has the test module and result types from CLAUDE.md; `npm run typecheck` passes
 
@@ -128,6 +128,7 @@ the code. Edge cases come from each test's SPEC.md.
 - [ ] **3.5 Trail Making: the result from a click log**
   - Learn: turning a list of events into a score; handling "finished", "timed out" and "stopped"
   - Check: tests pass for a full run, a timeout (records the max time: 150 s A, 300 s B) and a clinician stop (partial score kept)
+  - Note: write Trail Making's own score type here, in its test folder, then check `partA`, `partB`, `sampleA` and `sampleB` in `seed.sql` against it (decided at 3.1)
 
 - [ ] **3.6 SWAPS: the key and Form A grid**
   - Learn: encoding a printed form as data, and testing it against the paper
@@ -136,10 +137,12 @@ the code. Edge cases come from each test's SPEC.md.
 - [ ] **3.7 SWAPS: the result from an answer log**
   - Learn: counting corrections and errors; deciding which answer counts after a correction
   - Check: tests pass for a full 60 s run, a correction from wrong to right, a correction from right to wrong and a clinician stop (partial score kept)
+  - Note: write SWAPS's own score type here, in its test folder, then check `test` and `practice` in `seed.sql` against it (decided at 3.1)
 
 - [ ] **3.8 SWAPS: recall score**
   - Learn: a small scoring function from start to finish on your own
   - Check: tests pass for 7/7, 0/7 and a mix; a blank answer is rejected
+  - Note: add recall to SWAPS's score type, then check `recall` in `seed.sql` against it (decided at 3.1)
 
 - [ ] **3.9 Wording tests for `script.json`**
   - Learn: using tests to guard exact wording; snapshot tests
@@ -194,6 +197,7 @@ Steps 5.7 and 5.8 need the clinicians' answers on the wording conflicts (see the
 - [ ] **5.1 Development test page and a fake ResultStore**
   - Learn: an in-memory version of an interface; development-only routes
   - Check: `/dev/test/trail-making` loads in development; the route isn't in the production build
+  - Note: write the `ResultStore` interface here, before the fake one (decided at 3.1)
 
 - [ ] **5.2 Circle positions from the PDF**
   - Learn: turning a page layout into SVG coordinates
