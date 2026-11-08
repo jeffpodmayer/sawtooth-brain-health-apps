@@ -3,7 +3,7 @@
 The build, broken into small steps. Each step is about one session and teaches
 one thing. Tick a box only when its "Check" passes.
 
-**Current step:** 4.6
+**Current step:** 4.7
 
 How to use this file:
 
@@ -172,7 +172,7 @@ The voice is a core feature. Build it early and check Safari early.
   - Learn: keeping spoken text and displayed text separate
   - Check: a hint changes the audio only; the script's displayed text is unchanged; hinted lines are listed for review
 
-- [ ] **4.6 The audio player**
+- [x] **4.6 The audio player**
   - Learn: Howler.js preloading; using a clip's end to trigger the next step
   - Check: a demo page plays three clips back to back, each starting when the last one ends
 
