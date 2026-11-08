@@ -3,7 +3,7 @@
 
 import { existsSync } from "node:fs";
 import { mkdir, readdir, readFile, writeFile } from "node:fs/promises";
-import { checkScript } from "../src/shared/test-script.ts";
+import { checkScript, spokenText } from "../src/shared/test-script.ts";
 import { clipHash, needsClip, type AudioManifest } from "./audio-manifest.ts";
 import { audioSettings } from "./audio-settings.ts";
 
@@ -58,19 +58,28 @@ for (const { testName, lines } of tests) {
 
   for (const line of lines) {
     const path = `${folder}/${line.id}.mp3`;
-    const hash = clipHash(line.text, audioSettings);
+    const spoken = spokenText(line);
+    const hash = clipHash(spoken, audioSettings);
     if (!needsClip(hash, saved[line.id], existsSync(path))) {
       skipped++;
       continue;
     }
 
-    await writeFile(path, await generateClip(apiKey, line.id, line.text));
+    await writeFile(path, await generateClip(apiKey, line.id, spoken));
     // Saved after each clip, so a failed run can pick up where it stopped.
     saved[line.id] = hash;
     await writeFile(manifestPath, JSON.stringify(manifest, null, 2) + "\n");
     made++;
-    console.log(`Made ${path}: "${line.text}"`);
+    console.log(`Made ${path}: "${spoken}"`);
   }
 }
 
 console.log(`Done: ${made} made, ${skipped} skipped.`);
+
+// Hints need a person's ear, and a re-check on the final voice (ADR-029).
+console.log("Lines with a pronunciation hint (listen to these):");
+for (const { testName, lines } of tests) {
+  for (const line of lines) {
+    if (line.say) console.log(`  ${testName}/${line.id}: shows "${line.text}", says "${line.say}"`);
+  }
+}

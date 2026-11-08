@@ -3,7 +3,7 @@
 The build, broken into small steps. Each step is about one session and teaches
 one thing. Tick a box only when its "Check" passes.
 
-**Current step:** 4.5
+**Current step:** 4.6
 
 How to use this file:
 
@@ -168,7 +168,7 @@ The voice is a core feature. Build it early and check Safari early.
   - Learn: content hashes and a manifest file
   - Check: a second run makes zero API calls; editing one line regenerates only that clip
 
-- [ ] **4.5 Pronunciation hints**
+- [x] **4.5 Pronunciation hints**
   - Learn: keeping spoken text and displayed text separate
   - Check: a hint changes the audio only; the script's displayed text is unchanged; hinted lines are listed for review
 
@@ -447,6 +447,7 @@ Nothing real goes into production until every box here is ticked.
 - [ ] **12.3 Final audio**
   - Learn: the one-month paid plan and a final, full generation
   - Check: every clip regenerated with the commercial license; a clinician has listened to every clip; clips committed
+  - Note: `sb-05` had an "ay" hint removed at 4.5, because Adam read the plain "A" correctly and the hint made it worse. Listen to the "A" on the final voice and add a hint only if it's needed (ADR-029).
 
 - [ ] **12.4 Production database on Pro, with backups**
   - Learn: Supabase backups and restoring from one

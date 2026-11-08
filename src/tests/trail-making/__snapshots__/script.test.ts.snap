@@ -287,7 +287,6 @@ exports[`script.json matches the approved copy 1`] = `
       },
       {
         "id": "sb-05",
-        "say": "then go to the first letter, ay,",
         "text": "then go to the first letter, A,",
         "type": "spoken",
       },

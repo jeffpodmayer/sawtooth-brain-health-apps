@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { checkScript } from "./test-script";
+import { checkScript, spokenText, type SpokenLine } from "./test-script";
 
 const spoken = { id: "a-01", type: "spoken", text: "Hello." };
 const action = { id: "a-02", type: "action", action: "arrow" };
@@ -79,5 +79,23 @@ describe("checkScript", () => {
       sections: { one: [spoken], two: [spoken] },
     };
     expect(() => checkScript(script)).toThrow("duplicate id a-01");
+  });
+});
+
+describe("spokenText", () => {
+  const line: SpokenLine = { id: "a-01", type: "spoken", text: "Hello." };
+
+  it("uses the text when there is no hint", () => {
+    expect(spokenText(line)).toBe("Hello.");
+  });
+
+  it("uses the hint when there is one", () => {
+    expect(spokenText({ ...line, say: "Heh-low." })).toBe("Heh-low.");
+  });
+
+  it("leaves the displayed text alone", () => {
+    const hinted = { ...line, say: "Heh-low." };
+    spokenText(hinted);
+    expect(hinted.text).toBe("Hello.");
   });
 });

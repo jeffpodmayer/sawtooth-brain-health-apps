@@ -76,3 +76,8 @@ export function checkScript(data: unknown): TestScript {
 
   return data as TestScript;
 }
+
+// What the voice says for a line. Screens always show line.text.
+export function spokenText(line: SpokenLine): string {
+  return line.say ?? line.text;
+}

@@ -109,8 +109,7 @@
       {
         "id": "sb-05",
         "type": "spoken",
-        "text": "then go to the first letter, A,",
-        "say": "then go to the first letter, ay,"
+        "text": "then go to the first letter, A,"
       },
       { "id": "sb-06", "type": "action", "action": "arrow", "target": "A" },
       {
