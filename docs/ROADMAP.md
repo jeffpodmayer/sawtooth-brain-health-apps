@@ -3,7 +3,7 @@
 The build, broken into small steps. Each step is about one session and teaches
 one thing. Tick a box only when its "Check" passes.
 
-**Current step:** 2.3
+**Current step:** 2.4
 
 How to use this file:
 
@@ -66,7 +66,7 @@ Exact columns are decided at the start of each step.
   - Learn: Supabase's built-in `auth.users` vs. your own `clinicians` table; foreign keys
   - Check: you can sign in as a clinician in development; your `clinicians` row links you to Sawtooth
 
-- [ ] **2.3 Clients and each practice's enabled tests**
+- [x] **2.3 Clients and each practice's enabled tests**
   - Learn: a unique rule across two columns (`practice_id` + client code)
   - Check: a duplicate client code in the same practice is rejected; the same code in another practice is allowed
 
@@ -346,6 +346,7 @@ see their own practice.
 - [ ] **8.3 Clients list and new client codes**
   - Learn: reading and writing through RLS from the browser
   - Check: the list shows Sawtooth's clients only; a new client code saves; a duplicate code shows a clear message
+  - Note: first ask the clinicians whether they already have an ID for each client, and what one looks like; loosen the code format (2.3) with a new migration if needed
 
 - [ ] **8.4 Generate Test Sequence**
   - Learn: a modal with checkboxes; an Edge Function that creates the sequence and link
