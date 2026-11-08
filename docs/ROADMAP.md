@@ -3,7 +3,7 @@
 The build, broken into small steps. Each step is about one session and teaches
 one thing. Tick a box only when its "Check" passes.
 
-**Current step:** 4.2
+**Current step:** 4.3
 
 How to use this file:
 
@@ -156,7 +156,7 @@ The voice is a core feature. Build it early and check Safari early.
   - Learn: keeping a build-time key on your own computer only (no `VITE_` prefix, never in `src/`)
   - Check: the key is in `.env.local` without `VITE_`; `.env.local` is gitignored; the voice ID and service are single settings
 
-- [ ] **4.2 Load and check `script.json`**
+- [x] **4.2 Load and check `script.json`**
   - Learn: describing a file's shape with a type and rejecting bad files
   - Check: both tests' `script.json` files load; a line with a missing ID or an unknown type ("spoken"/"action") is rejected
 
