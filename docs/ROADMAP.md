@@ -3,7 +3,7 @@
 The build, broken into small steps. Each step is about one session and teaches
 one thing. Tick a box only when its "Check" passes.
 
-**Current step:** 2.2
+**Current step:** 2.3
 
 How to use this file:
 
@@ -62,7 +62,7 @@ Exact columns are decided at the start of each step.
   - Learn: what a migration is; `supabase link`, `migration new`, `db push`; uuid primary keys
   - Check: the `practices` table exists in development; the migration file is committed
 
-- [ ] **2.2 Clinician accounts and practice membership**
+- [x] **2.2 Clinician accounts and practice membership**
   - Learn: Supabase's built-in `auth.users` vs. your own `clinicians` table; foreign keys
   - Check: you can sign in as a clinician in development; your `clinicians` row links you to Sawtooth
 

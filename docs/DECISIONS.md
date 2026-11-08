@@ -492,3 +492,34 @@ by anyone. The dashboard's automatic RLS setting may differ between projects
 - Nothing in the browser can read a table until its policy is written, so
   each table needs its policy (2.7) before the app uses it.
 - RLS doesn't depend on a dashboard setting; the migrations are the record.
+
+## ADR-022: Clinician accounts, deletes and development data
+
+- **Status:** Accepted · **Date:** 2026-11-07
+
+**Context:** Supabase manages logins in `auth.users`, which the app shouldn't
+change and the browser can't read. Notes and stop actions (2.6, 9.1) will
+record which clinician acted, so that link must never break. ADR-002 says every
+database change is a migration, but development also needs a few rows to test with.
+
+**Decision:**
+
+- A `clinicians` table holds what the app needs: `id` (the same as the login's
+  `auth.users` id), `practice_id`, `display_name` and `created_at`. No role or
+  admin flag yet; no copy of the email.
+- Foreign keys block deletes (`on delete restrict`): a login can't be deleted
+  while its clinician row exists, and a practice can't be deleted while it has
+  clinicians. To remove someone's access, ban their login in Supabase.
+- Foreign key columns get an index (Postgres doesn't add one), named
+  `<table>_<column>_idx`.
+- Structure changes are always migrations. Development-only rows may be added
+  in the SQL Editor until `seed.sql` exists (2.9). Production data is added only
+  in the launch steps (12.6).
+- The development login uses email and password for now; the real sign-in
+  method is chosen in 8.1.
+
+**Consequences:**
+
+- "Who did this" always points to a real clinician, even after they leave.
+- Removing a clinician completely needs a deliberate cleanup, never one click.
+- Rows added in development by hand are recreated by the seed file in 2.9.

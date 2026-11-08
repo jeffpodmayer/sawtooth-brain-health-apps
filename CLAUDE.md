@@ -103,7 +103,10 @@ docs/            ROADMAP.md, DECISIONS.md
   Nothing hard-coded.
 - No names, demographics or other identifying details. Clients are a client code only.
 - Storage files go under `<practice_id>/`, with storage rules matching the database rules.
-- Every database change is a migration file. Never edit the database by hand.
+- Every change to the database's structure (tables, columns, indexes, policies)
+  is a migration file. Never change the structure by hand. Development-only
+  rows may be added in the SQL Editor (until `seed.sql`, roadmap 2.9);
+  production data is added only in the launch steps (roadmap 12.6).
 - Build-time keys (e.g. ElevenLabs) live only in `.env.local` on Jeff's computer,
   never with a `VITE_` prefix and never in `src/`.
 
