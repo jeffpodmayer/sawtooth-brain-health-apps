@@ -3,7 +3,7 @@
 The build, broken into small steps. Each step is about one session and teaches
 one thing. Tick a box only when its "Check" passes.
 
-**Current step:** 3.6
+**Current step:** 3.7
 
 How to use this file:
 
@@ -130,7 +130,7 @@ the code. Edge cases come from each test's SPEC.md.
   - Check: tests pass for a full run, a timeout (records the max time: 150 s A, 300 s B) and a clinician stop (partial score kept)
   - Note: write Trail Making's own score type here, in its test folder, then check `partA`, `partB`, `sampleA` and `sampleB` in `seed.sql` against it (decided at 3.1)
 
-- [ ] **3.6 SWAPS: the key and Form A grid**
+- [x] **3.6 SWAPS: the key and Form A grid**
   - Learn: encoding a printed form as data, and testing it against the paper
   - Check: the key has 7 symbols with the right numbers; the grid has 81 items (3 demo, 3 practice, 75 test) matching the brief row by row
 
