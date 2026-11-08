@@ -3,7 +3,7 @@
 The build, broken into small steps. Each step is about one session and teaches
 one thing. Tick a box only when its "Check" passes.
 
-**Current step:** 2.8
+**Current step:** 2.9
 
 How to use this file:
 
@@ -86,7 +86,7 @@ Exact columns are decided at the start of each step.
   - Learn: how RLS policies work; a helper function that returns the signed-in clinician's practice
   - Check: with a second fake practice, its clinician sees zero Sawtooth rows; a signed-out user sees nothing in any table
 
-- [ ] **2.8 Storage for sheets**
+- [x] **2.8 Storage for sheets**
   - Learn: Supabase Storage buckets; storage rules by `<practice_id>/` folder
   - Check: a clinician can't read or upload a file in another practice's folder
 
