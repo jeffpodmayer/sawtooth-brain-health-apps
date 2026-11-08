@@ -3,7 +3,7 @@
 The build, broken into small steps. Each step is about one session and teaches
 one thing. Tick a box only when its "Check" passes.
 
-**Current step:** 4.9
+**Current step:** 5.1
 
 How to use this file:
 
@@ -184,9 +184,7 @@ The voice is a core feature. Build it early and check Safari early.
   - Learn: falling back to the browser's voice in development only; failing a build on purpose
   - Check: in development a missing clip uses the browser voice; a production build fails if any clip is missing
 
-- [ ] **4.9 Cross-browser timing check**
-  - Learn: measuring with a screen recording
-  - Check: in Chrome, Edge, Safari and Firefox, the gap between a clip ending and the next step is measured and written down
+**4.9 Cross-browser timing check:** moved to 7.9 (decided 2026-11-08, not measured yet).
 
 ## Phase 5 — Trail Making test
 
@@ -335,8 +333,9 @@ or the seed file.
   - Check: a thank-you screen shows at the end; the sequence is marked complete; reopening the link is refused
 
 - [ ] **7.9 Full run in every browser**
-  - Learn: an end-to-end manual test plan
-  - Check: a full sequence (sound check → Trail Making → break → SWAPS → end) works in Chrome, Edge, Safari and Firefox, and results are in the development database
+  - Learn: an end-to-end manual test plan; measuring a timing gap across browsers
+  - Check: a full sequence (sound check → Trail Making → break → SWAPS → end) works in Chrome, Edge, Safari and Firefox, and results are in the development database; in each browser, the gap between a clip ending and the next step is measured and written down
+  - Note: moved here from 4.9. Timed parts start when a clip ends, and Howler's "end" is a timer set to the clip's length, not a report that the sound finished. A gap of tens of milliseconds is harmless; half a second or more, or one browser differing from the others, needs fixing. Choose the method here: a screen recording, or having a development page measure it. Edge and Firefox need installing on Jeff's Mac.
 
 ## Phase 8 — Clinician dashboard
 
