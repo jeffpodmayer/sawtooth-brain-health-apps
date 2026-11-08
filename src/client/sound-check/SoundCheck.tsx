@@ -20,6 +20,7 @@ function SoundCheck({ onHeard }: SoundCheckProps) {
   const [player] = useState(() => createAudioPlayer("sound-check", [line]));
   const [started, setStarted] = useState(false);
   const [playing, setPlaying] = useState(false);
+  const [clipPlayed, setClipPlayed] = useState(false);
 
   async function playClip() {
     setStarted(true);
@@ -27,6 +28,7 @@ function SoundCheck({ onHeard }: SoundCheckProps) {
     try {
       await player.ready;
       await player.play(line.id);
+      setClipPlayed(true);
     } finally {
       setPlaying(false);
     }
@@ -48,7 +50,12 @@ function SoundCheck({ onHeard }: SoundCheckProps) {
         {line.text}
       </h1>
       <div className="mt-8 flex flex-wrap gap-4">
-        <button type="button" disabled={playing} onClick={onHeard} className={buttonClass}>
+        <button
+          type="button"
+          disabled={playing || !clipPlayed}
+          onClick={onHeard}
+          className={buttonClass}
+        >
           Yes, I can hear it
         </button>
         <button type="button" disabled={playing} onClick={playClip} className={buttonClass}>

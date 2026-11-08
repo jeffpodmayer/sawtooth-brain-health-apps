@@ -236,6 +236,7 @@ Steps 5.7 and 5.8 need the clinicians' answers on the wording conflicts (see the
 - [ ] **5.11 Being stopped from outside**
   - Learn: how the shared layer asks a test for its partial result
   - Check: a fake stop mid-test returns the partial score and the sheet as it stood
+  - Note: the audio player has no way to stop a clip yet. Add one here, so a stop silences the voice and the test isn't left waiting for the clip to end (ADR-028, Phase 4 code review)
 
 - [ ] **5.12 Clinician look on the preview**
   - Learn: running a feedback round
@@ -301,10 +302,13 @@ or the seed file.
   - Learn: Edge Functions (Deno); using the secret key safely on the server; CORS
   - Check: a valid token returns the practice name and the tests to run; an unknown, completed or discontinued token is refused; nothing else about the client is returned
   - Note: decide with the clinicians what happens if a client reopens a link partway (ADR-005 leaves interruptions out of scope); results saved so far are in 2.5's table
+  - Note: if the browser has blocked sound, for example after a page reload with no click, `play()` never finishes and the test freezes. Howler's error event doesn't fire in this case. Handle it when deciding what a reopened link does (Phase 4 code review)
 
 - [ ] **7.2 The client's first screen**
   - Learn: the `/t/<link-token>` route; going full screen from a click
   - Check: the practice name shows (from practice settings); one click starts the sound check (4.7) and full screen
+  - Note: clip downloads have no time limit or retry, so one stalled clip hangs the sound check forever and one failed clip can't recover without a reload. Decide what the client sees (Phase 4 code review)
+  - Note: "Play it again" is disabled while the clip plays, so a keyboard user loses their place. Return focus to it when the clip ends (WCAG 2.2 AA, Phase 4 code review)
 
 - [ ] **7.3 The sequence runner**
   - Learn: a test registry; using the plug-in contract from the outside
