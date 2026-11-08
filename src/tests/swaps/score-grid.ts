@@ -2,6 +2,7 @@
 // Pure: replays every answer, so the server can re-check it from the raw log.
 
 import { gridItems } from "./form-a";
+import type { RecallScore } from "./score-recall";
 import { timeLimitMs } from "./time-limits";
 
 // What scoring reads from an answer log entry. timeMs counts from the end of "Begin!"
@@ -28,6 +29,7 @@ export type PracticeScore = {
 
 export type SwapsScores = {
   test: GridScore;
+  recall: RecallScore;
   practice: PracticeScore;
 };
 

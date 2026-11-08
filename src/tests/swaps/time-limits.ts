@@ -2,4 +2,5 @@
 
 export const timeLimitMs = {
   test: 60000,
+  recall: 60000,
 } as const;

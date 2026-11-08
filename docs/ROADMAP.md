@@ -3,7 +3,7 @@
 The build, broken into small steps. Each step is about one session and teaches
 one thing. Tick a box only when its "Check" passes.
 
-**Current step:** 3.8
+**Current step:** 3.9
 
 How to use this file:
 
@@ -139,9 +139,9 @@ the code. Edge cases come from each test's SPEC.md.
   - Check: tests pass for a full 60 s run, a correction from wrong to right, a correction from right to wrong and a clinician stop (partial score kept)
   - Note: write SWAPS's own score type here, in its test folder, then check `test` and `practice` in `seed.sql` against it (decided at 3.1)
 
-- [ ] **3.8 SWAPS: recall score**
+- [x] **3.8 SWAPS: recall score**
   - Learn: a small scoring function from start to finish on your own
-  - Check: tests pass for 7/7, 0/7 and a mix; a blank answer is rejected
+  - Check: tests pass for 7/7, 0/7 and a mix; a blank answer is scored as wrong and counted
   - Note: add recall to SWAPS's score type, then check `recall` in `seed.sql` against it (decided at 3.1)
 
 - [ ] **3.9 Wording tests for `script.json`**
@@ -279,8 +279,8 @@ the stop wording and the recall instruction (see the brief).
   - Check: the timer starts at "Begin!"; input stops at 60 s with the agreed wording; results match the 3.7 scoring tests
 
 - [ ] **6.8 Recall screen**
-  - Learn: an untimed screen with required answers
-  - Check: the 7 symbols appear without numbers, in recall-form order; all must be answered; it's always the last screen of the test
+  - Learn: a timed screen that always runs its full 60 seconds
+  - Check: the 7 symbols appear without numbers, in recall-form order; answers can be changed until time is up; any left empty are scored as wrong; it's always the last screen of the test
 
 - [ ] **6.9 Save the sheet and answer log; `onComplete`**
   - Learn: marking errors and corrections clearly in an exported SVG
