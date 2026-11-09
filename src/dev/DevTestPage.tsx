@@ -21,12 +21,9 @@ function DevTestPage() {
 
   if (!heard) return <SoundCheck onHeard={() => setHeard(true)} />;
 
-  return (
-    <>
-      <Test sequenceId="dev-sequence" stopRequested={false} onComplete={handleComplete} />
-      {saved.length > 0 && <pre className="p-8">{JSON.stringify(saved, null, 2)}</pre>}
-    </>
-  );
+  if (saved.length > 0) return <pre className="p-8">{JSON.stringify(saved, null, 2)}</pre>;
+
+  return <Test sequenceId="dev-sequence" stopRequested={false} onComplete={handleComplete} />;
 }
 
 export default DevTestPage;

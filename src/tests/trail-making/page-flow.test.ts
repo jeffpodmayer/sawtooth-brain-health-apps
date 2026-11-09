@@ -28,9 +28,24 @@ it("moves to the next page's instructions after the pause", () => {
   expect(nextFlow(at(0, "finished"), "pauseOver")).toEqual(at(1, "instructions"));
 });
 
-// Placeholder until 5.9, when finishing Part B ends the test.
-it("loops back to Sample A after Part B", () => {
-  expect(nextFlow(at(3, "finished"), "pauseOver")).toEqual(at(0, "instructions"));
+it("ends the test after Part B's pause", () => {
+  expect(nextFlow(at(3, "finished"), "pauseOver")).toEqual(at(3, "done"));
+});
+
+it("finishes a timed page when time runs out", () => {
+  expect(nextFlow(at(1, "test"), "timeUp")).toEqual(at(1, "finished"));
+  expect(nextFlow(at(3, "test"), "timeUp")).toEqual(at(3, "finished"));
+});
+
+it("ignores time running out once a page is finished", () => {
+  expect(nextFlow(at(1, "finished"), "timeUp")).toEqual(at(1, "finished"));
+});
+
+it("stays done whatever happens next", () => {
+  expect(nextFlow(at(3, "done"), "clicksEnabled")).toEqual(at(3, "done"));
+  expect(nextFlow(at(3, "done"), "pageCompleted")).toEqual(at(3, "done"));
+  expect(nextFlow(at(3, "done"), "timeUp")).toEqual(at(3, "done"));
+  expect(nextFlow(at(3, "done"), "pauseOver")).toEqual(at(3, "done"));
 });
 
 it("ignores an event that doesn't fit the current stage", () => {

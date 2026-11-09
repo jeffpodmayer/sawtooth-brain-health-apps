@@ -164,6 +164,9 @@ samples and the timed parts:
   recorded as the limit and the part is marked timed out (T5). The test moves on.
 - **Nothing counts after the limit or a stop.** A click logged after either isn't
   scored, even if the browser's timer fired a moment late.
+- ⏳ **If the screen becomes too small during a timed part,** the too-small message
+  replaces the page and the timer keeps running. The page comes back when the screen
+  is big enough, and the time includes the gap.
 - Times are stored in milliseconds. Reporting format is in "Scoring."
 - Samples are untimed. No timer or countdown is ever shown (T4).
 
@@ -218,6 +221,7 @@ has only `status` and `code`.
 - **Audio log:** when each clip started and ended.
 - **Screen:** screen size, page scale, browser name and version.
 - **Focus:** any time the test tab was hidden or lost focus, with times.
+- **Screen too small:** any time the too-small message replaced a timed part, with times.
 - **Sheets:** one SVG per timed part, as it ended, with errors slashed (T13).
   Samples aren't saved.
 
@@ -300,6 +304,11 @@ has only `status` and `code`.
     - C: Leave it as it is now. The voice and arrow show where to continue, but once
       the arrow goes away, a correct line looks like an error, on screen and on
       the saved sheet.
+17. If a client's screen becomes too small during a timed part, the app shows the
+    too-small message and the timer keeps running, so the time includes the gap. Those
+    moments are saved in the raw data, and you could end the test from the dashboard.
+    Pausing the timer instead would give the client a break in the middle of a timed
+    test. OK to keep it running?
 
 ## Digital vs. paper: what may change
 

@@ -4,10 +4,10 @@ export const pages = ["sampleA", "partA", "sampleB", "partB"] as const;
 
 export type Flow = {
   pageIndex: number;
-  phase: "instructions" | "practice" | "test" | "finished";
+  phase: "instructions" | "practice" | "test" | "finished" | "done";
 };
 
-export type FlowEvent = "clicksEnabled" | "pageCompleted" | "pauseOver";
+export type FlowEvent = "clicksEnabled" | "pageCompleted" | "timeUp" | "pauseOver";
 
 export const startFlow: Flow = { pageIndex: 0, phase: "instructions" };
 
@@ -22,8 +22,14 @@ export function nextFlow(flow: Flow, event: FlowEvent): Flow {
     return { pageIndex, phase: "finished" };
   }
 
+  if (event === "timeUp" && phase === "test") {
+    return { pageIndex, phase: "finished" };
+  }
+
   if (event === "pauseOver" && phase === "finished") {
-    return { pageIndex: (pageIndex + 1) % pages.length, phase: "instructions" };
+    return pageIndex === pages.length - 1
+      ? { pageIndex, phase: "done" }
+      : { pageIndex: pageIndex + 1, phase: "instructions" };
   }
 
   return flow;

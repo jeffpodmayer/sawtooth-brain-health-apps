@@ -3,7 +3,7 @@
 The build, broken into small steps. Each step is about one session and teaches
 one thing. Tick a box only when its "Check" passes.
 
-**Current step:** 5.9
+**Current step:** 5.10
 
 How to use this file:
 
@@ -225,7 +225,7 @@ Steps 5.7 and 5.8 were built on working answers (ADR-030, ADR-032). The clinicia
   - Learn: a small state machine (instructions → practice → test)
   - Check: a sample has no limit on errors or time and doesn't restart; finishing it moves on; practice clicks aren't scored
 
-- [ ] **5.9 Part A to Part B, time limits and `onComplete`**
+- [x] **5.9 Part A to Part B, time limits and `onComplete`**
   - Learn: handing a result to the shared layer through the plug-in contract
   - Check: timeouts stop at 150 s / 300 s; the result matches what the 3.5 scoring tests expect; the screen size is saved with the result
   - Note: remove the temporary "Timer started" console line in `TrailMaking.tsx` (added at 5.7)
@@ -234,6 +234,8 @@ Steps 5.7 and 5.8 were built on working answers (ADR-030, ADR-032). The clinicia
 - [ ] **5.10 Save the sheet and click log**
   - Learn: exporting the drawn SVG with the font embedded
   - Check: the saved SVG opens in a browser and shows errors marked; the full click log is in `rawData`
+  - Note: record any time the too-small-screen message replaced a timed part, with times (SPEC: Recording, decided at 5.9)
+  - Note: check that a click on empty space during a timed part is logged with `circle: null` (not tried at 5.9)
 
 - [ ] **5.11 Being stopped from outside**
   - Learn: how the shared layer asks a test for its partial result

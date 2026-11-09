@@ -1,4 +1,4 @@
-// Placeholder until the test is built: click through all four pages. Each page's instructions
+// Runs all four pages in order, then hands the result to the shared layer. Each page's instructions
 // play first, with their arrows (SPEC: Voice and arrows). Correct clicks draw lines; wrong clicks
 // get the full error response (SPEC: Errors). A finished page moves on by itself after a short pause.
 // Shows a message instead if the screen is too small.
@@ -7,14 +7,19 @@ import { useEffect, useReducer, useRef, useState } from "react";
 import { createAudioPlayer } from "../../shared/audio-player";
 import { realClock } from "../../shared/clock";
 import { runScript } from "../../shared/run-script";
+import type { TestProps } from "../../shared/test-module";
 import { checkScript, type ActionLine, type SpokenLine } from "../../shared/test-script";
 import { findCircleAt } from "./find-circle";
 import { judgeClick } from "./judge-click";
 import { expectedOrder } from "./order";
 import { nextFlow, pages, startFlow } from "./page-flow";
 import { pageLayouts, type Point } from "./page-layouts";
+import type { LoggedClick } from "./score-part";
+import { scoreTest } from "./score-test";
 import { isScreenLargeEnough } from "./screen-check";
 import script from "./script.json";
+import { testId, testVersion } from "./test-info";
+import { timeLimitMs } from "./time-limits";
 import TrailPage, { type WrongLine } from "./TrailPage";
 
 const arrowHoldMs = 1500;
@@ -32,7 +37,9 @@ function checkScreen() {
   return isScreenLargeEnough(window.innerWidth, window.innerHeight);
 }
 
-function TrailMaking() {
+function TrailMaking({ sequenceId, onComplete }: TestProps) {
+  const [startedAt] = useState(() => new Date().toISOString());
+  const handedOver = useRef(false);
   const [player] = useState(() => createAudioPlayer("trail-making", spokenLines));
   const [screenOk, setScreenOk] = useState(checkScreen);
   const [{ pageIndex, phase }, dispatchFlow] = useReducer(nextFlow, startFlow);
@@ -42,9 +49,14 @@ function TrailMaking() {
   const [lastWrong, setLastWrong] = useState<string | null>(null);
   const correcting = useRef(false);
   const timerStartedAt = useRef<number | null>(null);
+  const clickLogs = useRef<Record<"partA" | "partB", LoggedClick[]>>({ partA: [], partB: [] });
 
   const layout = pageLayouts[pages[pageIndex]];
   const order = expectedOrder[pages[pageIndex]];
+  const page = pages[pageIndex];
+
+  // The part whose clock is running. Null during the instructions, the samples and the pause.
+  const timedPart = phase === "test" && (page === "partA" || page === "partB") ? page : null;
 
   useEffect(() => {
     if (screenOk) {
@@ -82,11 +94,6 @@ function TrailMaking() {
 
       if (line.action === "startTimer") {
         timerStartedAt.current = realClock.now();
-
-        // Temporary, for the 5.7 check. Remove at 5.9, when the timer is used.
-        if (import.meta.env.DEV) {
-          console.info("Timer started", timerStartedAt.current);
-        }
       }
 
       if (line.action === "enableClicks") {
@@ -119,6 +126,21 @@ function TrailMaking() {
     };
   }, [player, pageIndex, screenOk, phase]);
 
+  // Ends a timed part at its limit. Finishing first clears this, because timedPart goes back to null.
+  useEffect(() => {
+    if (timedPart === null) {
+      return;
+    }
+
+    const limitTimer = window.setTimeout(() => {
+      player.stop();
+      setArrowOn(null);
+      dispatchFlow("timeUp");
+    }, timeLimitMs[timedPart]);
+
+    return () => window.clearTimeout(limitTimer);
+  }, [player, timedPart]);
+
   // Leaves a finished page on screen for a moment, then clears it and moves to the next one.
   useEffect(() => {
     if (phase !== "finished") {
@@ -135,6 +157,24 @@ function TrailMaking() {
 
     return () => window.clearTimeout(pauseTimer);
   }, [phase]);
+
+  // Hands the result to the shared layer. The ref keeps it to once, even if the parent redraws.
+  useEffect(() => {
+    if (phase !== "done" || handedOver.current) {
+      return;
+    }
+
+    handedOver.current = true;
+    onComplete({
+      testId,
+      testVersion,
+      sequenceId,
+      startedAt,
+      completedAt: new Date().toISOString(),
+      scores: scoreTest(clickLogs.current),
+      rawData: { clicks: clickLogs.current },
+    });
+  }, [phase, onComplete, sequenceId, startedAt]);
 
   // Plays the script's error section. A correct click stops the voice, which ends this early.
   async function speakCorrection(arrowTarget: string) {
@@ -155,6 +195,10 @@ function TrailMaking() {
     }
 
     const circle = findCircleAt(layout.circles, x, y);
+
+    if (timedPart !== null && timerStartedAt.current !== null) {
+      clickLogs.current[timedPart].push({ timeMs: realClock.now() - timerStartedAt.current, circle });
+    }
 
     if (circle === null) {
       return;

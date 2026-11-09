@@ -1,11 +1,12 @@
 // The Trail Making plug-in (ADR-001).
 
 import type { TestModule } from "../../shared/test-module";
+import { testId, testVersion } from "./test-info";
 import TrailMaking from "./TrailMaking";
 
 export const trailMaking: TestModule = {
-  id: "trail-making",
+  id: testId,
   name: "Trail Making",
-  version: "0.1.0",
+  version: testVersion,
   Component: TrailMaking,
 };
