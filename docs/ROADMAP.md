@@ -3,7 +3,7 @@
 The build, broken into small steps. Each step is about one session and teaches
 one thing. Tick a box only when its "Check" passes.
 
-**Current step:** 5.3
+**Current step:** 5.4
 
 How to use this file:
 
@@ -201,7 +201,7 @@ Steps 5.7 and 5.8 need the clinicians' answers on the wording conflicts (see the
   - Learn: turning a page layout into SVG coordinates
   - Check: all four pages (Sample A, Part A, Sample B, Part B) look like the scans by eye; circles don't overlap and are easy to click
 
-- [ ] **5.3 Draw the page, full screen, scaled to fit**
+- [x] **5.3 Draw the page, full screen, scaled to fit**
   - Learn: SVG `viewBox`; scaling to screen height; screenfull
   - Check: looks like the paper page; no scrolling; works in all four browsers
 
@@ -309,6 +309,7 @@ or the seed file.
   - Check: the practice name shows (from practice settings); one click starts the sound check (4.7) and full screen
   - Note: clip downloads have no time limit or retry, so one stalled clip hangs the sound check forever and one failed clip can't recover without a reload. Decide what the client sees (Phase 4 code review)
   - Note: "Play it again" is disabled while the clip plays, so a keyboard user loses their place. Return focus to it when the clip ends (WCAG 2.2 AA, Phase 4 code review)
+  - Note: decide what happens if a client leaves full screen during a test, for example with Esc. The page keeps working at window size, but only another click can bring full screen back (found at 5.3)
 
 - [ ] **7.3 The sequence runner**
   - Learn: a test registry; using the plug-in contract from the outside

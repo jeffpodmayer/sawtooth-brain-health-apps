@@ -8,6 +8,7 @@ import App from "./App.tsx";
 
 // Only the dev server has this page, so the production build leaves it out.
 const DevTestPage = import.meta.env.DEV ? lazy(() => import("./dev/DevTestPage")) : null;
+const DevTrailPages = import.meta.env.DEV ? lazy(() => import("./dev/DevTrailPages")) : null;
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
@@ -20,6 +21,16 @@ createRoot(document.getElementById("root")!).render(
             element={
               <Suspense>
                 <DevTestPage />
+              </Suspense>
+            }
+          />
+        )}
+        {DevTrailPages && (
+          <Route
+            path="/dev/trail-pages"
+            element={
+              <Suspense>
+                <DevTrailPages />
               </Suspense>
             }
           />
