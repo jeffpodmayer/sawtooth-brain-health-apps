@@ -37,8 +37,13 @@ new one. Part A is numbers (1 → 25). Part B alternates numbers and letters
 - Circle positions live in one data file, with an entry per page, separate from the code.
 - The page is scaled to fill the screen height in full screen and stays static:
   no scrolling, zooming or movement during a test.
-- **A click counts only if it lands inside a drawn circle.** Clicks outside every
-  circle do nothing (not an error, not logged as a click on a circle).
+- **A click counts only if it lands inside a drawn circle.** The whole circle counts,
+  including its outline and the number inside it, with no invisible margin around it.
+  Clicks outside every circle do nothing (not an error, not logged as a click on a circle).
+- A click counts the moment the main button goes down. Right-clicks and two-finger
+  taps do nothing.
+- Each line runs from the outer edge of one circle to the outer edge of the next,
+  so the numbers and letters stay readable.
 - No hover highlight on circles.
 - No timer, countdown, error text, help number or end/skip button on screen.
 - If the screen is too small to show the page at a usable size, show a message
@@ -262,6 +267,10 @@ test ended before its outcome was known. A `notGiven` part has only `status` and
 13. If a client's screen is too small, the app shows a message instead of the test.
     Our working rule is that circles must be at least 40 pixels across, which most
     laptops meet. OK?
+14. Some lines cross other circles on the way to their next circle, and can run
+    through the number or letter. Right now the line is drawn on top. It could
+    go behind the circle, which keeps the number readable but can make the line
+    look connected to that circle. Which do you prefer?
 
 ## Digital vs. paper: what may change
 

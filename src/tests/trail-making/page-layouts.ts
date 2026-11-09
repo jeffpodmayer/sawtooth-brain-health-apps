@@ -3,8 +3,11 @@
 
 export const pageSize = { width: 850, height: 1100 } as const;
 export const circleRadius = 31;
+export const circleOutlineWidth = 2;
+// The outline is centered on the radius, so half of its width sits outside it.
+export const circleOuterRadius = circleRadius + circleOutlineWidth / 2;
 
-type Point = { x: number; y: number };
+export type Point = { x: number; y: number };
 type Circle = Point & { id: string };
 type Box = Point & { width: number; height: number };
 

@@ -3,7 +3,7 @@
 The build, broken into small steps. Each step is about one session and teaches
 one thing. Tick a box only when its "Check" passes.
 
-**Current step:** 5.5
+**Current step:** 5.6
 
 How to use this file:
 
@@ -209,8 +209,8 @@ Steps 5.7 and 5.8 need the clinicians' answers on the wording conflicts (see the
   - Learn: measuring the screen; recording it with the result
   - Check: a too-small window shows a message (working threshold of 40 px circles, clinicians to confirm), and enlarging the window brings the test back
 
-- [ ] **5.5 Clicking circles and drawing lines**
-  - Learn: pointer events in SVG; large hit areas; ignoring double-clicks
+- [x] **5.5 Clicking circles and drawing lines**
+  - Learn: pointer events in SVG; the whole drawn circle as the click area, with no extra margin; ignoring double-clicks
   - Check: a full correct run works with a mouse and a trackpad; no hover highlight
 
 - [ ] **5.6 Errors: slash, arrow and voice**
