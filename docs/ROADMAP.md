@@ -3,7 +3,7 @@
 The build, broken into small steps. Each step is about one session and teaches
 one thing. Tick a box only when its "Check" passes.
 
-**Current step:** 6.3
+**Current step:** 6.4
 
 How to use this file:
 
@@ -261,7 +261,7 @@ the stop wording and the recall instruction (see the brief).
   - Learn: building an accessible button group
   - Check: buttons are 56px+ and easy to hit with a trackpad; the keyboard does nothing during the test
 
-- [ ] **6.3 Selecting boxes, auto-advance and corrections**
+- [x] **6.3 Selecting boxes, auto-advance and corrections**
   - Learn: keeping "which box is selected" in state; rules as small functions
   - Check: the next empty box is selected automatically; no skipping ahead; clicking a filled box lets you change it, then the selector returns to the next empty box
 

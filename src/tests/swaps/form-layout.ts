@@ -4,6 +4,7 @@
 export const pageSize = { width: 850, height: 1100 } as const;
 export const keySymbolSize = 43;
 export const gridSymbolSize = 46;
+export const selectionSize = 62;
 
 export type Point = { x: number; y: number };
 

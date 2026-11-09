@@ -152,7 +152,7 @@ The recall timer starts when this clip ends.
   At the start of practice it's item 4; at the start of the test, item 7.
 - **Answering:** clicking a number fills the selected box, and the selector moves to the
   next box.
-- **No skipping (S10):** empty boxes ahead can't be selected.
+- **No skipping (S10):** only the next empty box can be selected from the empty boxes ahead.
 - **Corrections (S9):** clicking a filled box in the current part selects it; the next
   number replaces the answer, and the selector returns to the next empty box. Changing
   to a different number counts as a correction; choosing the same number again doesn't.
