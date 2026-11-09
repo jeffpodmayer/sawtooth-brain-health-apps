@@ -223,7 +223,7 @@ in each box is the one scored.
 - **Audio log:** when each clip started and ended.
 - **Screen:** screen size, page scale, browser name and version.
 - **Focus:** any time the test tab was hidden or lost focus, with times.
-- **Sheet (SVG):** the grid as it ended, with **errors** and **corrections** clearly
+- **Sheet (SVG, in the result's `sheets`, not `rawData`):** the grid as it ended, with **errors** and **corrections** clearly
   marked (S13; e.g. a wrong answer circled, a corrected answer showing the old number
   struck through), plus the recall answers below it.
 

@@ -10,7 +10,7 @@ rule in CLAUDE.md.
 
 ## ADR-001: One app, tests as plug-ins
 
-- **Status:** Accepted · **Date:** by 2026-11-05 (naming 2026-11-06) · Component props extended by ADR-028
+- **Status:** Accepted · **Date:** by 2026-11-05 (naming 2026-11-06) · Component props extended by ADR-028 · Result extended by ADR-033
 
 **Context:** The practice will add more tests over time. Each test has its own
 rules, but they all share links, audio, timing, saving and the dashboard.
@@ -771,3 +771,25 @@ but misclicks.
 - A client who can't finish stays on the sample until the clinician ends it, so this
   relies on a clinician watching (ADR-005). Revisit if clients ever test unwatched.
 - Code 996 has no automatic source. Settle how a stop records it at roadmap 9.1.
+
+## ADR-033: Sheets are their own part of a test's result
+
+- **Status:** Accepted · **Date:** 2026-11-08 · Adds to the result in ADR-001
+
+**Context:** ADR-001's result has only `scores` and `rawData`, and both SPECs listed
+the sheet under `rawData`. But a sheet is saved as its own file in Storage (ADR-008,
+roadmap 7.6), and shared code must not need to look inside a test's `rawData` to find it.
+
+**Decision:**
+
+- A test's result also has `sheets`: each sheet's name and its full SVG text.
+- Trail Making uses `partA` and `partB`, for the timed parts that ended. A test with
+  no sheet to hand over returns an empty `sheets`.
+- The shared layer saves each one as a file under `<practice_id>/`. Sheets are not
+  stored in `raw_data`.
+
+**Consequences:**
+
+- SWAPS returns its sheet the same way (roadmap 6.9).
+- `sequence_tests` has no column pointing to a sheet yet. How files are named, and how
+  a result finds its files, is decided at roadmap 7.6 and may need a migration.

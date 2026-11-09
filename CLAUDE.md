@@ -82,7 +82,7 @@ docs/            ROADMAP.md, DECISIONS.md
 
 - Each test exports `id`, `name`, `version` and a React component taking
   `{ sequenceId, stopRequested, onComplete }`.
-- `onComplete` returns `{ testId, testVersion, sequenceId, startedAt, completedAt, scores, rawData }`.
+- `onComplete` returns `{ testId, testVersion, sequenceId, startedAt, completedAt, scores, rawData, sheets }`.
 - The shared layer must be able to stop a test and collect its partial result.
 - Shared code never knows how a test is scored. Test code never imports
   Supabase. All data goes through the `ResultStore` interface.

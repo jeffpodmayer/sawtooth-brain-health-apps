@@ -21,7 +21,23 @@ function DevTestPage() {
 
   if (!heard) return <SoundCheck onHeard={() => setHeard(true)} />;
 
-  if (saved.length > 0) return <pre className="p-8">{JSON.stringify(saved, null, 2)}</pre>;
+  if (saved.length > 0) {
+    return (
+      <main className="p-8">
+        {Object.entries(saved[0].result.sheets).map(([name, svg]) => (
+          <a
+            key={name}
+            href={`data:image/svg+xml,${encodeURIComponent(svg)}`}
+            download={`${name}.svg`}
+            className="mr-4 underline"
+          >
+            Download {name}
+          </a>
+        ))}
+        <pre>{JSON.stringify(saved, (key, value) => (key === "sheets" ? undefined : value), 2)}</pre>
+      </main>
+    );
+  }
 
   return <Test sequenceId="dev-sequence" stopRequested={false} onComplete={handleComplete} />;
 }

@@ -4,19 +4,23 @@
 // Shows a message instead if the screen is too small.
 
 import { useEffect, useReducer, useRef, useState } from "react";
+import { withAudioLog } from "../../shared/audio-log";
 import { createAudioPlayer } from "../../shared/audio-player";
-import { realClock } from "../../shared/clock";
+import { browserFrom } from "../../shared/browser-info";
+import { elapsedClock, realClock } from "../../shared/clock";
+import { recordFocus, type FocusLogEntry } from "../../shared/focus-log";
 import { runScript } from "../../shared/run-script";
 import type { TestProps } from "../../shared/test-module";
 import { checkScript, type ActionLine, type SpokenLine } from "../../shared/test-script";
+import { buildSheet } from "./build-sheet";
 import { findCircleAt } from "./find-circle";
-import { judgeClick } from "./judge-click";
+import { judgeClick, type ClickOutcome } from "./judge-click";
 import { expectedOrder } from "./order";
 import { nextFlow, pages, startFlow } from "./page-flow";
 import { pageLayouts, type Point } from "./page-layouts";
 import type { LoggedClick } from "./score-part";
 import { scoreTest } from "./score-test";
-import { isScreenLargeEnough } from "./screen-check";
+import { isScreenLargeEnough, pageScale } from "./screen-check";
 import script from "./script.json";
 import { testId, testVersion } from "./test-info";
 import { timeLimitMs } from "./time-limits";
@@ -33,6 +37,11 @@ const spokenLines = Object.values(sections)
 // In this test's script.json, an arrow line also names the circle it points to.
 type ArrowLine = ActionLine & { target: string };
 
+// A logged click as saved in rawData. Scoring reads only the LoggedClick fields.
+type RecordedClick = LoggedClick & Point & { outcome: ClickOutcome };
+
+type TooSmallEntry = { part: "partA" | "partB"; startedMs: number; endedMs: number | null };
+
 function checkScreen() {
   return isScreenLargeEnough(window.innerWidth, window.innerHeight);
 }
@@ -40,7 +49,8 @@ function checkScreen() {
 function TrailMaking({ sequenceId, onComplete }: TestProps) {
   const [startedAt] = useState(() => new Date().toISOString());
   const handedOver = useRef(false);
-  const [player] = useState(() => createAudioPlayer("trail-making", spokenLines));
+  const [testClock] = useState(() => elapsedClock(realClock));
+  const [player] = useState(() => withAudioLog(createAudioPlayer("trail-making", spokenLines), testClock));
   const [screenOk, setScreenOk] = useState(checkScreen);
   const [{ pageIndex, phase }, dispatchFlow] = useReducer(nextFlow, startFlow);
   const [connected, setConnected] = useState<readonly string[]>([]);
@@ -49,7 +59,11 @@ function TrailMaking({ sequenceId, onComplete }: TestProps) {
   const [lastWrong, setLastWrong] = useState<string | null>(null);
   const correcting = useRef(false);
   const timerStartedAt = useRef<number | null>(null);
-  const clickLogs = useRef<Record<"partA" | "partB", LoggedClick[]>>({ partA: [], partB: [] });
+  const clickLogs = useRef<Record<"partA" | "partB", RecordedClick[]>>({ partA: [], partB: [] });
+  const sheets = useRef<Record<string, string>>({});
+  const screens = useRef<Partial<Record<"partA" | "partB", { width: number; height: number; scale: number }>>>({});
+  const focusLog = useRef<FocusLogEntry[]>([]);
+  const tooSmallLog = useRef<TooSmallEntry[]>([]);
 
   const layout = pageLayouts[pages[pageIndex]];
   const order = expectedOrder[pages[pageIndex]];
@@ -59,17 +73,13 @@ function TrailMaking({ sequenceId, onComplete }: TestProps) {
   const timedPart = phase === "test" && (page === "partA" || page === "partB") ? page : null;
 
   useEffect(() => {
-    if (screenOk) {
-      return;
-    }
-
     function recheck() {
       setScreenOk(checkScreen());
     }
 
     window.addEventListener("resize", recheck);
     return () => window.removeEventListener("resize", recheck);
-  }, [screenOk]);
+  }, []);
 
   // Reads this page's instructions. Waits for a big enough screen, because the arrows are part
   // of them. If the screen gets too small partway, the voice stops and they start again.
@@ -141,6 +151,37 @@ function TrailMaking({ sequenceId, onComplete }: TestProps) {
     return () => window.clearTimeout(limitTimer);
   }, [player, timedPart]);
 
+  // Notes the screen each timed part was shown on, since a window can change between parts.
+  useEffect(() => {
+    if (timedPart !== null) {
+      const { innerWidth: width, innerHeight: height } = window;
+      screens.current[timedPart] = { width, height, scale: pageScale(width, height) };
+    }
+  }, [timedPart]);
+
+  useEffect(() => recordFocus(testClock, focusLog.current), [testClock]);
+
+  // Notes when the too-small message covers a timed part. The clock keeps running underneath.
+  useEffect(() => {
+    if (timedPart === null || screenOk) {
+      return;
+    }
+
+    const entry: TooSmallEntry = { part: timedPart, startedMs: testClock.now(), endedMs: null };
+    tooSmallLog.current.push(entry);
+
+    return () => {
+      entry.endedMs = testClock.now();
+    };
+  }, [screenOk, testClock, timedPart]);
+
+  // Keeps a timed part's sheet as it ended, before the pause clears the page.
+  useEffect(() => {
+    if (phase === "finished" && (page === "partA" || page === "partB")) {
+      sheets.current[page] = buildSheet(layout, connected, wrongLines);
+    }
+  }, [phase, page, layout, connected, wrongLines]);
+
   // Leaves a finished page on screen for a moment, then clears it and moves to the next one.
   useEffect(() => {
     if (phase !== "finished") {
@@ -172,9 +213,17 @@ function TrailMaking({ sequenceId, onComplete }: TestProps) {
       startedAt,
       completedAt: new Date().toISOString(),
       scores: scoreTest(clickLogs.current),
-      rawData: { clicks: clickLogs.current },
+      rawData: {
+        clicks: clickLogs.current,
+        audio: player.log,
+        screen: screens.current,
+        browser: browserFrom(navigator.userAgent),
+        focus: [...focusLog.current],
+        tooSmall: tooSmallLog.current,
+      },
+      sheets: sheets.current,
     });
-  }, [phase, onComplete, sequenceId, startedAt]);
+  }, [phase, onComplete, player, sequenceId, startedAt]);
 
   // Plays the script's error section. A correct click stops the voice, which ends this early.
   async function speakCorrection(arrowTarget: string) {
@@ -195,16 +244,16 @@ function TrailMaking({ sequenceId, onComplete }: TestProps) {
     }
 
     const circle = findCircleAt(layout.circles, x, y);
+    const outcome = circle === null ? "ignored" : judgeClick(order, connected.length, circle, lastWrong);
 
     if (timedPart !== null && timerStartedAt.current !== null) {
-      clickLogs.current[timedPart].push({ timeMs: realClock.now() - timerStartedAt.current, circle });
+      clickLogs.current[timedPart].push({ timeMs: realClock.now() - timerStartedAt.current, x, y, circle, outcome });
     }
 
     if (circle === null) {
       return;
     }
 
-    const outcome = judgeClick(order, connected.length, circle, lastWrong);
     const lastCorrect = connected.at(-1);
 
     if (outcome === "correct") {

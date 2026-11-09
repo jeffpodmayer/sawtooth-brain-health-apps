@@ -1,5 +1,16 @@
 import { describe, expect, it } from "vitest";
-import { isScreenLargeEnough } from "./screen-check";
+import { isScreenLargeEnough, pageScale } from "./screen-check";
+
+describe("pageScale", () => {
+  it("is 1 when the screen matches the page", () => {
+    expect(pageScale(850, 1100)).toBe(1);
+  });
+
+  it("uses whichever side limits the page", () => {
+    expect(pageScale(1700, 1100)).toBe(1);
+    expect(pageScale(425, 1100)).toBe(0.5);
+  });
+});
 
 describe("isScreenLargeEnough", () => {
   it("accepts common laptop screens", () => {

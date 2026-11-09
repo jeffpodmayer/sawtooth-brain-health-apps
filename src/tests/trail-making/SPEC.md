@@ -217,13 +217,12 @@ has only `status` and `code`.
   circle, double-click). Clicks during the instructions are blocked and not logged.
 - **Stop time:** if the clinician stopped a timed part, ms from "Begin." to the
   stop, so the server can re-score the partial result.
-- **Pointer movement** during timed parts, sampled about 20 times a second (T13).
 - **Audio log:** when each clip started and ended.
 - **Screen:** screen size, page scale, browser name and version.
 - **Focus:** any time the test tab was hidden or lost focus, with times.
 - **Screen too small:** any time the too-small message replaced a timed part, with times.
-- **Sheets:** one SVG per timed part, as it ended, with errors slashed (T13).
-  Samples aren't saved.
+- **Sheets (in the result's `sheets`, not `rawData`):** one SVG per timed part, as it
+  ended, with errors slashed (T13). Samples aren't saved.
 
 ## Stopped by the clinician
 
@@ -244,7 +243,7 @@ has only `status` and `code`.
 
 - Click rules: inside the circle only, double-clicks ignored, no clicks during the instructions
 - Arrow timing, the 1.5 s pause between pages
-- Storing milliseconds; the format of the click and pointer logs
+- Storing milliseconds; the format of the click log
 - Page scaling and the too-small-screen message
 
 **The clinicians decide** (every ⏳ in this file):
@@ -309,6 +308,9 @@ has only `status` and `code`.
     moments are saved in the raw data, and you could end the test from the dashboard.
     Pausing the timer instead would give the client a break in the middle of a timed
     test. OK to keep it running?
+18. An earlier plan recorded the pointer's position about 20 times a second during
+    the timed parts. It's left out for now because nothing in the app uses it. Would
+    you use it? It can be added back before the first real client.
 
 ## Digital vs. paper: what may change
 

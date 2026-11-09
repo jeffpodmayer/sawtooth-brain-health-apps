@@ -1,11 +1,23 @@
 import { describe, expect, it, vi } from "vitest";
-import { createFakeClock, realClock } from "./clock";
+import { createFakeClock, elapsedClock, realClock } from "./clock";
 
 describe("realClock", () => {
   it("reads performance.now()", () => {
     vi.spyOn(performance, "now").mockReturnValue(1234.5);
     expect(realClock.now()).toBe(1234.5);
     vi.restoreAllMocks();
+  });
+});
+
+describe("elapsedClock", () => {
+  it("counts elapsed time from when the elapsed clock was made", () => {
+    const clock = createFakeClock();
+    clock.advance(500);
+    const elapsed = elapsedClock(clock);
+
+    expect(elapsed.now()).toBe(0);
+    clock.advance(250);
+    expect(elapsed.now()).toBe(250);
   });
 });
 

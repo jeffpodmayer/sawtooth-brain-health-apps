@@ -17,6 +17,9 @@ export type TestResult = {
   // Write a test's own shapes with `type`: an `interface` won't fit here.
   scores: Record<string, unknown>;
   rawData: Record<string, unknown>;
+
+  // Finished sheets as SVG text, by name. Each one is saved as its own file (ADR-033).
+  sheets: Record<string, string>;
 };
 
 export type TestProps = {

@@ -6,8 +6,10 @@ import { circleRadius, pageSize } from "./page-layouts";
 // Working answer, pending clinician approval.
 const minCircleDiameterPx = 40;
 
-export function isScreenLargeEnough(width: number, height: number): boolean {
-  const scale = Math.min(width / pageSize.width, height / pageSize.height);
+export function pageScale(width: number, height: number): number {
+  return Math.min(width / pageSize.width, height / pageSize.height);
+}
 
-  return 2 * circleRadius * scale >= minCircleDiameterPx;
+export function isScreenLargeEnough(width: number, height: number): boolean {
+  return 2 * circleRadius * pageScale(width, height) >= minCircleDiameterPx;
 }

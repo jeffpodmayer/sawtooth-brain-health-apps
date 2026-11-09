@@ -3,7 +3,7 @@
 The build, broken into small steps. Each step is about one session and teaches
 one thing. Tick a box only when its "Check" passes.
 
-**Current step:** 5.10
+**Current step:** 5.11
 
 How to use this file:
 
@@ -231,7 +231,7 @@ Steps 5.7 and 5.8 were built on working answers (ADR-030, ADR-032). The clinicia
   - Note: remove the temporary "Timer started" console line in `TrailMaking.tsx` (added at 5.7)
   - Note: log clicks only during the `test` stage (added at 5.8), so practice clicks are never scored or saved
 
-- [ ] **5.10 Save the sheet and click log**
+- [x] **5.10 Save the sheet and click log**
   - Learn: exporting the drawn SVG with the font embedded
   - Check: the saved SVG opens in a browser and shows errors marked; the full click log is in `rawData`
   - Note: record any time the too-small-screen message replaced a timed part, with times (SPEC: Recording, decided at 5.9)
@@ -332,6 +332,7 @@ or the seed file.
 - [ ] **7.6 Upload the sheet**
   - Learn: uploading to Storage through an Edge Function
   - Check: the SVG lands under `<practice_id>/`; the client can't read it back
+  - Note: upload each entry in the result's `sheets`, and decide how files are named and how a result finds them (ADR-033)
 
 - [ ] **7.7 The real ResultStore**
   - Learn: swapping one implementation of an interface for another
