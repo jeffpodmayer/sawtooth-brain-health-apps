@@ -682,7 +682,7 @@ give the shared layer no way to ask. The contract also didn't say what format
 
 ## ADR-029: Free placeholder voice during development
 
-- **Status:** Accepted · **Date:** 2026-11-08 · Changes the development voice in ADR-006
+- **Status:** Accepted · **Date:** 2026-11-08 · Changes the development voice in ADR-006 · Placeholder voice changed by ADR-031
 
 **Context:** ADR-006 planned the "Justin Time" library voice on the free plan
 during development. ElevenLabs' docs say free accounts can't use Voice Library
@@ -726,3 +726,22 @@ and 5.7 disagreed. The clinicians haven't answered this question yet.
   needs room for it.
 - A client who misses a spoken instruction has no text to fall back on, since
   instructions can't be replayed. Raise this when the clinicians are asked.
+
+## ADR-031: Bella replaces Adam as the placeholder voice
+
+- **Status:** Accepted · **Date:** 2026-11-08 · Changes the development voice in ADR-029
+
+**Context:** ADR-029 chose "Adam" as the free placeholder voice for development.
+Jeff preferred a different voice to hear while building.
+
+**Decision:**
+
+- Development clips use "Bella" (`hpp4J3VqNfWAUOO0d1Us`).
+- "Justin Time" stays the planned final voice, generated in the paid month
+  (roadmap 12.3).
+
+**Consequences:**
+
+- All 58 clips are regenerated, using about 1,900 ElevenLabs characters.
+- Development clips still aren't final and never go to real clients.
+- The default-voice expiry noted in ADR-029 may apply to Bella too.
