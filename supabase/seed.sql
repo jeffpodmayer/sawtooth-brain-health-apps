@@ -74,8 +74,8 @@ values (
   '{
     "partA": {"status": "completed", "code": null, "timeMs": 38000, "timeSeconds": 38, "correctLines": 24, "correctClicks": 25, "errors": 0},
     "partB": {"status": "completed", "code": null, "timeMs": 91000, "timeSeconds": 91, "correctLines": 24, "correctClicks": 25, "errors": 1},
-    "sampleA": {"passed": true, "tries": 1},
-    "sampleB": {"passed": true, "tries": 1}
+    "sampleA": {"passed": true},
+    "sampleB": {"passed": true}
   }',
   '{"seed": true}',
   1440, 900

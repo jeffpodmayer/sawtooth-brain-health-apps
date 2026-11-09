@@ -27,10 +27,9 @@ export type PartScore = GivenPartScore | { status: "notGiven"; code: 996 | 997 |
 
 export type SampleScore = {
   passed: boolean;
-  tries: number;
 };
 
-// A sample is null if the test ended before that sample's outcome was known.
+// A sample is null if the test ended before reaching it.
 export type TrailMakingScores = {
   partA: PartScore;
   partB: PartScore;
