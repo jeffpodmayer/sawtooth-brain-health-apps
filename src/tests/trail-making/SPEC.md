@@ -79,7 +79,7 @@ new one. Part A is numbers (1 → 25). Part B alternates numbers and letters
 
 Each finished page moves to the next automatically, after a short pause
 (about 1.5 s; one setting). The source has no spoken line for these moves.
-Failed-practice rules are below. The clinician can end the test at any point from
+Practice rules are below. The clinician can end the test at any point from
 the dashboard (see "Stopped by the clinician").
 
 ## Script
@@ -169,15 +169,11 @@ samples and the timed parts:
 
 ## Practice rules ⏳
 
-- **A failed try:** 3 errors in one try, or 2 minutes without finishing.
-- **After a failed try:** the page clears and the sample starts again from the
-  beginning, instructions included.
-- **Three failed tries on Sample A:** Part A is not given (code 996). The test
-  continues to Sample B. The NACC instructions say to present Sample B even if
-  Sample A failed.
-- **Three failed tries on Sample B:** Part B is not given (code 996). The test ends.
-- Practice clicks are not scored or saved. Only each sample's outcome
-  (passed / failed, number of tries) is recorded.
+- **No automatic failure.** A sample has no limit on errors or time, and it doesn't
+  restart. The client keeps going until the sample is finished (ADR-032).
+- **Only the clinician can end a sample early,** from the dashboard. That ends the
+  whole test (see "Stopped by the clinician").
+- Practice clicks are not scored or saved. Only each sample's outcome is recorded.
 
 ## Alphabet pre-test ⏳
 
@@ -207,8 +203,9 @@ such as B minus A (T11).
 | `correctClicks` | Correct circle clicks including circle 1, 0–25 (T12)                                             |
 | `errors`        | Error clicks (commission errors). Ignored clicks don't count.                                    |
 
-Plus, per sample: `passed` (yes/no) and `tries` (1–3). A sample is empty (null) if the
-test ended before its outcome was known. A `notGiven` part has only `status` and `code`.
+Plus, per sample: `passed` (yes if finished, no if the clinician ended the test during
+it). A sample is empty (null) if the test ended before reaching it. A `notGiven` part
+has only `status` and `code`.
 
 ## Recording (`rawData`)
 
@@ -232,6 +229,8 @@ test ended before its outcome was known. A `notGiven` part has only `status` and
 - If the stop comes during a timed part's instructions, before the timer starts,
   that part is `notGiven`.
 - Parts not yet reached are `notGiven`.
+- The test records no code for a stop, because it only learns that it was stopped, not
+  why. How a stop becomes 996 or 997 is settled at roadmap 9.1.
 - The stop reason (Gave up, Interrupted, Alphabet check not passed) is saved.
 - The sheet is saved as it stood. The partial result goes through the shared stop hook.
 
@@ -247,7 +246,7 @@ test ended before its outcome was known. A `notGiven` part has only `status` and
 **The clinicians decide** (every ⏳ in this file):
 
 - Wording changes W1–W3, and voice-only instructions
-- The sample error response, what counts as a failed try, what happens after one
+- The sample error response, and having no automatic limit on a sample
 - Codes 996/997 and the alphabet check process
 - How time is reported
 
@@ -262,11 +261,15 @@ test ended before its outcome was known. A `notGiven` part has only `status` and
 4. In practice, the paper script asks "What is the next number?" and waits for an
    answer. The app can't hear, so it says "That one was not correct. Please start
    here and continue." instead. OK?
-5. What counts as a failed practice try? Our proposal: 3 mistakes, or 2 minutes
-   without finishing.
-6. After a failed try, should the practice start over with the instructions read again?
-7. If Sample A fails three times, skip Part A but still try Sample B, as the NACC
-   instructions say? (Earlier you said the test ends.)
+5. Should a practice sample have any automatic limit on mistakes or time? (Working
+   answer: no limit, and only you can end it, from the dashboard. Our earlier proposal
+   was 3 mistakes or 2 minutes.)
+6. Should a practice sample ever start over with the instructions read again? (Working
+   answer: no.)
+7. If a client can't do a sample, you'd end the test from the dashboard and it stops
+   there, with no Part A or B. Earlier you said the test ends after three failed tries.
+   The NACC instructions say not to give Test A if the client can't complete the sample
+   and clearly doesn't understand the task, and to enter code 996. OK?
 8. Will you do the alphabet check on the video call before the test? If the client
    doesn't pass, you'd end the test after Part A with "Alphabet check not passed."
 9. Do you want codes 996 and 997 in the results and the CSV?

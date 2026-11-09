@@ -223,7 +223,7 @@ Steps 5.7 and 5.8 need the clinicians' answers on the wording conflicts (see the
 
 - [ ] **5.8 Practice rounds**
   - Learn: a small state machine (instructions → practice → test)
-  - Check: practice follows the failure rule agreed with the clinicians; practice clicks aren't scored
+  - Check: a sample has no limit on errors or time and doesn't restart; finishing it moves on; practice clicks aren't scored
 
 - [ ] **5.9 Part A to Part B, time limits and `onComplete`**
   - Learn: handing a result to the shared layer through the plug-in contract
@@ -391,7 +391,7 @@ see their own practice.
   - Learn: recording an action with who did it and why
   - Check: "End current test" and "End whole sequence" both require a reason (Gave up / Interrupted); the action saves with the clinician's ID
   - Note: a stop must be saved before the client's partial result arrives, so the status check (9.3) has something to read. `sequence_tests` doesn't allow that yet; add a stop-request state by migration (Phase 2 code review)
-  - Note: a test only learns that it was stopped, not why, so Trail Making can't yet record Part B as `notGiven` with code 997. Settle how once the clinicians confirm the alphabet check (Phase 3 code review)
+  - Note: a test only learns that it was stopped, not why, so Trail Making can't yet record a part as `notGiven` with code 996 or 997. A stop during a sample needs 996 when the client couldn't do it (ADR-032). Settle how once the clinicians confirm the alphabet check (Phase 3 code review)
 
 - [ ] **9.2 Real-time stop to the client's tab**
   - Learn: Supabase real-time channels; letting a client listen without letting it read tables (approach decided at the start of this step)

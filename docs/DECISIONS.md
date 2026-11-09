@@ -221,7 +221,7 @@ watching, not by a button that could be clicked by accident or used to skip.
 
 ## ADR-010: Test-specific choices
 
-- **Status:** Accepted · **Date:** 2026-11-04 to 2026-11-05
+- **Status:** Accepted · **Date:** 2026-11-04 to 2026-11-05 · Trail Making practice failure changed by ADR-032
 
 **Context:** Choices that apply to one test, but change how it's built.
 
@@ -745,3 +745,29 @@ Jeff preferred a different voice to hear while building.
 - All 58 clips are regenerated, using about 1,900 ElevenLabs characters.
 - Development clips still aren't final and never go to real clients.
 - The default-voice expiry noted in ADR-029 may apply to Bella too.
+
+## ADR-032: Only the clinician ends a Trail Making sample
+
+- **Status:** Accepted, clinicians not yet asked · **Date:** 2026-11-08 · Changes the Trail Making practice failure rule in ADR-010
+
+**Context:** ADR-010 ended Trail Making after three failed practice tries, and the
+SPEC's working answer defined a failed try as 3 errors or 2 minutes. The NACC
+instructions make this the examiner's judgment: if the participant can't complete the
+sample and clearly doesn't comprehend the task, Test A isn't given and code 996 is
+entered. A fixed count would also end the test for a client who understands the task
+but misclicks.
+
+**Decision:**
+
+- A sample has no limit on errors or time, and it doesn't restart.
+- Only the clinician can end a sample early, from the dashboard. That ends the whole test.
+- Sample results keep `passed` and drop `tries`.
+
+**Consequences:**
+
+- Build 5.8 this way. The question stays open in the SPEC (questions 5 to 7), and the
+  clinicians can still change it.
+- Trail Making and SWAPS now work the same way for practice: the clinician decides.
+- A client who can't finish stays on the sample until the clinician ends it, so this
+  relies on a clinician watching (ADR-005). Revisit if clients ever test unwatched.
+- Code 996 has no automatic source. Settle how a stop records it at roadmap 9.1.
