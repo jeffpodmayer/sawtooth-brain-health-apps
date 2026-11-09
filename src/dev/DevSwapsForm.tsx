@@ -4,6 +4,7 @@ import { useState } from "react";
 import NumberPad from "../tests/swaps/NumberPad";
 import { canSelect, nextEmpty, type Answers } from "../tests/swaps/selection";
 import SwapsPage from "../tests/swaps/SwapsPage";
+import { isOnScreen, topRowFor } from "../tests/swaps/visible-rows";
 
 // The timed test's boxes, so the selector starts on item 7.
 const part = { first: 7, last: 81 };
@@ -12,6 +13,7 @@ function DevSwapsForm() {
   const [answers, setAnswers] = useState<Answers>(new Map());
   const [selected, setSelected] = useState<number | null>(part.first);
   const [disabled, setDisabled] = useState(false);
+  const topRow = topRowFor(nextEmpty(part, answers) ?? part.last);
 
   function handlePick(number: number) {
     if (selected === null) {
@@ -24,7 +26,7 @@ function DevSwapsForm() {
   }
 
   function handleItemPress(item: number) {
-    if (!disabled && canSelect(part, answers, item)) {
+    if (!disabled && canSelect(part, answers, item) && isOnScreen(item, topRow)) {
       setSelected(item);
     }
   }
@@ -34,7 +36,7 @@ function DevSwapsForm() {
       <label className="fixed top-2 left-2 text-base">
         <input type="checkbox" checked={disabled} onChange={(event) => setDisabled(event.target.checked)} /> Pad off
       </label>
-      <SwapsPage answers={answers} selected={selected} onItemPress={handleItemPress} />
+      <SwapsPage answers={answers} selected={selected} topRow={topRow} onItemPress={handleItemPress} />
       <NumberPad disabled={disabled} onPick={handlePick} />
     </div>
   );

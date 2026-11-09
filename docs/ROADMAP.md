@@ -3,7 +3,7 @@
 The build, broken into small steps. Each step is about one session and teaches
 one thing. Tick a box only when its "Check" passes.
 
-**Current step:** 6.4
+**Current step:** 6.5
 
 How to use this file:
 
@@ -265,7 +265,7 @@ the stop wording and the recall instruction (see the brief).
   - Learn: keeping "which box is selected" in state; rules as small functions
   - Check: the next empty box is selected automatically; no skipping ahead; clicking a filled box lets you change it, then the selector returns to the next empty box
 
-- [ ] **6.4 Showing 6 rows and scrolling up slowly**
+- [x] **6.4 Showing 6 rows and scrolling up slowly**
   - Learn: smooth movement with CSS transforms, without the page jumping
   - Check: rows 1–6 show at the start; the grid moves up slowly at row 5; smooth in Safari; the client can't scroll it
 

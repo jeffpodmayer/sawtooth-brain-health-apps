@@ -8,7 +8,7 @@ export const selectionSize = 62;
 
 export type Point = { x: number; y: number };
 
-const key = { firstX: 199, y: 121, spacing: 74 };
+const key = { firstX: 157, y: 140, spacing: 90 };
 const grid = { firstY: 249, rowSpacing: 90, columnX: [128, 199, 274, 349, 421, 498, 573, 648, 726] };
 
 // Row 1's two gray boxes, side by side, with their printed labels above them.
@@ -19,6 +19,16 @@ export const grayBoxes = [
 
 export const grayLabelInset = 12;
 export const grayLabelGap = 13;
+
+// The part of the page that shows: the key and six grid rows. The grid slides inside its window.
+export const visibleArea = { y: 90, height: 660 } as const;
+export const gridWindow = { y: 194, height: 550 } as const;
+export const scrollMs = 600;
+
+// How far the grid has moved up when topRow is the row at the top of its window.
+export function scrollOffset(topRow: number): number {
+  return (topRow - 1) * grid.rowSpacing;
+}
 
 // index counts along the key from 0, in printed order.
 export function keyPosition(index: number): Point {

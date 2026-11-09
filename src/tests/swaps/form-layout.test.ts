@@ -15,6 +15,6 @@ it("puts item 81 in the bottom right", () => {
 });
 
 it("spaces the key along one line", () => {
-  expect(keyPosition(0)).toEqual({ x: 199, y: 121 });
-  expect(keyPosition(6)).toEqual({ x: 643, y: 121 });
+  expect(keyPosition(0)).toEqual({ x: 157, y: 140 });
+  expect(keyPosition(6)).toEqual({ x: 697, y: 140 });
 });
