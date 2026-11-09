@@ -3,7 +3,7 @@
 The build, broken into small steps. Each step is about one session and teaches
 one thing. Tick a box only when its "Check" passes.
 
-**Current step:** 5.6
+**Current step:** 5.8
 
 How to use this file:
 
@@ -213,13 +213,13 @@ Steps 5.7 and 5.8 need the clinicians' answers on the wording conflicts (see the
   - Learn: pointer events in SVG; the whole drawn circle as the click area, with no extra margin; ignoring double-clicks
   - Check: a full correct run works with a mouse and a trackpad; no hover highlight
 
-- [ ] **5.6 Errors: slash, arrow and voice**
+- [x] **5.6 Errors: slash, arrow and voice**
   - Learn: connecting the click judge (3.4) to the screen; layering SVG marks
   - Check: a wrong click draws a slashed line that stays on screen; "That one was not correct." plays, then an arrow points to the last correct circle, then "Please start here and continue." plays; a correct click during the voice stops it and removes the arrow; a wrong click during the voice is slashed and counted while the voice carries on; a double-click on a wrong circle counts as one error; no error text on screen
 
-- [ ] **5.7 Instructions from `script.json`**
+- [x] **5.7 Instructions from `script.json`**
   - Learn: running a script line by line (spoken lines play; action lines trigger arrows)
-  - Check: lines play in script order, with no instruction text on any page; arrows appear after the matching words; circles can't be clicked while the voice speaks; the timer starts when "Begin." ends; no replay button
+  - Check: lines play in script order, with no instruction text on any page; arrows appear after the matching words; circles can't be clicked while the instruction voice speaks; the timer starts when "Begin." ends; no replay button
 
 - [ ] **5.8 Practice rounds**
   - Learn: a small state machine (instructions → practice → test)
@@ -228,6 +228,7 @@ Steps 5.7 and 5.8 need the clinicians' answers on the wording conflicts (see the
 - [ ] **5.9 Part A to Part B, time limits and `onComplete`**
   - Learn: handing a result to the shared layer through the plug-in contract
   - Check: timeouts stop at 150 s / 300 s; the result matches what the 3.5 scoring tests expect; the screen size is saved with the result
+  - Note: remove the temporary "Timer started" console line in `TrailMaking.tsx` (added at 5.7)
 
 - [ ] **5.10 Save the sheet and click log**
   - Learn: exporting the drawn SVG with the font embedded

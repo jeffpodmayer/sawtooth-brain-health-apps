@@ -56,6 +56,11 @@ new one. Part A is numbers (1 → 25). Part B alternates numbers and letters
   text on any page. The test starts directly on the Sample A page with the voice reading.
 - On every page, the voice reads the instructions straight through. Where the script
   says to point, an arrow appears on that circle **after** the voice says it.
+- If an arrow is the last thing before clicks turn on (the End arrow on Sample A), it
+  stays on screen for about 1.5 s (one setting), then clears as clicks turn on.
+- If the screen is too small when a page's instructions are due, they wait until it's
+  big enough. If it becomes too small partway through, the voice stops, and that page's
+  instructions start again from the top once the screen is OK.
 - Nothing waits for a click during the instructions. Circles can't be clicked while
   the voice reads them. The client starts clicking when the voice finishes.
 - The timed parts end their instructions with ⏳ "Begin." The timer starts when
