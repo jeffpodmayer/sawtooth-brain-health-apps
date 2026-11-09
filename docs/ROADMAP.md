@@ -3,7 +3,7 @@
 The build, broken into small steps. Each step is about one session and teaches
 one thing. Tick a box only when its "Check" passes.
 
-**Current step:** 5.1
+**Current step:** 5.2
 
 How to use this file:
 
@@ -192,7 +192,7 @@ Built as a module in `src/tests/trail-making/`, run from a development-only
 page until the sequence runner exists (Phase 7).
 Steps 5.7 and 5.8 need the clinicians' answers on the wording conflicts (see the brief).
 
-- [ ] **5.1 Development test page and a fake ResultStore**
+- [x] **5.1 Development test page and a fake ResultStore**
   - Learn: an in-memory version of an interface; development-only routes
   - Check: `/dev/test/trail-making` loads in development; the route isn't in the production build
   - Note: write the `ResultStore` interface here, before the fake one (decided at 3.1)
