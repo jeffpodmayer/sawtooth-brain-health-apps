@@ -186,7 +186,10 @@ The recall timer starts when this clip ends.
 - The 7 symbols in recall-form order: **square, flag, triangle, pentagon, circle, heart,
   cross**. Drawn empty, as on the form, with no key and no grid.
 - The selected symbol is outlined. Clicking a number puts it **inside** the symbol, and
-  the selector moves to the next empty symbol.
+  the selector moves forward to the next empty symbol, going round to the start after the
+  last one. It doesn't jump back to a skipped symbol (decided 2026-11-09).
+- Once all 7 are filled, the selector stays on the symbol just answered, and the number
+  pad stays on (decided 2026-11-09).
 - Clicking any symbol selects it, so answers can be changed until time is up.
 - **At 60 s the screen ends.** Any symbol still empty is scored as wrong. ⏳ This replaces
   the earlier "untimed, no blanks" answer (S14–S15).

@@ -25,3 +25,18 @@ export function canSelect(part: ItemRange, answers: Answers, item: number): bool
 
   return answers.has(item) || item === nextEmpty(part, answers);
 }
+
+// The next empty item after this one, going round to the start of the part. Null when the part is full.
+export function nextEmptyAfter(part: ItemRange, answers: Answers, item: number): number | null {
+  const count = part.last - part.first + 1;
+
+  for (let step = 1; step < count; step += 1) {
+    const next = part.first + ((item - part.first + step) % count);
+
+    if (!answers.has(next)) {
+      return next;
+    }
+  }
+
+  return null;
+}

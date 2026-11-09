@@ -17,6 +17,11 @@ export const keyPrintedOrder = [
   "flag", "pentagon", "triangle", "square", "heart", "circle", "cross",
 ] as const satisfies readonly SwapsSymbol[];
 
+// The order the symbols are printed in on the recall form.
+export const recallOrder = [
+  "square", "flag", "triangle", "pentagon", "circle", "heart", "cross",
+] as const satisfies readonly SwapsSymbol[];
+
 // F flag, P pentagon, T triangle, S square, H heart, C circle, X cross.
 export const gridRows = [
   "HTFXHSTPC",

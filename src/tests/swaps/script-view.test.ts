@@ -12,6 +12,9 @@ const highlight2 = { id: "d", type: "action", action: "highlight", target: "item
 const fill1 = { id: "e", type: "action", action: "fill", target: "item:1", value: 7 } as ActionLine;
 const select4 = { id: "f", type: "action", action: "select", target: "item:4" } as ActionLine;
 const enableInput = { id: "g", type: "action", action: "enableInput" } as ActionLine;
+const highlightRecall = { id: "h", type: "action", action: "highlight", target: "recall:all" } as ActionLine;
+const selectSquare = { id: "i", type: "action", action: "select", target: "recall:square" } as ActionLine;
+const selectCross = { id: "j", type: "action", action: "select", target: "recall:cross" } as ActionLine;
 
 it("replaces the last arrow with a new one", () => {
   const view = applyScriptAction(applyScriptAction(startView, arrowOnHeart), arrowOnItem2);
@@ -50,6 +53,25 @@ it("clears the arrow and highlight when input turns on, and keeps the selection"
   const view = applyScriptAction(before, enableInput);
 
   expect(view).toMatchObject({ arrowOn: null, highlighted: null, selected: 4, inputOn: true });
+});
+
+it("highlights all the recall symbols at once", () => {
+  const view = applyScriptAction(startView, highlightRecall);
+
+  expect(view.allHighlighted).toBe(true);
+  expect(view.highlighted).toBeNull();
+});
+
+it("selects a recall symbol by its place on the recall form", () => {
+  expect(applyScriptAction(startView, selectSquare).selected).toBe(1);
+  expect(applyScriptAction(startView, selectCross).selected).toBe(7);
+});
+
+it("ends the script's recall section with the first symbol selected and the pad on", () => {
+  const actions = sections.recall.filter((line): line is ActionLine => line.type === "action");
+  const end = actions.reduce(applyScriptAction, startView);
+
+  expect(end).toMatchObject({ selected: 1, allHighlighted: false, highlighted: null, inputOn: true });
 });
 
 it("makes the lines after practice's last arrow wait", () => {

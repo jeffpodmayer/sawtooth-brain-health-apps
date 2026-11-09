@@ -3,7 +3,7 @@
 The build, broken into small steps. Each step is about one session and teaches
 one thing. Tick a box only when its "Check" passes.
 
-**Current step:** 6.8
+**Current step:** 6.9
 
 How to use this file:
 
@@ -282,7 +282,7 @@ the stop wording and the recall instruction (see the brief).
   - Learn: starting a timer from a clip end; stopping on time exactly
   - Check: the timer starts at "Begin!"; input stops at 60 s with no spoken cue (SPEC question 5 is still open with the clinicians); results match the 3.7 scoring tests
 
-- [ ] **6.8 Recall screen**
+- [x] **6.8 Recall screen**
   - Learn: a timed screen that always runs its full 60 seconds
   - Check: the 7 symbols appear without numbers, in recall-form order; answers can be changed until time is up; any left empty are scored as wrong; it's always the last screen of the test
 
@@ -290,6 +290,7 @@ the stop wording and the recall instruction (see the brief).
   - Learn: marking errors and corrections clearly in an exported SVG
   - Check: the saved sheet shows errors and corrections; `rawData` has the full answer log; totals only, no per-answer timing in `scores`
   - Note: SWAPS text is regular weight, but Trail Making's sheet embeds only the bold font. The sheet also needs its own styles for `fill-white` and `fill-form-gray` (added at 6.1)
+  - Note: remove the two temporary `console.info` lines in `Swaps.tsx` once the scores are in the result
 
 - [ ] **6.10 Being stopped from outside**
   - Learn: the same stop pattern as Trail Making (5.11)

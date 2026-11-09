@@ -10,6 +10,7 @@ import App from "./App.tsx";
 const DevTestPage = import.meta.env.DEV ? lazy(() => import("./dev/DevTestPage")) : null;
 const DevTrailPages = import.meta.env.DEV ? lazy(() => import("./dev/DevTrailPages")) : null;
 const DevSwapsForm = import.meta.env.DEV ? lazy(() => import("./dev/DevSwapsForm")) : null;
+const DevSwapsRecall = import.meta.env.DEV ? lazy(() => import("./dev/DevSwapsRecall")) : null;
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
@@ -42,6 +43,16 @@ createRoot(document.getElementById("root")!).render(
             element={
               <Suspense>
                 <DevSwapsForm />
+              </Suspense>
+            }
+          />
+        )}
+        {DevSwapsRecall && (
+          <Route
+            path="/dev/swaps-recall"
+            element={
+              <Suspense>
+                <DevSwapsRecall />
               </Suspense>
             }
           />

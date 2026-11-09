@@ -45,3 +45,14 @@ export function itemPosition(item: number): Point {
     y: grid.firstY + Math.floor(index / columns) * grid.rowSpacing,
   };
 }
+
+// The recall form's one row of symbols, measured from the form.
+export const recallSymbolSize = 60;
+export const recallSelectionSize = 84;
+
+const recall = { firstX: 110, y: 400, spacing: 105 };
+
+// place counts along the recall row from 1, in recall-form order.
+export function recallPosition(place: number): Point {
+  return { x: recall.firstX + (place - 1) * recall.spacing, y: recall.y };
+}

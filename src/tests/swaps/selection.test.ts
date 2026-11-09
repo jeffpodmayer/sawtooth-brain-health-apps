@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { canSelect, nextEmpty } from "./selection";
+import { canSelect, nextEmpty, nextEmptyAfter } from "./selection";
 
 // The practice boxes: items 4 to 6.
 const practice = { first: 4, last: 6 };
@@ -45,5 +45,26 @@ describe("canSelect", () => {
 
   it("does not allow a box after this part", () => {
     expect(canSelect(practice, answered(4, 5, 6), 7)).toBe(false);
+  });
+});
+
+describe("nextEmptyAfter", () => {
+  // The recall symbols: 1 to 7.
+  const recall = { first: 1, last: 7 };
+
+  it("moves to the next symbol after an answer", () => {
+    expect(nextEmptyAfter(recall, answered(1), 1)).toBe(2);
+  });
+
+  it("moves forward past a skipped symbol, not back to it", () => {
+    expect(nextEmptyAfter(recall, answered(1, 2, 4), 4)).toBe(5);
+  });
+
+  it("goes round to the first empty symbol after the last one", () => {
+    expect(nextEmptyAfter(recall, answered(1, 2, 4, 5, 6, 7), 7)).toBe(3);
+  });
+
+  it("is null when every symbol is filled", () => {
+    expect(nextEmptyAfter(recall, answered(1, 2, 3, 4, 5, 6, 7), 3)).toBeNull();
   });
 });
