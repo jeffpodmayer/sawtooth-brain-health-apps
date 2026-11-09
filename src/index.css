@@ -9,6 +9,7 @@
   --color-accent: #0f5f63;
   --color-success-bg: #e3f1ee;
   --color-success-ink: #0b4e51;
+  --color-form-gray: #bfbfbf;
 }
 
 @layer base {

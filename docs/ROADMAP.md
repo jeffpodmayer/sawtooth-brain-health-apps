@@ -3,7 +3,7 @@
 The build, broken into small steps. Each step is about one session and teaches
 one thing. Tick a box only when its "Check" passes.
 
-**Current step:** 6.1
+**Current step:** 6.2
 
 How to use this file:
 
@@ -253,7 +253,7 @@ Built as a module in `src/tests/swaps/`, run from `/dev/test/swaps`.
 Steps 6.5–6.8 need the clinicians' answers on demo text, practice feedback,
 the stop wording and the recall instruction (see the brief).
 
-- [ ] **6.1 Draw the key and the Form A grid**
+- [x] **6.1 Draw the key and the Form A grid**
   - Learn: drawing the symbols as SVG shapes; laying out a grid from data (3.6)
   - Check: laid over the Form A PDF, the symbols, order and gray practice box match
 
@@ -271,7 +271,7 @@ the stop wording and the recall instruction (see the brief).
 
 - [ ] **6.5 Demo animation**
   - Learn: syncing animation steps with clip endings
-  - Check: arrows, highlighted boxes and numbers filling in line up with each spoken demo line; no demo text on screen
+  - Check: arrows, highlighted boxes and numbers filling in line up with each spoken demo line; no demo text on screen other than the form's "Demo" and "Practice" labels (ADR-034)
 
 - [ ] **6.6 Practice items**
   - Learn: reusing test behavior with feedback added
@@ -288,6 +288,7 @@ the stop wording and the recall instruction (see the brief).
 - [ ] **6.9 Save the sheet and answer log; `onComplete`**
   - Learn: marking errors and corrections clearly in an exported SVG
   - Check: the saved sheet shows errors and corrections; `rawData` has the full answer log; totals only, no per-answer timing in `scores`
+  - Note: SWAPS text is regular weight, but Trail Making's sheet embeds only the bold font. The sheet also needs its own styles for `fill-white` and `fill-form-gray` (added at 6.1)
 
 - [ ] **6.10 Being stopped from outside**
   - Learn: the same stop pattern as Trail Making (5.11)

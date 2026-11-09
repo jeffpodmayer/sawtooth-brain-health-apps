@@ -705,7 +705,7 @@ voices through the API.
 
 ## ADR-030: Test instructions are voice only
 
-- **Status:** Accepted, clinicians not yet asked · **Date:** 2026-11-08 · Changes the on-screen instructions in ADR-006
+- **Status:** Accepted, clinicians not yet asked · **Date:** 2026-11-08 · Changes the on-screen instructions in ADR-006 · Exception added by ADR-034
 
 **Context:** ADR-006 says instructions are spoken and shown on screen, as the
 clinicians asked in the planning meeting. Both SPECs were later written as voice
@@ -793,3 +793,24 @@ roadmap 7.6), and shared code must not need to look inside a test's `rawData` to
 - SWAPS returns its sheet the same way (roadmap 6.9).
 - `sequence_tests` has no column pointing to a sheet yet. How files are named, and how
   a result finds its files, is decided at roadmap 7.6 and may need a migration.
+
+## ADR-034: SWAPS shows the form's "Demo" and "Practice" labels
+
+- **Status:** Accepted · **Date:** 2026-11-08 · Adds an exception to ADR-030
+
+**Context:** ADR-030 keeps instruction and demo text off the screen inside both tests.
+SWAPS Form A prints "Demo" and "Practice" above the two gray boxes in row 1. Trail
+Making leaves off its printed "Sample A" and "Sample B" titles.
+
+**Decision:**
+
+- SWAPS shows those two labels, as printed on Form A.
+- They are form labels, not instructions, so they live with the page layout and not in
+  `script.json`.
+- This applies to SWAPS only. Trail Making stays as it is, and all other instructions
+  stay voice only.
+
+**Consequences:**
+
+- Roadmap 6.5's "no demo text on screen" excludes these two labels.
+- The labels are on screen during the timed test as well, because they are part of row 1.

@@ -53,14 +53,17 @@ F flag, P pentagon, T triangle, S square, H heart, C circle, X cross:
 ## Screen and layout
 
 - The key stays visible at the top for the whole test (not on the recall screen).
-- The grid looks like Form A: each symbol with an empty answer box below it, the
-  demo and practice items in row 1, and the gray box around the practice items.
+- The grid looks like Form A: each symbol is drawn empty and the client's number goes
+  inside it, as in the key. In these rules, an item's "box" means that spot inside its
+  symbol. Row 1 has two gray boxes side by side, demo items 1–3 and practice items 4–6,
+  sharing one thin line between them, with the form's printed "Demo" and "Practice"
+  labels above them (ADR-034). The practice symbols are white, as printed.
 - **Rows 1–6 show at the start.** When the client reaches row 5, the grid scrolls up
   slowly so the next rows come into view (S5). The client can't scroll it.
 - **The 1–7 number pad** sits below the grid (layout from the design
   prototype). Buttons are 56px+ tall. The keyboard does nothing (S4, S19).
-- The selected answer box is outlined in the accent color.
-- **Voice only:** no instruction or demo text on screen. The voice reads while arrows
+- The selected symbol is outlined in the accent color.
+- **Voice only:** no instruction or demo text on screen, apart from those two labels. The voice reads while arrows
   and highlighted boxes show what it means.
 - No timer, countdown, error text, help number or end/skip button on screen.
 - Clicking (number pad and boxes) is disabled while the voice speaks.
@@ -75,7 +78,6 @@ F flag, P pentagon, T triangle, S square, H heart, C circle, X cross:
    timer starts when that clip ends.
 4. **At 60 seconds:** answering stops and the test part ends, with no spoken cue.
    If all 75 are done sooner, the test part ends then.
-   sooner, the test part ends then.
 5. **Recall:** a new screen with the 7 symbols (no key, no grid). ⏳ The voice reads the
    recall instruction; the client has 60 seconds.
 6. `onComplete` returns the result. The sequence runner shows the break screen.
@@ -104,16 +106,16 @@ numbers filling in. The exact lines, with IDs, live in `script.json`.
 > Here is a symbol **[arrow on grid item 1]**. This number \*\*[arrow on the 7 inside the
 >
 > > heart in the key]** goes with this symbol, so I would put it here like this.
-> > **[7 fills in below item 1]\*\*
+> > **[7 fills in inside item 1]\*\*
 
 > Here is the next symbol **[arrow on item 2]**. This number \*\*[arrow on the 1 inside
 >
 > > the triangle in the key]** goes with this symbol, so I would put it here like this.
-> > **[1 fills in below item 2]\*\*
+> > **[1 fills in inside item 2]\*\*
 
 > This symbol **[arrow on item 3]** goes with this number \*\*[arrow on the 6 inside the
 >
-> > flag in the key]**, so I would put it here like this. **[6 fills in below item 3]\*\*
+> > flag in the key]**, so I would put it here like this. **[6 fills in inside item 3]\*\*
 
 Each demo item's box is highlighted while it's being talked about.
 
