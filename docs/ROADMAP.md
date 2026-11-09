@@ -3,7 +3,7 @@
 The build, broken into small steps. Each step is about one session and teaches
 one thing. Tick a box only when its "Check" passes.
 
-**Current step:** 6.7
+**Current step:** 6.8
 
 How to use this file:
 
@@ -278,9 +278,9 @@ the stop wording and the recall instruction (see the brief).
   - Check: a wrong answer gets the agreed feedback; practice isn't scored; only the clinician can end it
   - Note: move the demo player from `src/dev/DevSwapsDemo.tsx` and the answers and selected-box state from `src/dev/DevSwapsForm.tsx` into the real test component
 
-- [ ] **6.7 The 60-second test**
+- [x] **6.7 The 60-second test**
   - Learn: starting a timer from a clip end; stopping on time exactly
-  - Check: the timer starts at "Begin!"; input stops at 60 s with the agreed wording; results match the 3.7 scoring tests
+  - Check: the timer starts at "Begin!"; input stops at 60 s with no spoken cue (SPEC question 5 is still open with the clinicians); results match the 3.7 scoring tests
 
 - [ ] **6.8 Recall screen**
   - Learn: a timed screen that always runs its full 60 seconds

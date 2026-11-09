@@ -131,7 +131,10 @@ Then the selector moves to item 4 and the number pad turns on.
 
 > Good. Now that you know how to do it, I want you to continue filling in the number
 > that goes with each symbol. Be sure to work from left to right, without skipping any.
-> When you finish this line go on to the next one. **[highlight row 1, then row 2]**
+> When you finish this line go on to the next one.
+
+⏳ The examiner's pointing at row 1, then row 2, is left out (decided 2026-11-08), because
+the selector moves to the next row by itself.
 
 > When I say begin, start here **[arrow on item 7]** and work as quickly as you can,
 > without making mistakes, until I tell you to stop. Ready? Begin!
@@ -255,6 +258,7 @@ in each box is the one scored.
 - SW1 practice feedback and SW2 recall wording, and voice-only instructions
 - Recall timing (60 s, always full) and scoring blanks as wrong
 - No spoken cue at the end of the 60 seconds
+- Leaving out the row 1 and row 2 highlights in the test instructions
 
 ## Questions for the clinicians
 
@@ -272,6 +276,10 @@ in each box is the one scored.
 6. Answered 2026-11-08: if a client changes an answer, only the final answer is
    scored, a corrected answer isn't an error, and every correction is recorded.
 7. Which norms will you use? They come from paper testing (see below).
+8. The instructions have the examiner point to row 1, then row 2, after "When you finish
+   this line go on to the next one." The app leaves that out, because the selector moves
+   to the next row by itself, so nothing on screen shows what "this line" means. OK, or
+   would you like the rows highlighted?
 
 ## Digital vs. paper: what may change
 

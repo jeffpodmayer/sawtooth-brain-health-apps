@@ -6,7 +6,7 @@
     "Spoken lines are played in order; each line is one audio clip named by its id.",
     "Joining a section's spoken lines with single spaces gives the source wording, minus the adaptations listed below.",
     "An arrow replaces the previous arrow. A highlight stays until the next highlight or until input is enabled.",
-    "Targets: item:N is grid item N (1-81, left to right, top to bottom); key:<symbol> is the number inside that symbol in the key; row:N is a visible grid row; recall:<symbol> is a recall symbol.",
+    "Targets: item:N is grid item N (1-81, left to right, top to bottom); key:<symbol> is the number inside that symbol in the key; recall:<symbol> is a recall symbol.",
     "The recall form's final colon is spoken as a full stop (punctuation only)."
   ],
   "adaptations": [
@@ -211,18 +211,6 @@
         "id": "te-04",
         "type": "spoken",
         "text": "When you finish this line go on to the next one."
-      },
-      {
-        "id": "te-05",
-        "type": "action",
-        "action": "highlight",
-        "target": "row:1"
-      },
-      {
-        "id": "te-06",
-        "type": "action",
-        "action": "highlight",
-        "target": "row:2"
       },
       {
         "id": "te-07",

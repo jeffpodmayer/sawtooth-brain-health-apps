@@ -52,3 +52,24 @@ it("stops at a clip that was cut off, and runs nothing after it", async () => {
   expect(seen).toEqual(["two"]);
   expect(finished).toBe(false);
 });
+
+it("waits for an action that hands back a promise", async () => {
+  const seen: string[] = [];
+  let endPause: () => void = () => {};
+  const player = {
+    play: async (lineId: string) => {
+      seen.push(lineId);
+      return true;
+    },
+  };
+
+  const running = runScript(lines.slice(1, 3), player, () => new Promise<void>((resolve) => {
+    endPause = resolve;
+  }));
+  await Promise.resolve();
+  expect(seen).toEqual([]);
+
+  endPause();
+  await running;
+  expect(seen).toEqual(["three"]);
+});
