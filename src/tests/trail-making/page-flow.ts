@@ -7,12 +7,16 @@ export type Flow = {
   phase: "instructions" | "practice" | "test" | "finished" | "done";
 };
 
-export type FlowEvent = "clicksEnabled" | "pageCompleted" | "timeUp" | "pauseOver";
+export type FlowEvent = "clicksEnabled" | "pageCompleted" | "timeUp" | "pauseOver" | "stopped";
 
 export const startFlow: Flow = { pageIndex: 0, phase: "instructions" };
 
 export function nextFlow(flow: Flow, event: FlowEvent): Flow {
   const { pageIndex, phase } = flow;
+
+  if (event === "stopped") {
+    return { pageIndex, phase: "done" };
+  }
 
   if (event === "clicksEnabled" && phase === "instructions") {
     return { pageIndex, phase: pages[pageIndex].startsWith("sample") ? "practice" : "test" };

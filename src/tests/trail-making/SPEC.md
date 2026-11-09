@@ -207,16 +207,17 @@ such as B minus A (T11).
 | `errors`        | Error clicks (commission errors). Ignored clicks don't count.                                    |
 
 Plus, per sample: `passed` (yes if finished, no if the clinician ended the test during
-it). A sample is empty (null) if the test ended before reaching it. A `notGiven` part
-has only `status` and `code`.
+it, including during its instructions). A sample is empty (null) if the test ended before
+reaching it. A `notGiven` part has only `status` and `code`.
 
 ## Recording (`rawData`)
 
 - **Click log** for each timed part: time (ms from "Begin."), position on the page,
   which circle (if any), and the outcome: correct, error, or ignored (outside a
   circle, double-click). Clicks during the instructions are blocked and not logged.
-- **Stop time:** if the clinician stopped a timed part, ms from "Begin." to the
-  stop, so the server can re-score the partial result.
+- **Stop point (`stop`):** where a clinician's stop found the test: the page, its stage
+  and, if a timed part's clock was running, ms from "Begin." to the stop. Empty if the
+  test wasn't stopped. The server re-scores a partial result from this.
 - **Audio log:** when each clip started and ended.
 - **Screen:** screen size, page scale, browser name and version.
 - **Focus:** any time the test tab was hidden or lost focus, with times.
@@ -228,7 +229,10 @@ has only `status` and `code`.
 
 - The voice stops, clicking stops and the current part is marked `stopped` with
   its partial counts and elapsed time.
-- If the stop comes during a sample, that part is `notGiven`.
+- If the stop comes during a sample or its instructions, the sample is not passed and
+  the timed part after it is `notGiven`.
+- If the stop comes in the pause after a page, that page keeps its result and the next
+  page counts as not reached.
 - If the stop comes during a timed part's instructions, before the timer starts,
   that part is `notGiven`.
 - Parts not yet reached are `notGiven`.

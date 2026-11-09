@@ -46,6 +46,14 @@ it("stays done whatever happens next", () => {
   expect(nextFlow(at(3, "done"), "pageCompleted")).toEqual(at(3, "done"));
   expect(nextFlow(at(3, "done"), "timeUp")).toEqual(at(3, "done"));
   expect(nextFlow(at(3, "done"), "pauseOver")).toEqual(at(3, "done"));
+  expect(nextFlow(at(3, "done"), "stopped")).toEqual(at(3, "done"));
+});
+
+it("ends the test from any stage when stopped", () => {
+  expect(nextFlow(at(0, "instructions"), "stopped")).toEqual(at(0, "done"));
+  expect(nextFlow(at(0, "practice"), "stopped")).toEqual(at(0, "done"));
+  expect(nextFlow(at(1, "test"), "stopped")).toEqual(at(1, "done"));
+  expect(nextFlow(at(1, "finished"), "stopped")).toEqual(at(1, "done"));
 });
 
 it("ignores an event that doesn't fit the current stage", () => {

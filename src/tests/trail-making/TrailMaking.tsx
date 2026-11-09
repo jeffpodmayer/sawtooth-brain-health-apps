@@ -19,7 +19,7 @@ import { expectedOrder } from "./order";
 import { nextFlow, pages, startFlow } from "./page-flow";
 import { pageLayouts, type Point } from "./page-layouts";
 import type { LoggedClick } from "./score-part";
-import { scoreTest } from "./score-test";
+import { scoreTest, type StopPoint } from "./score-test";
 import { isScreenLargeEnough, pageScale } from "./screen-check";
 import script from "./script.json";
 import { testId, testVersion } from "./test-info";
@@ -46,7 +46,7 @@ function checkScreen() {
   return isScreenLargeEnough(window.innerWidth, window.innerHeight);
 }
 
-function TrailMaking({ sequenceId, onComplete }: TestProps) {
+function TrailMaking({ sequenceId, stopRequested, onComplete }: TestProps) {
   const [startedAt] = useState(() => new Date().toISOString());
   const handedOver = useRef(false);
   const [testClock] = useState(() => elapsedClock(realClock));
@@ -64,6 +64,7 @@ function TrailMaking({ sequenceId, onComplete }: TestProps) {
   const screens = useRef<Partial<Record<"partA" | "partB", { width: number; height: number; scale: number }>>>({});
   const focusLog = useRef<FocusLogEntry[]>([]);
   const tooSmallLog = useRef<TooSmallEntry[]>([]);
+  const stopPoint = useRef<StopPoint | null>(null);
 
   const layout = pageLayouts[pages[pageIndex]];
   const order = expectedOrder[pages[pageIndex]];
@@ -182,6 +183,26 @@ function TrailMaking({ sequenceId, onComplete }: TestProps) {
     }
   }, [phase, page, layout, connected, wrongLines]);
 
+  // A clinician's stop. Notes where the test was and keeps the sheet as it stood, then ends the
+  // test. Moving to "done" turns clicks off, clears the timers and hands over the result.
+  useEffect(() => {
+    if (!stopRequested || phase === "done") {
+      return;
+    }
+
+    const stoppedAtMs =
+      timedPart !== null && timerStartedAt.current !== null ? realClock.now() - timerStartedAt.current : null;
+
+    stopPoint.current = { page, phase, stoppedAtMs };
+
+    if (timedPart !== null) {
+      sheets.current[timedPart] = buildSheet(layout, connected, wrongLines);
+    }
+
+    player.stop();
+    dispatchFlow("stopped");
+  }, [stopRequested, phase, page, timedPart, layout, connected, wrongLines, player]);
+
   // Leaves a finished page on screen for a moment, then clears it and moves to the next one.
   useEffect(() => {
     if (phase !== "finished") {
@@ -212,9 +233,10 @@ function TrailMaking({ sequenceId, onComplete }: TestProps) {
       sequenceId,
       startedAt,
       completedAt: new Date().toISOString(),
-      scores: scoreTest(clickLogs.current),
+      scores: scoreTest(clickLogs.current, stopPoint.current),
       rawData: {
         clicks: clickLogs.current,
+        stop: stopPoint.current,
         audio: player.log,
         screen: screens.current,
         browser: browserFrom(navigator.userAgent),

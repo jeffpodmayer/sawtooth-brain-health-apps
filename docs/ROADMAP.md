@@ -3,7 +3,7 @@
 The build, broken into small steps. Each step is about one session and teaches
 one thing. Tick a box only when its "Check" passes.
 
-**Current step:** 5.11
+**Current step:** 6.1
 
 How to use this file:
 
@@ -237,7 +237,7 @@ Steps 5.7 and 5.8 were built on working answers (ADR-030, ADR-032). The clinicia
   - Note: record any time the too-small-screen message replaced a timed part, with times (SPEC: Recording, decided at 5.9)
   - Note: check that a click on empty space during a timed part is logged with `circle: null` (not tried at 5.9)
 
-- [ ] **5.11 Being stopped from outside**
+- [x] **5.11 Being stopped from outside**
   - Learn: how the shared layer asks a test for its partial result
   - Check: a fake stop mid-test returns the partial score and the sheet as it stood
   - Note: use the audio player's stop function (added at 5.6), so a stop silences the voice and the test isn't left waiting for the clip to end (ADR-028, Phase 4 code review)
