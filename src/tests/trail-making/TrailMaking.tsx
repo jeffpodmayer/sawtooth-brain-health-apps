@@ -1,9 +1,9 @@
 // Placeholder until the test is built: click through all four pages. Each page's instructions
 // play first, with their arrows (SPEC: Voice and arrows). Correct clicks draw lines; wrong clicks
-// get the full error response (SPEC: Errors). The next press after a finished page moves on.
+// get the full error response (SPEC: Errors). A finished page moves on by itself after a short pause.
 // Shows a message instead if the screen is too small.
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useReducer, useRef, useState } from "react";
 import { createAudioPlayer } from "../../shared/audio-player";
 import { realClock } from "../../shared/clock";
 import { runScript } from "../../shared/run-script";
@@ -11,13 +11,14 @@ import { checkScript, type ActionLine, type SpokenLine } from "../../shared/test
 import { findCircleAt } from "./find-circle";
 import { judgeClick } from "./judge-click";
 import { expectedOrder } from "./order";
+import { nextFlow, pages, startFlow } from "./page-flow";
 import { pageLayouts, type Point } from "./page-layouts";
 import { isScreenLargeEnough } from "./screen-check";
 import script from "./script.json";
 import TrailPage, { type WrongLine } from "./TrailPage";
 
-const pages = ["sampleA", "partA", "sampleB", "partB"] as const;
 const arrowHoldMs = 1500;
+const pagePauseMs = 1500;
 const sections = checkScript(script).sections;
 const errorLines = sections.error;
 const spokenLines = Object.values(sections)
@@ -34,8 +35,7 @@ function checkScreen() {
 function TrailMaking() {
   const [player] = useState(() => createAudioPlayer("trail-making", spokenLines));
   const [screenOk, setScreenOk] = useState(checkScreen);
-  const [pageIndex, setPageIndex] = useState(0);
-  const [clicksOn, setClicksOn] = useState(false);
+  const [{ pageIndex, phase }, dispatchFlow] = useReducer(nextFlow, startFlow);
   const [connected, setConnected] = useState<readonly string[]>([]);
   const [wrongLines, setWrongLines] = useState<readonly WrongLine[]>([]);
   const [arrowOn, setArrowOn] = useState<string | null>(null);
@@ -62,7 +62,7 @@ function TrailMaking() {
   // Reads this page's instructions. Waits for a big enough screen, because the arrows are part
   // of them. If the screen gets too small partway, the voice stops and they start again.
   useEffect(() => {
-    if (!screenOk || clicksOn) {
+    if (!screenOk || phase !== "instructions") {
       return;
     }
 
@@ -72,7 +72,7 @@ function TrailMaking() {
 
     function enableClicks() {
       setArrowOn(null);
-      setClicksOn(true);
+      dispatchFlow("clicksEnabled");
     }
 
     function handleAction(line: ActionLine) {
@@ -117,7 +117,24 @@ function TrailMaking() {
       window.clearTimeout(holdTimer);
       player.stop();
     };
-  }, [player, pageIndex, screenOk, clicksOn]);
+  }, [player, pageIndex, screenOk, phase]);
+
+  // Leaves a finished page on screen for a moment, then clears it and moves to the next one.
+  useEffect(() => {
+    if (phase !== "finished") {
+      return;
+    }
+
+    const pauseTimer = window.setTimeout(() => {
+      setConnected([]);
+      setWrongLines([]);
+      setArrowOn(null);
+      setLastWrong(null);
+      dispatchFlow("pauseOver");
+    }, pagePauseMs);
+
+    return () => window.clearTimeout(pauseTimer);
+  }, [phase]);
 
   // Plays the script's error section. A correct click stops the voice, which ends this early.
   async function speakCorrection(arrowTarget: string) {
@@ -133,17 +150,7 @@ function TrailMaking() {
   }
 
   function handlePress({ x, y }: Point) {
-    if (!clicksOn) {
-      return;
-    }
-
-    if (connected.length === order.length) {
-      setClicksOn(false);
-      setPageIndex((pageIndex + 1) % pages.length);
-      setConnected([]);
-      setWrongLines([]);
-      setArrowOn(null);
-      setLastWrong(null);
+    if (phase !== "practice" && phase !== "test") {
       return;
     }
 
@@ -160,7 +167,12 @@ function TrailMaking() {
       player.stop();
       setArrowOn(null);
       setLastWrong(null);
-      setConnected([...connected, circle]);
+      const nowConnected = [...connected, circle];
+      setConnected(nowConnected);
+
+      if (nowConnected.length === order.length) {
+        dispatchFlow("pageCompleted");
+      }
     }
 
     if (outcome === "error") {

@@ -3,7 +3,7 @@
 The build, broken into small steps. Each step is about one session and teaches
 one thing. Tick a box only when its "Check" passes.
 
-**Current step:** 5.8
+**Current step:** 5.9
 
 How to use this file:
 
@@ -190,7 +190,7 @@ The voice is a core feature. Build it early and check Safari early.
 
 Built as a module in `src/tests/trail-making/`, run from a development-only
 page until the sequence runner exists (Phase 7).
-Steps 5.7 and 5.8 need the clinicians' answers on the wording conflicts (see the brief).
+Steps 5.7 and 5.8 were built on working answers (ADR-030, ADR-032). The clinicians haven't been asked yet (see the SPEC's questions).
 
 - [x] **5.1 Development test page and a fake ResultStore**
   - Learn: an in-memory version of an interface; development-only routes
@@ -221,7 +221,7 @@ Steps 5.7 and 5.8 need the clinicians' answers on the wording conflicts (see the
   - Learn: running a script line by line (spoken lines play; action lines trigger arrows)
   - Check: lines play in script order, with no instruction text on any page; arrows appear after the matching words; circles can't be clicked while the instruction voice speaks; the timer starts when "Begin." ends; no replay button
 
-- [ ] **5.8 Practice rounds**
+- [x] **5.8 Practice rounds**
   - Learn: a small state machine (instructions → practice → test)
   - Check: a sample has no limit on errors or time and doesn't restart; finishing it moves on; practice clicks aren't scored
 
@@ -229,6 +229,7 @@ Steps 5.7 and 5.8 need the clinicians' answers on the wording conflicts (see the
   - Learn: handing a result to the shared layer through the plug-in contract
   - Check: timeouts stop at 150 s / 300 s; the result matches what the 3.5 scoring tests expect; the screen size is saved with the result
   - Note: remove the temporary "Timer started" console line in `TrailMaking.tsx` (added at 5.7)
+  - Note: log clicks only during the `test` stage (added at 5.8), so practice clicks are never scored or saved
 
 - [ ] **5.10 Save the sheet and click log**
   - Learn: exporting the drawn SVG with the font embedded
@@ -239,7 +240,7 @@ Steps 5.7 and 5.8 need the clinicians' answers on the wording conflicts (see the
   - Check: a fake stop mid-test returns the partial score and the sheet as it stood
   - Note: use the audio player's stop function (added at 5.6), so a stop silences the voice and the test isn't left waiting for the clip to end (ADR-028, Phase 4 code review)
 
-- [ ] **5.12 Clinician look on the preview**
+- [ ] **5.12 Clinician look on the preview (going to wait on this**
   - Learn: running a feedback round
   - Check: each clinician has tried it in at least one browser; feedback is in the running list
   - Note: first add each clinician's email to the preview's Cloudflare Access policy (only Jeff's is on it, see 1.9)
