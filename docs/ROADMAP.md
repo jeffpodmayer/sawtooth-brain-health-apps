@@ -3,7 +3,7 @@
 The build, broken into small steps. Each step is about one session and teaches
 one thing. Tick a box only when its "Check" passes.
 
-**Current step:** 5.4
+**Current step:** 5.5
 
 How to use this file:
 
@@ -205,9 +205,9 @@ Steps 5.7 and 5.8 need the clinicians' answers on the wording conflicts (see the
   - Learn: SVG `viewBox`; scaling to screen height; screenfull
   - Check: looks like the paper page; no scrolling; works in all four browsers
 
-- [ ] **5.4 Screen-size check**
+- [x] **5.4 Screen-size check**
   - Learn: measuring the screen; recording it with the result
-  - Check: a too-small window shows a message (threshold set with the clinicians); screen size is saved with the result
+  - Check: a too-small window shows a message (working threshold of 40 px circles, clinicians to confirm), and enlarging the window brings the test back
 
 - [ ] **5.5 Clicking circles and drawing lines**
   - Learn: pointer events in SVG; large hit areas; ignoring double-clicks
@@ -227,7 +227,7 @@ Steps 5.7 and 5.8 need the clinicians' answers on the wording conflicts (see the
 
 - [ ] **5.9 Part A to Part B, time limits and `onComplete`**
   - Learn: handing a result to the shared layer through the plug-in contract
-  - Check: timeouts stop at 150 s / 300 s; the result matches what the 3.5 scoring tests expect
+  - Check: timeouts stop at 150 s / 300 s; the result matches what the 3.5 scoring tests expect; the screen size is saved with the result
 
 - [ ] **5.10 Save the sheet and click log**
   - Learn: exporting the drawn SVG with the font embedded
@@ -395,6 +395,7 @@ see their own practice.
 - [ ] **9.2 Real-time stop to the client's tab**
   - Learn: Supabase real-time channels; letting a client listen without letting it read tables (approach decided at the start of this step)
   - Check: a stop reaches the client's tab within a second or two; the client can't hear any other sequence's messages
+  - Note: consider alerting the dashboard when a client's screen is too small, in case the client can't explain the problem on the call. This needs a client-to-dashboard message and a decision on how it fits with ADR-009 (no live progress view) (raised at 5.4)
 
 - [ ] **9.3 Status-check fallback**
   - Learn: polling an Edge Function every few seconds; stopping the polling cleanly

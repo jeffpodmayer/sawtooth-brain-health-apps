@@ -42,8 +42,8 @@ new one. Part A is numbers (1 → 25). Part B alternates numbers and letters
 - No hover highlight on circles.
 - No timer, countdown, error text, help number or end/skip button on screen.
 - If the screen is too small to show the page at a usable size, show a message
-  instead of the test (threshold: open question in the brief). Save the screen
-  size with the result.
+  instead of the test. ⏳ Too small means circles under 40 px across, which is about
+  550 wide or 710 tall. Save the screen size with the result.
 
 ## Voice and arrows (no instruction text)
 
@@ -259,6 +259,9 @@ test ended before its outcome was known. A `notGiven` part has only `status` and
 11. Which norms will you use? They come from paper testing (see below).
 12. The paper sample pages have the titles "Sample A" and "Sample B" printed above
     the box. The app leaves them off, because the voice gives the instructions. OK?
+13. If a client's screen is too small, the app shows a message instead of the test.
+    Our working rule is that circles must be at least 40 pixels across, which most
+    laptops meet. OK?
 
 ## Digital vs. paper: what may change
 

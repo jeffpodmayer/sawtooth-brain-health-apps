@@ -19,7 +19,7 @@ function DevTestPage() {
   return (
     <>
       <Test sequenceId="dev-sequence" stopRequested={false} onComplete={handleComplete} />
-      <pre className="p-8">{JSON.stringify(saved, null, 2)}</pre>
+      {saved.length > 0 && <pre className="p-8">{JSON.stringify(saved, null, 2)}</pre>}
     </>
   );
 }
