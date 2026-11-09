@@ -2,15 +2,19 @@
 // The sound check comes first, because browsers block sound until a click.
 
 import { useEffect, useState } from "react";
+import { useParams } from "react-router";
 import SoundCheck from "../client/sound-check/SoundCheck";
 import type { TestResult } from "../shared/test-module";
+import { swaps } from "../tests/swaps";
 import { trailMaking } from "../tests/trail-making";
 import { createFakeResultStore, type SavedResult } from "./fake-result-store";
 
 const store = createFakeResultStore();
-const { Component: Test } = trailMaking;
+const tests = [trailMaking, swaps];
 
 function DevTestPage() {
+  const { testId } = useParams();
+  const test = tests.find((candidate) => candidate.id === testId);
   const [heard, setHeard] = useState(false);
   const [saved, setSaved] = useState<SavedResult[]>([]);
   const [stopRequested, setStopRequested] = useState(false);
@@ -55,6 +59,10 @@ function DevTestPage() {
       </main>
     );
   }
+
+  if (!test) return <main className="p-8">No test called {testId}.</main>;
+
+  const { Component: Test } = test;
 
   return <Test sequenceId="dev-sequence" stopRequested={stopRequested} onComplete={handleComplete} />;
 }
