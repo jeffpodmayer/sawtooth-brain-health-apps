@@ -221,7 +221,7 @@ watching, not by a button that could be clicked by accident or used to skip.
 
 ## ADR-010: Test-specific choices
 
-- **Status:** Accepted · **Date:** 2026-11-04 to 2026-11-05 · Trail Making practice failure changed by ADR-032
+- **Status:** Accepted · **Date:** 2026-11-04 to 2026-11-05 · Trail Making practice failure changed by ADR-032 · SWAPS key spacing changed by ADR-035
 
 **Context:** Choices that apply to one test, but change how it's built.
 
@@ -814,3 +814,22 @@ Making leaves off its printed "Sample A" and "Sample B" titles.
 
 - Roadmap 6.5's "no demo text on screen" excludes these two labels.
 - The labels are on screen during the timed test as well, because they are part of row 1.
+
+## ADR-035: The SWAPS key is narrower than printed
+
+- **Status:** Accepted · **Date:** 2026-11-08 · Adjusts the Form A layout in ADR-010
+
+**Context:** ADR-010 says the SWAPS screens use the real Form A layout. Jeff preferred
+a narrower key on screen than the one printed on the form.
+
+**Decision:**
+
+- The key's symbols are 75 units apart instead of the form's 90, centered over the grid,
+  so each sits almost directly above one of grid columns 2 to 8.
+- The symbols, their order, their numbers and the grid don't change.
+
+**Consequences:**
+
+- The key no longer lines up with the Form A PDF when laid over it (the 6.1 check).
+- It is one more small difference from the paper form. Clinicians will see it at 6.11.
+- Going back is a one-line change in `form-layout.ts`.

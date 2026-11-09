@@ -3,7 +3,7 @@
 The build, broken into small steps. Each step is about one session and teaches
 one thing. Tick a box only when its "Check" passes.
 
-**Current step:** 6.5
+**Current step:** 6.6
 
 How to use this file:
 
@@ -269,13 +269,14 @@ the stop wording and the recall instruction (see the brief).
   - Learn: smooth movement with CSS transforms, without the page jumping
   - Check: rows 1–6 show at the start; the grid moves up slowly at row 5; smooth in Safari; the client can't scroll it
 
-- [ ] **6.5 Demo animation**
+- [x] **6.5 Demo animation**
   - Learn: syncing animation steps with clip endings
   - Check: arrows, highlighted boxes and numbers filling in line up with each spoken demo line; no demo text on screen other than the form's "Demo" and "Practice" labels (ADR-034)
 
 - [ ] **6.6 Practice items**
   - Learn: reusing test behavior with feedback added
   - Check: a wrong answer gets the agreed feedback; practice isn't scored; only the clinician can end it
+  - Note: move the demo player from `src/dev/DevSwapsDemo.tsx` and the answers and selected-box state from `src/dev/DevSwapsForm.tsx` into the real test component
 
 - [ ] **6.7 The 60-second test**
   - Learn: starting a timer from a clip end; stopping on time exactly

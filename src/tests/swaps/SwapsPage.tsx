@@ -18,6 +18,7 @@ import {
   selectionSize,
   visibleArea,
 } from "./form-layout";
+import { arrowTo } from "./marks";
 import type { Answers } from "./selection";
 import SymbolShape from "./SymbolShape";
 
@@ -27,6 +28,7 @@ type SwapsPageProps = {
   answers?: Answers;
   selected?: number | null;
   topRow?: number;
+  arrowOn?: string | null;
   onItemPress?: (item: number) => void;
 };
 
@@ -37,7 +39,9 @@ function selectionSquare(item: number) {
   return { x: x - selectionSize / 2, y: y - selectionSize / 2, width: selectionSize, height: selectionSize };
 }
 
-function SwapsPage({ answers = noAnswers, selected = null, topRow = 1, onItemPress }: SwapsPageProps) {
+function SwapsPage({ answers = noAnswers, selected = null, topRow = 1, arrowOn = null, onItemPress }: SwapsPageProps) {
+  const arrow = arrowOn === null ? null : arrowTo(arrowOn);
+
   function handlePointerDown(event: PointerEvent<SVGRectElement>, item: number) {
     // On a Mac, Ctrl + click is a right-click.
     if (event.button !== 0 || event.ctrlKey) {
@@ -86,6 +90,13 @@ function SwapsPage({ answers = noAnswers, selected = null, topRow = 1, onItemPre
           ))}
         </g>
       </g>
+
+      {arrow && (
+        <g>
+          <line {...arrow.shaft} strokeWidth={5} className="stroke-ink" />
+          <polygon points={arrow.head} />
+        </g>
+      )}
     </svg>
   );
 }
