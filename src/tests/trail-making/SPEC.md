@@ -57,7 +57,7 @@ new one. Part A is numbers (1 → 25). Part B alternates numbers and letters
 - On every page, the voice reads the instructions straight through. Where the script
   says to point, an arrow appears on that circle **after** the voice says it.
 - Nothing waits for a click during the instructions. Circles can't be clicked while
-  the voice is speaking. The client starts clicking when the voice finishes.
+  the voice reads them. The client starts clicking when the voice finishes.
 - The timed parts end their instructions with ⏳ "Begin." The timer starts when
   that clip ends.
 
@@ -133,7 +133,10 @@ samples and the timed parts:
 4. The voice says **"Please start here and continue."**
 5. The arrow disappears at the next correct click.
 
-- The timer keeps running throughout (T7). Clicks are ignored until step 4 finishes.
+- The timer keeps running throughout (T7). Clicks still count while the error voice speaks:
+  - A correct click stops the voice at once, removes the arrow and draws the line.
+  - A wrong click counts as an error and gets its slashed line. The voice carries on
+    without restarting.
 - No error text on screen (T2).
 - ⏳ **Samples use the same response.** The NACC sample script is a spoken exchange
   ("You were at number 2. What is the next number?", then wait for the answer).
@@ -141,6 +144,9 @@ samples and the timed parts:
 - **A wrong first click** (before circle 1 is reached) has no line to slash: the voice
   steps and the arrow on circle 1 still happen.
 - **Clicking the last correct circle again** is ignored (treated as a double-click).
+- ⏳ **Clicking the same wrong circle twice in a row** is ignored (treated as a
+  double-click). Going back to it after a correct click, or after a different wrong
+  circle, is an error again.
 - **Clicking a circle already connected earlier** is an error.
 - **Clicks outside every circle** do nothing.
 - **Clicks after the End circle** are ignored. The part is already over.
@@ -203,7 +209,7 @@ test ended before its outcome was known. A `notGiven` part has only `status` and
 
 - **Click log** for each timed part: time (ms from "Begin."), position on the page,
   which circle (if any), and the outcome: correct, error, or ignored (outside a
-  circle, double-click). Clicks during the voice are blocked and not logged.
+  circle, double-click). Clicks during the instructions are blocked and not logged.
 - **Stop time:** if the clinician stopped a timed part, ms from "Begin." to the
   stop, so the server can re-score the partial result.
 - **Pointer movement** during timed parts, sampled about 20 times a second (T13).
@@ -228,7 +234,7 @@ test ended before its outcome was known. A `notGiven` part has only `status` and
 
 **The app decides** (change here, no clinician sign-off needed):
 
-- Click rules: inside the circle only, double-clicks ignored, no clicks during the voice
+- Click rules: inside the circle only, double-clicks ignored, no clicks during the instructions
 - Arrow timing, the 1.5 s pause between pages
 - Storing milliseconds; the format of the click and pointer logs
 - Page scaling and the too-small-screen message
@@ -271,6 +277,21 @@ test ended before its outcome was known. A `notGiven` part has only `status` and
     through the number or letter. Right now the line is drawn on top. It could
     go behind the circle, which keeps the number readable but can make the line
     look connected to that circle. Which do you prefer?
+15. If a client clicks the same wrong circle twice in a row, for example with a
+    double-click, the app counts one error. Going back to that circle after a
+    correct click counts as a new error. OK?
+16. If a client clicks back on the circle just before the last correct one (for
+    example 1, 2, then 1 again), the app counts an error. Its slashed line lands
+    exactly on top of the correct line between those two circles, so a good
+    connection looks crossed out. Which do you prefer?
+    - A: Draw the slashed line just beside the correct line, so both show. (Our
+      suggestion.)
+    - B: Don't draw a slashed line in this case. The voice and arrow still happen
+      and the error is still counted, but it leaves no mark on the page or the
+      saved sheet.
+    - C: Leave it as it is now. The voice and arrow show where to continue, but once
+      the arrow goes away, a correct line looks like an error, on screen and on
+      the saved sheet.
 
 ## Digital vs. paper: what may change
 
@@ -284,7 +305,8 @@ make them fit less well:
 - **Screen size** changes how big the circles look and how far apart they are.
   Screen size is saved with each result for this reason.
 - **Corrections are identical every time.** On paper they depend on the examiner's
-  speed. Here, each error costs the length of the two error clips.
+  speed. Here, the voice takes at most the length of the two error clips, and a
+  correct click stops it sooner.
 - **Wording and delivery:** the ⏳ changes, voice-only instructions and an exact
   timer start (instead of a stopwatch) all differ from the paper procedure.
 - **What it means:** clinicians should judge whether paper norms apply, and may want

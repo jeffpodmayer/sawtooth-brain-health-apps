@@ -6,8 +6,10 @@ import { spokenText, type SpokenLine } from "./test-script";
 export type AudioPlayer = {
   // Finishes when every clip has downloaded. Fails if any clip can't load.
   ready: Promise<void>;
-  // Finishes when the clip has played to its end.
-  play: (lineId: string) => Promise<void>;
+  // Finishes when the clip is over: true if it played to its end, false if it was stopped.
+  play: (lineId: string) => Promise<boolean>;
+  // Silences the clip that is playing, if there is one.
+  stop: () => void;
 };
 
 // Development only: reads a line aloud when its clip doesn't exist yet (roadmap 4.8).
@@ -23,6 +25,7 @@ function speakWithBrowserVoice(text: string): Promise<void> {
 export function createAudioPlayer(testName: string, lines: SpokenLine[]): AudioPlayer {
   const clips = new Map<string, Howl>();
   const browserVoiceLines = new Map<string, string>();
+  let silenceCurrent: (() => void) | null = null;
 
   const loading = lines.map(
     (line) =>
@@ -44,21 +47,40 @@ export function createAudioPlayer(testName: string, lines: SpokenLine[]): AudioP
       }),
   );
 
-  function play(lineId: string): Promise<void> {
+  function play(lineId: string): Promise<boolean> {
     if (import.meta.env.DEV) {
       const browserVoiceText = browserVoiceLines.get(lineId);
-      if (browserVoiceText) return speakWithBrowserVoice(browserVoiceText);
+      if (browserVoiceText) {
+        return new Promise((resolve, reject) => {
+          silenceCurrent = () => {
+            speechSynthesis.cancel();
+            resolve(false);
+          };
+          speakWithBrowserVoice(browserVoiceText).then(() => resolve(true), reject);
+        });
+      }
     }
 
     const clip = clips.get(lineId);
     if (!clip) throw new Error(`${lineId}: clip was not preloaded`);
 
     return new Promise((resolve, reject) => {
-      clip.once("end", () => resolve());
+      silenceCurrent = () => {
+        clip.off("end");
+        clip.off("playerror");
+        clip.stop();
+        resolve(false);
+      };
+      clip.once("end", () => resolve(true));
       clip.once("playerror", (_soundId, error) => reject(new Error(`${lineId}: ${error}`)));
       clip.play();
     });
   }
 
-  return { ready: Promise.all(loading).then(() => undefined), play };
+  function stop() {
+    silenceCurrent?.();
+    silenceCurrent = null;
+  }
+
+  return { ready: Promise.all(loading).then(() => undefined), play, stop };
 }

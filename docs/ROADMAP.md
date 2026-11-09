@@ -215,11 +215,11 @@ Steps 5.7 and 5.8 need the clinicians' answers on the wording conflicts (see the
 
 - [ ] **5.6 Errors: slash, arrow and voice**
   - Learn: connecting the click judge (3.4) to the screen; layering SVG marks
-  - Check: no instruction text on any page; arrows appear after the matching words; circles can't be clicked while the voice speaks; the timer starts when "Begin." ends; no replay button
+  - Check: a wrong click draws a slashed line that stays on screen; "That one was not correct." plays, then an arrow points to the last correct circle, then "Please start here and continue." plays; a correct click during the voice stops it and removes the arrow; a wrong click during the voice is slashed and counted while the voice carries on; a double-click on a wrong circle counts as one error; no error text on screen
 
 - [ ] **5.7 Instructions from `script.json`**
   - Learn: running a script line by line (spoken lines play; action lines trigger arrows)
-  - Check: lines play in script order, with no instruction text on screen; the timer starts at the agreed clip end; no replay button
+  - Check: lines play in script order, with no instruction text on any page; arrows appear after the matching words; circles can't be clicked while the voice speaks; the timer starts when "Begin." ends; no replay button
 
 - [ ] **5.8 Practice rounds**
   - Learn: a small state machine (instructions → practice → test)
@@ -236,7 +236,7 @@ Steps 5.7 and 5.8 need the clinicians' answers on the wording conflicts (see the
 - [ ] **5.11 Being stopped from outside**
   - Learn: how the shared layer asks a test for its partial result
   - Check: a fake stop mid-test returns the partial score and the sheet as it stood
-  - Note: the audio player has no way to stop a clip yet. Add one here, so a stop silences the voice and the test isn't left waiting for the clip to end (ADR-028, Phase 4 code review)
+  - Note: use the audio player's stop function (added at 5.6), so a stop silences the voice and the test isn't left waiting for the clip to end (ADR-028, Phase 4 code review)
 
 - [ ] **5.12 Clinician look on the preview**
   - Learn: running a feedback round

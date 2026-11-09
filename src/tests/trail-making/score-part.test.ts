@@ -47,6 +47,21 @@ describe("scorePart", () => {
     expect(scorePart("partA", clicks, 2000).errors).toBe(0);
   });
 
+  it("counts a double-click on a wrong circle as one error", () => {
+    const clicks = [click(1000, "1"), click(2000, "5"), click(2100, "5")];
+    expect(scorePart("partA", clicks, 3000).errors).toBe(1);
+  });
+
+  it("counts a wrong circle again after a correct click", () => {
+    const clicks = [click(1000, "1"), click(2000, "5"), click(3000, "2"), click(4000, "5")];
+    expect(scorePart("partA", clicks, 5000).errors).toBe(2);
+  });
+
+  it("counts wrong, different wrong, then the first wrong again as three errors", () => {
+    const clicks = [click(1000, "1"), click(2000, "5"), click(3000, "7"), click(4000, "5")];
+    expect(scorePart("partA", clicks, 5000).errors).toBe(3);
+  });
+
   it("skips clicks outside a circle", () => {
     const clicks = [click(1000, null), click(3000, "1")];
     const score = scorePart("partA", clicks, 4000);

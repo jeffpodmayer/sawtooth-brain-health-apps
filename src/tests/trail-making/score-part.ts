@@ -51,20 +51,23 @@ export function scorePart(
   let correctClicks = 0;
   let errors = 0;
   let endClickMs: number | null = null;
+  let lastWrong: string | null = null;
 
   for (const click of clicks) {
     if (click.circle === null || click.timeMs > cutoffMs) {
       continue;
     }
 
-    const outcome = judgeClick(order, correctClicks, click.circle);
+    const outcome = judgeClick(order, correctClicks, click.circle, lastWrong);
 
     if (outcome === "error") {
       errors += 1;
+      lastWrong = click.circle;
     }
 
     if (outcome === "correct") {
       correctClicks += 1;
+      lastWrong = null;
 
       if (correctClicks === order.length) {
         endClickMs = click.timeMs;

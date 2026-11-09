@@ -1,5 +1,5 @@
 // Judges one click on a circle (SPEC: Errors). Pure: same inputs, same answer.
-// Clicks outside every circle or during the voice never reach this function.
+// Clicks outside every circle or during the instructions never reach this function.
 
 export type ClickOutcome = "correct" | "error" | "ignored";
 
@@ -7,6 +7,7 @@ export function judgeClick(
   order: readonly string[],
   correctSoFar: number,
   clicked: string,
+  lastWrong: string | null,
 ): ClickOutcome {
   if (correctSoFar >= order.length) {
     return "ignored";
@@ -16,7 +17,7 @@ export function judgeClick(
     return "correct";
   }
 
-  if (clicked === order[correctSoFar - 1]) {
+  if (clicked === order[correctSoFar - 1] || clicked === lastWrong) {
     return "ignored";
   }
 
