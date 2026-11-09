@@ -3,7 +3,7 @@
 The build, broken into small steps. Each step is about one session and teaches
 one thing. Tick a box only when its "Check" passes.
 
-**Current step:** 5.2
+**Current step:** 5.3
 
 How to use this file:
 
@@ -197,7 +197,7 @@ Steps 5.7 and 5.8 need the clinicians' answers on the wording conflicts (see the
   - Check: `/dev/test/trail-making` loads in development; the route isn't in the production build
   - Note: write the `ResultStore` interface here, before the fake one (decided at 3.1)
 
-- [ ] **5.2 Circle positions from the PDF**
+- [x] **5.2 Circle positions from the PDF**
   - Learn: turning a page layout into SVG coordinates
   - Check: all four pages (Sample A, Part A, Sample B, Part B) look like the scans by eye; circles don't overlap and are easy to click
 

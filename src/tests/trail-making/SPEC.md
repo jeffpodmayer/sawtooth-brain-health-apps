@@ -34,7 +34,7 @@ new one. Part A is numbers (1 → 25). Part B alternates numbers and letters
 - Each page looks like the paper page: portrait, circles placed approximately as
   printed (by eye from the scans), with the "Begin" and "End" labels. Sample pages
   keep their box outline. Generally the same circle size as on paper.
-- Circle positions live in a data file per page, separate from the code.
+- Circle positions live in one data file, with an entry per page, separate from the code.
 - The page is scaled to fill the screen height in full screen and stays static:
   no scrolling, zooming or movement during a test.
 - **A click counts only if it lands inside a drawn circle.** Clicks outside every
@@ -257,6 +257,8 @@ test ended before its outcome was known. A `notGiven` part has only `status` and
 10. Report time in whole seconds, like the NACC form, or tenths of a second? (Working
     answer: tenths.)
 11. Which norms will you use? They come from paper testing (see below).
+12. The paper sample pages have the titles "Sample A" and "Sample B" printed above
+    the box. The app leaves them off, because the voice gives the instructions. OK?
 
 ## Digital vs. paper: what may change
 
