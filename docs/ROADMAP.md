@@ -3,7 +3,7 @@
 The build, broken into small steps. Each step is about one session and teaches
 one thing. Tick a box only when its "Check" passes.
 
-**Current step:** 6.2
+**Current step:** 6.3
 
 How to use this file:
 
@@ -257,7 +257,7 @@ the stop wording and the recall instruction (see the brief).
   - Learn: drawing the symbols as SVG shapes; laying out a grid from data (3.6)
   - Check: laid over the Form A PDF, the symbols, order and gray practice box match
 
-- [ ] **6.2 The 1–7 number pad**
+- [x] **6.2 The 1–7 number pad**
   - Learn: building an accessible button group
   - Check: buttons are 56px+ and easy to hit with a trackpad; the keyboard does nothing during the test
 

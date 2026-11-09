@@ -16,7 +16,7 @@ import SymbolShape from "./SymbolShape";
 
 function SwapsPage() {
   return (
-    <svg viewBox={`0 0 ${pageSize.width} ${pageSize.height}`} className="block h-screen w-screen fill-ink select-none">
+    <svg viewBox={`0 0 ${pageSize.width} ${pageSize.height}`} className="block min-h-0 w-full flex-1 fill-ink select-none">
       {grayBoxes.map(({ label, ...box }) => (
         <g key={label}>
           <rect {...box} strokeWidth={1.5} className="fill-form-gray stroke-ink" />
