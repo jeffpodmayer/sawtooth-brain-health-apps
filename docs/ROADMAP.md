@@ -3,7 +3,7 @@
 The build, broken into small steps. Each step is about one session and teaches
 one thing. Tick a box only when its "Check" passes.
 
-**Current step:** 7.1
+**Current step:** 7.2
 
 How to use this file:
 
@@ -306,11 +306,11 @@ the stop wording and the recall instruction (see the brief).
 Until the dashboard exists (Phase 8), make test sequences in development with SQL
 or the seed file.
 
-- [ ] **7.1 First Edge Function: check a link**
+- [x] **7.1 First Edge Function: check a link**
   - Learn: Edge Functions (Deno); using the secret key safely on the server; CORS
   - Check: a valid token returns the practice name and the tests to run; an unknown, completed or discontinued token is refused; nothing else about the client is returned
-  - Note: decide with the clinicians what happens if a client reopens a link partway (ADR-005 leaves interruptions out of scope); results saved so far are in 2.5's table
-  - Note: if the browser has blocked sound, for example after a page reload with no click, `play()` never finishes and the test freezes. Howler's error event doesn't fire in this case. Handle it when deciding what a reopened link does (Phase 4 code review)
+  - Note: a reopened link returns only the tests with no result yet, and an interrupted test starts again from its beginning (ADR-036, clinicians not yet asked)
+  - Note: the blocked-sound freeze after a reload (Phase 4 code review) is avoided by always starting at the welcome screen (ADR-036); built in 7.2 and 7.3
 
 - [ ] **7.2 The client's first screen**
   - Learn: the `/t/<link-token>` route; going full screen from a click
@@ -318,10 +318,12 @@ or the seed file.
   - Note: clip downloads have no time limit or retry, so one stalled clip hangs the sound check forever and one failed clip can't recover without a reload. Decide what the client sees (Phase 4 code review)
   - Note: "Play it again" is disabled while the clip plays, so a keyboard user loses their place. Return focus to it when the clip ends (WCAG 2.2 AA, Phase 4 code review)
   - Note: decide what happens if a client leaves full screen during a test, for example with Esc. The page keeps working at window size, but only another click can bring full screen back (found at 5.3)
+  - Note: every load of the link starts here, never inside a test (ADR-036). A refused link gets one message, whatever the reason (ADR-037); decide its wording, with no help phone number
 
 - [ ] **7.3 The sequence runner**
   - Learn: a test registry; using the plug-in contract from the outside
   - Check: both tests run back to back on the development test page, with the fake ResultStore
+  - Note: run only the tests `check-link` returns, in that order, and never restore a test partway (ADR-036)
 
 - [ ] **7.4 Break screen**
   - Learn: a simple in-between screen with no way out for the client
@@ -332,6 +334,7 @@ or the seed file.
   - Check: a result saves to the right sequence; a result with an edited score is rejected or flagged; a result for someone else's token is refused
   - Note: add a database rule so a saved result can't be overwritten and a closed sequence can't reopen (ADR-008), and require `completed_at` to be on or after `started_at` (Phase 2 code review)
   - Note: add `.ts` to the scoring modules' relative imports so Deno can load them, and reject logs with negative or invalid times (Phase 3 code review)
+  - Note: build it like `check-link` (ADR-037). VS Code shows false errors in function files until the Deno extension is set up; decide whether to add it
 
 - [ ] **7.6 Upload the sheet**
   - Learn: uploading to Storage through an Edge Function
@@ -345,6 +348,7 @@ or the seed file.
 - [ ] **7.8 End of sequence**
   - Learn: closing a sequence so its link stops working
   - Check: a thank-you screen shows at the end; the sequence is marked complete; reopening the link is refused
+  - Note: `check-link` returns an empty test list for an open sequence with nothing left to run. Decide what the client sees then
 
 - [ ] **7.9 Full run in every browser**
   - Learn: an end-to-end manual test plan; measuring a timing gap across browsers

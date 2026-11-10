@@ -111,3 +111,54 @@ values (
   'Fake development note. Not about a real person.',
   '10000000-0000-4000-8000-000000000001'
 );
+
+-- Sequences for trying the client link (roadmap 7.1). Their link tokens are fixed
+-- and fake, so the same test links work after every reset. Development only.
+insert into public.sequences (id, practice_id, client_id, created_by, link_token, status)
+values
+  -- Open, nothing done yet: the link returns both tests.
+  ('30000000-0000-4000-8000-000000000002', '9fd7e9ef-8180-4ee6-b96a-b54143062035',
+   '20000000-0000-4000-8000-000000000002', '10000000-0000-4000-8000-000000000001',
+   repeat('a', 64), 'open'),
+  -- Open, reopened partway: Trail Making is done, so the link returns SWAPS only.
+  ('30000000-0000-4000-8000-000000000003', '9fd7e9ef-8180-4ee6-b96a-b54143062035',
+   '20000000-0000-4000-8000-000000000002', '10000000-0000-4000-8000-000000000001',
+   repeat('b', 64), 'open'),
+  -- Completed and discontinued: both links are refused.
+  ('30000000-0000-4000-8000-000000000004', '9fd7e9ef-8180-4ee6-b96a-b54143062035',
+   '20000000-0000-4000-8000-000000000002', '10000000-0000-4000-8000-000000000001',
+   repeat('c', 64), 'completed'),
+  ('30000000-0000-4000-8000-000000000005', '9fd7e9ef-8180-4ee6-b96a-b54143062035',
+   '20000000-0000-4000-8000-000000000002', '10000000-0000-4000-8000-000000000001',
+   repeat('d', 64), 'discontinued');
+
+-- Tests still to run. The database fills in status (pending) by itself.
+insert into public.sequence_tests (id, practice_id, sequence_id, test_id, position)
+values
+  ('40000000-0000-4000-8000-000000000003', '9fd7e9ef-8180-4ee6-b96a-b54143062035',
+   '30000000-0000-4000-8000-000000000002', 'trail-making', 1),
+  ('40000000-0000-4000-8000-000000000004', '9fd7e9ef-8180-4ee6-b96a-b54143062035',
+   '30000000-0000-4000-8000-000000000002', 'swaps', 2),
+  ('40000000-0000-4000-8000-000000000006', '9fd7e9ef-8180-4ee6-b96a-b54143062035',
+   '30000000-0000-4000-8000-000000000003', 'swaps', 2);
+
+-- The finished Trail Making in the reopened sequence. Same made-up scores as above.
+insert into public.sequence_tests (
+  id, practice_id, sequence_id, test_id, position, status, test_version,
+  started_at, completed_at, scores, raw_data, screen_width, screen_height
+)
+values (
+  '40000000-0000-4000-8000-000000000005',
+  '9fd7e9ef-8180-4ee6-b96a-b54143062035',
+  '30000000-0000-4000-8000-000000000003',
+  'trail-making', 1, 'completed', '0.0.0-seed',
+  now() - interval '30 minutes', now() - interval '20 minutes',
+  '{
+    "partA": {"status": "completed", "code": null, "timeMs": 38000, "timeSeconds": 38, "correctLines": 24, "correctClicks": 25, "errors": 0},
+    "partB": {"status": "completed", "code": null, "timeMs": 91000, "timeSeconds": 91, "correctLines": 24, "correctClicks": 25, "errors": 1},
+    "sampleA": {"passed": true},
+    "sampleB": {"passed": true}
+  }',
+  '{"seed": true}',
+  1440, 900
+);

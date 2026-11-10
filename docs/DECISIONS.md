@@ -103,7 +103,7 @@ to try the app without real data.
 
 ## ADR-005: Clients test at home with a mouse
 
-- **Status:** Accepted · **Date:** 2026-11-05 · Replaces the earlier tablet-and-stylus plan
+- **Status:** Accepted · **Date:** 2026-11-05 · Replaces the earlier tablet-and-stylus plan · Interruptions narrowed by ADR-036
 
 **Context:** The planning meeting settled how the app is used (A1–A5).
 
@@ -448,7 +448,7 @@ but not who is let in or how it's set up. Pages previews are public by default.
 
 ## ADR-020: Code review before main, and working on dev
 
-- **Status:** Accepted · **Date:** 2026-11-07
+- **Status:** Accepted · **Date:** 2026-11-07 · Release routine extended by ADR-037
 
 **Context:** ADR-014 sets when `dev` is merged into `main`, but not how the
 merge is done, whether it's reviewed, or whether work happens on other branches.
@@ -833,3 +833,66 @@ a narrower key on screen than the one printed on the form.
 - The key no longer lines up with the Form A PDF when laid over it (the 6.1 check).
 - It is one more small difference from the paper form. Clinicians will see it at 6.11.
 - Going back is a one-line change in `form-layout.ts`.
+
+## ADR-036: A reopened link starts again at the first unfinished test
+
+- **Status:** Accepted, clinicians not yet asked · **Date:** 2026-11-09 · Narrows the interruptions left out of scope by ADR-005
+
+**Context:** ADR-005 left interruptions (tab closed, lost connection, page reload) out of
+scope. The link check (roadmap 7.1) has to answer something when a client opens a link
+a second time. A result is saved only when a test completes or is stopped, so an
+interrupted test has nothing saved. Browsers also block sound after a reload until the
+client clicks, which freezes a test that is waiting for a clip to end.
+
+**Decision:**
+
+- A link works while its sequence is open. The link check returns only the tests with no
+  result yet, in order.
+- A test that was interrupted starts again from its beginning. Finished and stopped tests
+  are kept and never run again (ADR-008).
+- Every load of the link starts at the welcome screen and the sound check. The app never
+  puts a client straight back into a test.
+
+**Consequences:**
+
+- A client who restarts an interrupted test has already seen part of it, which may help
+  their score. The clinician is watching and judges that. Raise it when the clinicians
+  are asked.
+- Nothing records that a test was started and abandoned. Add that by migration if the
+  clinicians want to see it.
+- Sound is always unlocked by a click before any test audio, so the blocked-sound freeze
+  (Phase 4 code review) can't happen after a reload.
+- No migration is needed: a second result for the same test is still not allowed (ADR-024).
+
+## ADR-037: How Edge Functions are called and released
+
+- **Status:** Accepted · **Date:** 2026-11-09 · Adds a step to the release routine in ADR-020
+
+**Context:** The link check (roadmap 7.1) is the first Edge Function. The functions that
+save results, upload sheets and check status will follow the same pattern.
+
+**Decision:**
+
+- Functions are built with Supabase's `@supabase/server` library. It checks the caller's
+  key, answers CORS and supplies a database client that uses the secret key. Supabase
+  gives the secret key to the function by itself, so it is never typed, copied or stored.
+- A caller must send the publishable key. That key is public, so the link token is the
+  real check, done in the function's own code.
+- The link token travels in the request body, never in the address, and is never logged.
+- Every refusal gets the same reply (`404`, `link_not_valid`), whether the token is
+  unknown, badly formed or belongs to a completed or discontinued sequence.
+- A reply is built by hand from named values, so a new table column can't leak into it.
+- Any website may call the functions (the library's default CORS). Clients have no login
+  for another site to abuse, and a caller needs a link token either way.
+- Deploys use `--use-api`, so Docker isn't needed.
+- Release order: test on `dev` → code review → apply migrations to production → deploy
+  functions to production → merge `dev` into `main`.
+
+**Consequences:**
+
+- Revisit the allowed websites when the subdomain is added (roadmap 11.3).
+- The client screen can't tell a finished visit from a mistyped link, so it shows one
+  message for both.
+- A function changed on `dev` is live on development at once, but reaches production
+  only at the next release.
+- The release line in CLAUDE.md gains the functions step.

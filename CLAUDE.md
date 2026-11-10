@@ -44,7 +44,9 @@ npx supabase db push --remote          # apply migrations to the linked project 
 npx supabase migration list --remote   # compare local migration files with the linked project
 npx supabase db reset --remote=<development-ref>   # wipe development, rebuild it and load seed.sql; deletes all logins. Development only.
 npx supabase db push --remote=<production-ref>   # apply migrations to production (the CLI stays linked to development; preview first with --dry-run)
-npx supabase functions deploy <name>
+npx supabase functions new <name> --auth apikey   # new Edge Function that requires the publishable key (adds a block to supabase/config.toml)
+npx supabase functions deploy <name> --use-api    # deploy to the linked project (development); --use-api bundles on Supabase's side, so Docker isn't needed
+npx supabase functions deploy --use-api --remote=<production-ref>   # deploy every Edge Function to production (release time only; the CLI stays linked to development)
 ```
 
 Add new commands here when they are created.
@@ -118,7 +120,7 @@ docs/            ROADMAP.md, DECISIONS.md
 
 - `dev` branch → Cloudflare preview → Supabase `development` project (fake data only).
 - `main` branch → production subdomain → Supabase `production` project.
-- Release (at the end of each phase): test on `dev` → code review (if code changed) → apply migrations to production → merge `dev` into `main` (fast-forward only). See ADR-020.
+- Release (at the end of each phase): test on `dev` → code review (if code changed) → apply migrations to production → deploy Edge Functions to production → merge `dev` into `main` (fast-forward only). See ADR-020 and ADR-037.
 - `seed.sql` never runs against production.
 
 **Accessibility**
