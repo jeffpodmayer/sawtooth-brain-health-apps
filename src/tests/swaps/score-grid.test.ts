@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { gridItems } from "./form-a";
-import { scoreGrid, type LoggedAnswer } from "./score-grid";
+import { replayGrid, scoreGrid, type LoggedAnswer } from "./score-grid";
 
 function answer(timeMs: number, item: number, number: number): LoggedAnswer {
   return { timeMs, item, number };
@@ -147,5 +147,28 @@ describe("scoreGrid", () => {
     const score = scoreGrid([answer(1000, 7, 1), answer(2000, 20, 4)], 3000);
     expect(score.attempted).toBe(2);
     expect(score.correct).toBe(2);
+  });
+});
+
+// Item 7 is a triangle (1) and item 8 is a pentagon (4).
+describe("replayGrid", () => {
+  it("keeps each box's numbers in the order they were given", () => {
+    const { history } = replayGrid([answer(1000, 7, 2), answer(2000, 8, 4), answer(3000, 7, 1)], null);
+    expect(history).toEqual(
+      new Map([
+        [7, [2, 1]],
+        [8, [4]],
+      ]),
+    );
+  });
+
+  it("doesn't add the same number twice in a row", () => {
+    const { history } = replayGrid([answer(1000, 7, 1), answer(2000, 7, 1)], null);
+    expect(history.get(7)).toEqual([1]);
+  });
+
+  it("keeps a change back to an earlier number", () => {
+    const { history } = replayGrid([answer(1000, 7, 2), answer(2000, 7, 1), answer(3000, 7, 2)], null);
+    expect(history.get(7)).toEqual([2, 1, 2]);
   });
 });

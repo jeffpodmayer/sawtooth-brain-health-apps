@@ -1,20 +1,27 @@
 // Runs SWAPS: the introduction and demo, practice, the test, then recall (SPEC: Flow).
 
 import { useEffect, useRef, useState } from "react";
+import { withAudioLog } from "../../shared/audio-log";
 import { createAudioPlayer } from "../../shared/audio-player";
-import { realClock } from "../../shared/clock";
+import { browserFrom } from "../../shared/browser-info";
+import { elapsedClock, realClock } from "../../shared/clock";
+import { recordFocus, type FocusLogEntry } from "../../shared/focus-log";
 import { runScript } from "../../shared/run-script";
+import type { TestProps } from "../../shared/test-module";
 import { checkScript, type ActionLine, type SpokenLine } from "../../shared/test-script";
+import { buildSheet } from "./build-sheet";
 import { recallOrder } from "./form-a";
+import { pageSize, visibleArea } from "./form-layout";
 import NumberPad from "./NumberPad";
 import { isRightNumber } from "./practice";
 import RecallPage from "./RecallPage";
-import { scoreGrid, type LoggedAnswer } from "./score-grid";
-import { scoreRecall, type LoggedRecallAnswer } from "./score-recall";
+import { replayGrid, scoreGrid, type LoggedAnswer, type SwapsScores } from "./score-grid";
+import { replayRecall, scoreRecall, type LoggedRecallAnswer } from "./score-recall";
 import script from "./script.json";
 import { applyScriptAction, splitAfterFinalArrow, startView, type ScriptView } from "./script-view";
 import { canSelect, nextEmpty, nextEmptyAfter } from "./selection";
 import SwapsPage from "./SwapsPage";
+import { testId, testVersion } from "./test-info";
 import { timeLimitMs } from "./time-limits";
 import { isOnScreen, topRowFor } from "./visible-rows";
 
@@ -31,8 +38,31 @@ const spokenLines = Object.values(sections)
   .flat()
   .filter((line): line is SpokenLine => line.type === "spoken");
 
-function Swaps() {
-  const [player] = useState(() => createAudioPlayer("swaps", spokenLines));
+type ScreenNote = { width: number; height: number; scale: number };
+
+// The window's size, and how big the form is drawn in it: pixels per form unit.
+function measureScreen(page: HTMLElement | null): ScreenNote | undefined {
+  const drawn = page?.querySelector("svg")?.getBoundingClientRect();
+
+  if (!drawn) {
+    return undefined;
+  }
+
+  return {
+    width: window.innerWidth,
+    height: window.innerHeight,
+    scale: Math.min(drawn.width / pageSize.width, drawn.height / visibleArea.height),
+  };
+}
+
+function Swaps({ sequenceId, onComplete }: TestProps) {
+  const [startedAt] = useState(() => new Date().toISOString());
+  const handedOver = useRef(false);
+  const [testClock] = useState(() => elapsedClock(realClock));
+  const [player] = useState(() => withAudioLog(createAudioPlayer("swaps", spokenLines), testClock));
+  const pageRef = useRef<HTMLDivElement>(null);
+  const screens = useRef<Partial<Record<"test" | "recall", ScreenNote>>>({});
+  const focusLog = useRef<FocusLogEntry[]>([]);
   const [view, setView] = useState(startView);
   const [wrongAnswers, setWrongAnswers] = useState(0);
   const [stage, setStage] = useState<"practice" | "test" | "recall" | "ended">("practice");
@@ -131,6 +161,7 @@ function Swaps() {
 
       if (line.action === "startTimer") {
         timerStartedAt.current = realClock.now();
+        screens.current.test = measureScreen(pageRef.current);
         limitTimer = window.setTimeout(timeUp, timeLimitMs.test);
       }
     }
@@ -174,6 +205,7 @@ function Swaps() {
 
       if (line.action === "startTimer") {
         recallStartedAt.current = realClock.now();
+        screens.current.recall = measureScreen(pageRef.current);
         limitTimer = window.setTimeout(timeUp, timeLimitMs.recall);
       }
     }
@@ -193,22 +225,46 @@ function Swaps() {
     };
   }, [player, stage]);
 
-  // For checking 6.7 and 6.8 by hand. Goes at 6.9, when the scores go into the result.
+  useEffect(() => recordFocus(testClock, focusLog.current), [testClock]);
+
+  // Hands the result to the shared layer. The ref keeps it to once, even if the parent redraws.
   useEffect(() => {
-    if (stage === "recall" && timerStartedAt.current !== null) {
-      console.info("SWAPS test ended", {
-        padOffAtMs: realClock.now() - timerStartedAt.current,
-        score: scoreGrid(answerLog.current, null),
-      });
+    if (stage !== "ended" || handedOver.current) {
+      return;
     }
 
-    if (stage === "ended" && recallStartedAt.current !== null) {
-      console.info("SWAPS recall ended", {
-        padOffAtMs: realClock.now() - recallStartedAt.current,
-        score: scoreRecall(recallLog.current, null),
-      });
-    }
-  }, [stage]);
+    handedOver.current = true;
+
+    const { history } = replayGrid(answerLog.current, null);
+    const { finalAnswers } = replayRecall(recallLog.current, null);
+
+    const scores: SwapsScores = {
+      test: scoreGrid(answerLog.current, null),
+      recall: scoreRecall(recallLog.current, null),
+      practice: { wrongAnswers },
+    };
+
+    onComplete({
+      testId,
+      testVersion,
+      sequenceId,
+      startedAt,
+      completedAt: new Date().toISOString(),
+      scores,
+      rawData: {
+        answers: { test: answerLog.current, recall: recallLog.current },
+        finalAnswers: {
+          test: Object.fromEntries([...history].map(([item, numbers]) => [item, numbers.at(-1)])),
+          recall: Object.fromEntries(finalAnswers),
+        },
+        audio: player.log,
+        screen: screens.current,
+        browser: browserFrom(navigator.userAgent),
+        focus: [...focusLog.current],
+      },
+      sheets: { sheet: buildSheet({ shown: view.answers, history, recall: finalAnswers }) },
+    });
+  }, [stage, onComplete, player, sequenceId, startedAt, view.answers, wrongAnswers]);
 
   function handleTestPick(item: number, number: number) {
     if (timerStartedAt.current === null) {
@@ -288,7 +344,7 @@ function Swaps() {
   }
 
   return (
-    <div className="flex h-screen flex-col pb-6">
+    <div ref={pageRef} className="flex h-screen flex-col pb-6">
       {recallView === null ? (
         <SwapsPage answers={view.answers} selected={view.highlighted ?? view.selected} topRow={topRow} arrowOn={view.arrowOn} onItemPress={handleItemPress} />
       ) : (

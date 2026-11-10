@@ -39,15 +39,22 @@ const correctNumbers = new Map(
     .map((item) => [item.item, item.correctNumber]),
 );
 
-export function scoreGrid(
+// What the log comes to once the rules are applied. history holds each answered box's numbers
+// in order: the last is the final answer, and each one before it was replaced by a correction.
+export type GridReplay = {
+  status: GivenGridScore["status"];
+  timeMs: number;
+  history: ReadonlyMap<number, readonly number[]>;
+};
+
+export function replayGrid(
   answers: readonly LoggedAnswer[],
   stoppedAtMs: number | null,
-): GivenGridScore {
+): GridReplay {
   const stopped = stoppedAtMs !== null && stoppedAtMs < timeLimitMs.test;
   const cutoffMs = stopped ? stoppedAtMs : timeLimitMs.test;
 
-  const finalAnswers = new Map<number, number>();
-  let corrections = 0;
+  const history = new Map<number, number[]>();
   let endAnswerMs: number | null = null;
 
   for (const answer of answers) {
@@ -55,33 +62,47 @@ export function scoreGrid(
       continue;
     }
 
-    const previous = finalAnswers.get(answer.item);
+    const numbers = history.get(answer.item) ?? [];
 
-    if (previous !== undefined && previous !== answer.number) {
-      corrections += 1;
+    if (numbers.at(-1) !== answer.number) {
+      history.set(answer.item, [...numbers, answer.number]);
     }
 
-    finalAnswers.set(answer.item, answer.number);
-
-    if (finalAnswers.size === correctNumbers.size) {
+    if (history.size === correctNumbers.size) {
       endAnswerMs = answer.timeMs;
-    }
-  }
-
-  let correct = 0;
-
-  for (const [item, number] of finalAnswers) {
-    if (number === correctNumbers.get(item)) {
-      correct += 1;
     }
   }
 
   return {
     status: endAnswerMs !== null ? "completed" : stopped ? "stopped" : "timedOut",
     timeMs: endAnswerMs ?? cutoffMs,
-    attempted: finalAnswers.size,
+    history,
+  };
+}
+
+export function scoreGrid(
+  answers: readonly LoggedAnswer[],
+  stoppedAtMs: number | null,
+): GivenGridScore {
+  const { status, timeMs, history } = replayGrid(answers, stoppedAtMs);
+
+  let correct = 0;
+  let corrections = 0;
+
+  for (const [item, numbers] of history) {
+    corrections += numbers.length - 1;
+
+    if (numbers.at(-1) === correctNumbers.get(item)) {
+      correct += 1;
+    }
+  }
+
+  return {
+    status,
+    timeMs,
+    attempted: history.size,
     correct,
-    errors: finalAnswers.size - correct,
+    errors: history.size - correct,
     corrections,
   };
 }

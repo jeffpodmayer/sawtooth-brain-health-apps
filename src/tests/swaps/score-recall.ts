@@ -21,10 +21,16 @@ export type RecallScore = GivenRecallScore | { status: "notGiven" };
 
 const correctNumbers = new Map<string, number>(Object.entries(keyNumbers));
 
-export function scoreRecall(
+// What the log comes to once the rules are applied: each answered symbol's final number.
+export type RecallReplay = {
+  status: GivenRecallScore["status"];
+  finalAnswers: ReadonlyMap<string, number>;
+};
+
+export function replayRecall(
   answers: readonly LoggedRecallAnswer[],
   stoppedAtMs: number | null,
-): GivenRecallScore {
+): RecallReplay {
   const stopped = stoppedAtMs !== null && stoppedAtMs < timeLimitMs.recall;
   const cutoffMs = stopped ? stoppedAtMs : timeLimitMs.recall;
 
@@ -38,6 +44,15 @@ export function scoreRecall(
     finalAnswers.set(answer.symbol, answer.number);
   }
 
+  return { status: stopped ? "stopped" : "completed", finalAnswers };
+}
+
+export function scoreRecall(
+  answers: readonly LoggedRecallAnswer[],
+  stoppedAtMs: number | null,
+): GivenRecallScore {
+  const { status, finalAnswers } = replayRecall(answers, stoppedAtMs);
+
   let correct = 0;
 
   for (const [symbol, number] of finalAnswers) {
@@ -47,7 +62,7 @@ export function scoreRecall(
   }
 
   return {
-    status: stopped ? "stopped" : "completed",
+    status,
     correct,
     blank: correctNumbers.size - finalAnswers.size,
   };

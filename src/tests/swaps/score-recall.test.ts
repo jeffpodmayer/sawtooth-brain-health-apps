@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { keyNumbers, keyPrintedOrder } from "./form-a";
-import { scoreRecall, type LoggedRecallAnswer } from "./score-recall";
+import { replayRecall, scoreRecall, type LoggedRecallAnswer } from "./score-recall";
 
 function answer(timeMs: number, symbol: string, number: number): LoggedRecallAnswer {
   return { timeMs, symbol, number };
@@ -113,5 +113,20 @@ describe("scoreRecall", () => {
     const score = scoreRecall([answer(1000, "star", 1)], null);
     expect(score.correct).toBe(0);
     expect(score.blank).toBe(7);
+  });
+});
+
+describe("replayRecall", () => {
+  it("gives each answered symbol's final answer", () => {
+    const { finalAnswers } = replayRecall(
+      [answer(1000, "square", 2), answer(2000, "flag", 6), answer(3000, "square", 5)],
+      null,
+    );
+    expect(finalAnswers).toEqual(
+      new Map([
+        ["square", 5],
+        ["flag", 6],
+      ]),
+    );
   });
 });

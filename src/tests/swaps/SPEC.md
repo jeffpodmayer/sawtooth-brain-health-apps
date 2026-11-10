@@ -229,11 +229,16 @@ in each box is the one scored.
   that part to the stop, so the server can re-score the partial result.
 - **Final answers** for all 75 test boxes and the 7 recall symbols.
 - **Audio log:** when each clip started and ended.
-- **Screen:** screen size, page scale, browser name and version.
+- **Screen:** for the test and for recall, the window size and page scale (pixels per form
+  unit) when its timer started; browser name and version.
 - **Focus:** any time the test tab was hidden or lost focus, with times.
-- **Sheet (SVG, in the result's `sheets`, not `rawData`):** the grid as it ended, with **errors** and **corrections** clearly
-  marked (S13; e.g. a wrong answer circled, a corrected answer showing the old number
-  struck through), plus the recall answers below it.
+- **Sheet (SVG, in the result's `sheets` as `sheet`, not `rawData`):** Form A as the test ended,
+  all nine rows, with the recall answers below it under a "Recall" label (decided 2026-11-09):
+  - A wrong final answer has a red box round its symbol, in the grid and on recall (S13).
+  - Each number replaced by a correction sits under its symbol, small and struck through
+    (grid only; recall changes are in the answer log).
+  - Test boxes show only the answers that were scored, so the sheet and the scores agree.
+  - A blank recall symbol is left empty.
 
 ## Stopped by the clinician
 
