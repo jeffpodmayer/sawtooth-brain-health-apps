@@ -57,7 +57,8 @@ src/
   client/        client test screens (/t/<link-token>)
   dashboard/     clinician side (/dashboard)
   tests/
-    <test-name>/ one self-contained module per test: CLAUDE.md, SPEC.md, script.json, code
+    <test-name>/ one self-contained module per test: SPEC.md, script.json, the main component,
+                 and scoring/ (pure code the server re-uses), screen/ and sheet/
 supabase/
   migrations/    every database change, as a file
   functions/     Edge Functions
