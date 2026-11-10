@@ -15,8 +15,9 @@ import { pageSize, visibleArea } from "./form-layout";
 import NumberPad from "./NumberPad";
 import { isRightNumber } from "./practice";
 import RecallPage from "./RecallPage";
-import { replayGrid, scoreGrid, type LoggedAnswer, type SwapsScores } from "./score-grid";
-import { replayRecall, scoreRecall, type LoggedRecallAnswer } from "./score-recall";
+import { replayGrid, type LoggedAnswer } from "./score-grid";
+import { replayRecall, type LoggedRecallAnswer } from "./score-recall";
+import { scoreSwaps, type StopPoint } from "./score-swaps";
 import script from "./script.json";
 import { applyScriptAction, splitAfterFinalArrow, startView, type ScriptView } from "./script-view";
 import { canSelect, nextEmpty, nextEmptyAfter } from "./selection";
@@ -55,7 +56,7 @@ function measureScreen(page: HTMLElement | null): ScreenNote | undefined {
   };
 }
 
-function Swaps({ sequenceId, onComplete }: TestProps) {
+function Swaps({ sequenceId, stopRequested, onComplete }: TestProps) {
   const [startedAt] = useState(() => new Date().toISOString());
   const handedOver = useRef(false);
   const [testClock] = useState(() => elapsedClock(realClock));
@@ -66,6 +67,10 @@ function Swaps({ sequenceId, onComplete }: TestProps) {
   const [view, setView] = useState(startView);
   const [wrongAnswers, setWrongAnswers] = useState(0);
   const [stage, setStage] = useState<"practice" | "test" | "recall" | "ended">("practice");
+
+  // A clinician's stop ends the test wherever it is. The effects read this, so a stop clears
+  // their timers and silences the voice. stage itself still says where the test was.
+  const activeStage = stopRequested ? "ended" : stage;
   const timerStartedAt = useRef<number | null>(null);
   const answerLog = useRef<LoggedAnswer[]>([]);
   const [recallView, setRecallView] = useState<ScriptView | null>(null);
@@ -75,7 +80,7 @@ function Swaps({ sequenceId, onComplete }: TestProps) {
 
   // A wrong practice answer stays on screen for a moment, then the feedback plays.
   useEffect(() => {
-    if (wrongAnswers === 0) {
+    if (wrongAnswers === 0 || activeStage !== "practice") {
       return;
     }
 
@@ -87,9 +92,13 @@ function Swaps({ sequenceId, onComplete }: TestProps) {
       window.clearTimeout(showTimer);
       player.stop();
     };
-  }, [player, wrongAnswers]);
+  }, [player, activeStage, wrongAnswers]);
 
   useEffect(() => {
+    if (activeStage !== "practice") {
+      return;
+    }
+
     let cancelled = false;
     let pauseTimer: number | undefined;
 
@@ -130,11 +139,11 @@ function Swaps({ sequenceId, onComplete }: TestProps) {
       window.clearTimeout(pauseTimer);
       player.stop();
     };
-  }, [player]);
+  }, [player, activeStage]);
 
   // After practice: the test instructions, ending with the pad on and item 7 selected.
   useEffect(() => {
-    if (stage !== "test") {
+    if (activeStage !== "test") {
       return;
     }
 
@@ -178,11 +187,11 @@ function Swaps({ sequenceId, onComplete }: TestProps) {
       window.clearTimeout(limitTimer);
       player.stop();
     };
-  }, [player, stage]);
+  }, [player, activeStage]);
 
   // After the test: a short pause, then the recall screen, its instruction and its full 60 seconds.
   useEffect(() => {
-    if (stage !== "recall") {
+    if (activeStage !== "recall") {
       return;
     }
 
@@ -223,26 +232,30 @@ function Swaps({ sequenceId, onComplete }: TestProps) {
       window.clearTimeout(limitTimer);
       player.stop();
     };
-  }, [player, stage]);
+  }, [player, activeStage]);
 
   useEffect(() => recordFocus(testClock, focusLog.current), [testClock]);
 
   // Hands the result to the shared layer. The ref keeps it to once, even if the parent redraws.
+  // If stage never reached "ended" itself, a clinician's stop ended the test, and stage says where.
   useEffect(() => {
-    if (stage !== "ended" || handedOver.current) {
+    if (activeStage !== "ended" || handedOver.current) {
       return;
     }
 
     handedOver.current = true;
 
-    const { history } = replayGrid(answerLog.current, null);
-    const { finalAnswers } = replayRecall(recallLog.current, null);
+    let stop: StopPoint | null = null;
 
-    const scores: SwapsScores = {
-      test: scoreGrid(answerLog.current, null),
-      recall: scoreRecall(recallLog.current, null),
-      practice: { wrongAnswers },
-    };
+    if (stage !== "ended") {
+      const clockStartedAt = { practice: null, test: timerStartedAt.current, recall: recallStartedAt.current }[stage];
+
+      stop = { stage, stoppedAtMs: clockStartedAt === null ? null : realClock.now() - clockStartedAt };
+    }
+
+    const answers = { test: answerLog.current, recall: recallLog.current };
+    const { history } = replayGrid(answers.test, stop?.stage === "test" ? stop.stoppedAtMs : null);
+    const { finalAnswers } = replayRecall(answers.recall, stop?.stage === "recall" ? stop.stoppedAtMs : null);
 
     onComplete({
       testId,
@@ -250,9 +263,10 @@ function Swaps({ sequenceId, onComplete }: TestProps) {
       sequenceId,
       startedAt,
       completedAt: new Date().toISOString(),
-      scores,
+      scores: scoreSwaps(answers, wrongAnswers, stop),
       rawData: {
-        answers: { test: answerLog.current, recall: recallLog.current },
+        answers,
+        stop,
         finalAnswers: {
           test: Object.fromEntries([...history].map(([item, numbers]) => [item, numbers.at(-1)])),
           recall: Object.fromEntries(finalAnswers),
@@ -264,7 +278,7 @@ function Swaps({ sequenceId, onComplete }: TestProps) {
       },
       sheets: { sheet: buildSheet({ shown: view.answers, history, recall: finalAnswers }) },
     });
-  }, [stage, onComplete, player, sequenceId, startedAt, view.answers, wrongAnswers]);
+  }, [activeStage, stage, onComplete, player, sequenceId, startedAt, view.answers, wrongAnswers]);
 
   function handleTestPick(item: number, number: number) {
     if (timerStartedAt.current === null) {
@@ -350,7 +364,7 @@ function Swaps({ sequenceId, onComplete }: TestProps) {
       ) : (
         <RecallPage answers={recallView.answers} selected={recallView.selected} allHighlighted={recallView.allHighlighted} onSymbolPress={handleSymbolPress} />
       )}
-      <NumberPad disabled={!(recallView ?? view).inputOn} onPick={handlePick} />
+      <NumberPad disabled={activeStage === "ended" || !(recallView ?? view).inputOn} onPick={handlePick} />
     </div>
   );
 }

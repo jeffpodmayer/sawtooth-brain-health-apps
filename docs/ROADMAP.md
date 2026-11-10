@@ -3,7 +3,7 @@
 The build, broken into small steps. Each step is about one session and teaches
 one thing. Tick a box only when its "Check" passes.
 
-**Current step:** 6.10
+**Current step:** 7.1
 
 How to use this file:
 
@@ -292,7 +292,7 @@ the stop wording and the recall instruction (see the brief).
   - Note: SWAPS text is regular weight, but Trail Making's sheet embeds only the bold font. The sheet also needs its own styles for `fill-white` and `fill-form-gray` (added at 6.1)
   - Note: remove the two temporary `console.info` lines in `Swaps.tsx` once the scores are in the result
 
-- [ ] **6.10 Being stopped from outside**
+- [x] **6.10 Being stopped from outside**
   - Learn: the same stop pattern as Trail Making (5.11)
   - Check: a fake stop mid-test returns the partial score and the sheet as it stood
   - Note: `Swaps.tsx` doesn't read `stopRequested` yet. Add the stop time to `rawData`, and make test and recall `notGiven` where the SPEC says so (left from 6.9)
