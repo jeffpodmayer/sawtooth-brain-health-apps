@@ -2,7 +2,7 @@
 // in form-layout.ts, so the browser scales the whole page to fit the screen.
 
 import type { PointerEvent } from "react";
-import { gridItems, keyNumbers, keyPrintedOrder } from "./form-a";
+import { gridItems, keyNumbers, keyPrintedOrder } from "../scoring/form-a";
 import {
   grayBoxes,
   grayLabelGap,

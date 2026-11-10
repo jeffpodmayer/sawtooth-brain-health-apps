@@ -1,9 +1,9 @@
 // Development only (roadmap 6.8): the SWAPS recall screen and number pad, to check by hand. No voice, no timer.
 
 import { useState } from "react";
-import NumberPad from "../tests/swaps/NumberPad";
-import RecallPage from "../tests/swaps/RecallPage";
-import { nextEmptyAfter, type Answers } from "../tests/swaps/selection";
+import NumberPad from "../tests/swaps/screen/NumberPad";
+import RecallPage from "../tests/swaps/screen/RecallPage";
+import { nextEmptyAfter, type Answers } from "../tests/swaps/screen/selection";
 
 const part = { first: 1, last: 7 };
 

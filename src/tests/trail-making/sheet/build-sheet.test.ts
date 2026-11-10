@@ -1,6 +1,6 @@
 import { expect, it } from "vitest";
 import { buildSheet } from "./build-sheet";
-import { pageLayouts } from "./page-layouts";
+import { pageLayouts } from "../screen/page-layouts";
 
 const sheet = buildSheet(pageLayouts.partA, ["1", "2", "3"], [{ from: "3", to: "7" }]);
 

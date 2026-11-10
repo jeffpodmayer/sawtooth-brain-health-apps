@@ -1,6 +1,6 @@
 // Which grid rows show on screen (SPEC: Screen and layout, Scrolling). Pure: same inputs, same answer.
 
-import { gridRows } from "./form-a";
+import { gridRows } from "../scoring/form-a";
 
 const columns = gridRows[0].length;
 const visibleRows = 6;

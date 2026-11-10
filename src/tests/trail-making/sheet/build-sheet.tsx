@@ -3,8 +3,8 @@
 
 import boldFont from "@fontsource/atkinson-hyperlegible/files/atkinson-hyperlegible-latin-700-normal.woff2?inline";
 import { renderToStaticMarkup } from "react-dom/server";
-import type { PageLayout } from "./page-layouts";
-import TrailPage, { type WrongLine } from "./TrailPage";
+import type { PageLayout } from "../screen/page-layouts";
+import TrailPage, { type WrongLine } from "../screen/TrailPage";
 
 // A saved file has no Tailwind, so it defines the classes that affect how the page looks.
 // The color is the theme's `ink` (ADR-015), written out because the file stands alone.

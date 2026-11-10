@@ -2,7 +2,7 @@
 // It shows the same area of the page as SwapsPage, so the number pad stays where it was.
 
 import type { PointerEvent } from "react";
-import { recallOrder } from "./form-a";
+import { recallOrder } from "../scoring/form-a";
 import { pageSize, recallPosition, recallSelectionSize, recallSymbolSize, visibleArea } from "./form-layout";
 import type { Answers } from "./selection";
 import SymbolShape from "./SymbolShape";

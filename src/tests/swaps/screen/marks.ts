@@ -1,6 +1,6 @@
 // The arrow that points at a key number or a grid item. Pure: same inputs, same answer.
 
-import { keyNumbers, keyPrintedOrder, type SwapsSymbol } from "./form-a";
+import { keyNumbers, keyPrintedOrder, type SwapsSymbol } from "../scoring/form-a";
 import { itemPosition, keyPosition, keySymbolSize, selectionSize, type Point } from "./form-layout";
 
 const arrowGap = 6;

@@ -2,7 +2,7 @@
 // 100-unit square, then moved and scaled into place, so the same drawing works at any size.
 
 import type { ReactElement } from "react";
-import type { SwapsSymbol } from "./form-a";
+import type { SwapsSymbol } from "../scoring/form-a";
 
 const shapes: Record<SwapsSymbol, ReactElement> = {
   triangle: <polygon points="0,-48 46,42 -46,42" />,

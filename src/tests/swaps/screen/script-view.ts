@@ -1,7 +1,7 @@
 // What the script's actions show at each moment. Pure: each action gives the next view.
 
-import type { ActionLine, ScriptLine } from "../../shared/test-script";
-import { gridItems, recallOrder } from "./form-a";
+import type { ActionLine, ScriptLine } from "../../../shared/test-script";
+import { gridItems, recallOrder } from "../scoring/form-a";
 import type { Answers } from "./selection";
 
 export type ScriptView = {

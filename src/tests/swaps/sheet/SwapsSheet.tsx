@@ -2,7 +2,7 @@
 // marked, and the recall answers below it. It draws with SymbolShape and form-layout.ts, so the
 // sheet's symbols and positions can't differ from the screen's.
 
-import { gridItems, keyNumbers, keyPrintedOrder, recallOrder } from "./form-a";
+import { gridItems, keyNumbers, keyPrintedOrder, recallOrder } from "../scoring/form-a";
 import {
   grayBoxes,
   grayLabelGap,
@@ -18,11 +18,11 @@ import {
   selectionSize,
   visibleArea,
   type Point,
-} from "./form-layout";
-import type { GridReplay } from "./score-grid";
-import type { RecallReplay } from "./score-recall";
-import type { Answers } from "./selection";
-import SymbolShape from "./SymbolShape";
+} from "../screen/form-layout";
+import type { GridReplay } from "../scoring/score-grid";
+import type { RecallReplay } from "../scoring/score-recall";
+import type { Answers } from "../screen/selection";
+import SymbolShape from "../screen/SymbolShape";
 
 // The recall row sits below row 9, under its own label. The sheet is one letter-size page.
 const recallRowY = 1105;

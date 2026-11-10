@@ -1,6 +1,6 @@
 import { expect, it } from "vitest";
-import { checkScript, type ActionLine } from "../../shared/test-script";
-import script from "./script.json";
+import { checkScript, type ActionLine } from "../../../shared/test-script";
+import script from "../script.json";
 import { applyScriptAction, splitAfterFinalArrow, startView } from "./script-view";
 
 const sections = checkScript(script).sections;

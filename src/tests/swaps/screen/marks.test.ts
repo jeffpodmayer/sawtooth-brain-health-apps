@@ -1,5 +1,5 @@
 import { expect, it } from "vitest";
-import { keyPrintedOrder } from "./form-a";
+import { keyPrintedOrder } from "../scoring/form-a";
 import { visibleArea } from "./form-layout";
 import { arrowTo, arrowToItem, arrowToKey } from "./marks";
 

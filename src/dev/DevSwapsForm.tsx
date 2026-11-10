@@ -1,11 +1,11 @@
 // Development only (roadmap 6.1–6.3): the SWAPS form and number pad working together, to check by hand.
 
 import { useState } from "react";
-import { keyPrintedOrder } from "../tests/swaps/form-a";
-import NumberPad from "../tests/swaps/NumberPad";
-import { canSelect, nextEmpty, type Answers } from "../tests/swaps/selection";
-import SwapsPage from "../tests/swaps/SwapsPage";
-import { isOnScreen, topRowFor } from "../tests/swaps/visible-rows";
+import { keyPrintedOrder } from "../tests/swaps/scoring/form-a";
+import NumberPad from "../tests/swaps/screen/NumberPad";
+import { canSelect, nextEmpty, type Answers } from "../tests/swaps/screen/selection";
+import SwapsPage from "../tests/swaps/screen/SwapsPage";
+import { isOnScreen, topRowFor } from "../tests/swaps/screen/visible-rows";
 
 // The timed test's boxes, so the selector starts on item 7.
 const part = { first: 7, last: 81 };

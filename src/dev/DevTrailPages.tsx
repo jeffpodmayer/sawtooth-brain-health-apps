@@ -3,8 +3,8 @@
 
 import { useState } from "react";
 import screenfull from "screenfull";
-import { pageLayouts } from "../tests/trail-making/page-layouts";
-import TrailPage from "../tests/trail-making/TrailPage";
+import { pageLayouts } from "../tests/trail-making/screen/page-layouts";
+import TrailPage from "../tests/trail-making/screen/TrailPage";
 
 const pages = [pageLayouts.sampleA, pageLayouts.partA, pageLayouts.sampleB, pageLayouts.partB];
 
