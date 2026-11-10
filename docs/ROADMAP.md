@@ -3,7 +3,7 @@
 The build, broken into small steps. Each step is about one session and teaches
 one thing. Tick a box only when its "Check" passes.
 
-**Current step:** 7.2
+**Current step:** 7.3
 
 How to use this file:
 
@@ -312,7 +312,7 @@ or the seed file.
   - Note: a reopened link returns only the tests with no result yet, and an interrupted test starts again from its beginning (ADR-036, clinicians not yet asked)
   - Note: the blocked-sound freeze after a reload (Phase 4 code review) is avoided by always starting at the welcome screen (ADR-036); built in 7.2 and 7.3
 
-- [ ] **7.2 The client's first screen**
+- [x] **7.2 The client's first screen**
   - Learn: the `/t/<link-token>` route; going full screen from a click
   - Check: the practice name shows (from practice settings); one click starts the sound check (4.7) and full screen
   - Note: clip downloads have no time limit or retry, so one stalled clip hangs the sound check forever and one failed clip can't recover without a reload. Decide what the client sees (Phase 4 code review)
@@ -324,10 +324,12 @@ or the seed file.
   - Learn: a test registry; using the plug-in contract from the outside
   - Check: both tests run back to back on the development test page, with the fake ResultStore
   - Note: run only the tests `check-link` returns, in that order, and never restore a test partway (ADR-036)
+  - Note: Trail Making and SWAPS wait for their clips with no time limit, so a stalled download hangs a test, as the sound check did before 7.2. Decide what the client sees (found at 7.2)
 
 - [ ] **7.4 Break screen**
   - Learn: a simple in-between screen with no way out for the client
   - Check: a break screen shows between tests; the client clicks to start the next test; no end or skip button
+  - Note: the click that starts the next test also returns to full screen with `enterFullScreen`, in case the client left it. Nothing interrupts a test that has left full screen (decided at 7.2)
 
 - [ ] **7.5 Edge Function: save a result**
   - Learn: checking a token on the server; re-scoring on the server with the same scoring code

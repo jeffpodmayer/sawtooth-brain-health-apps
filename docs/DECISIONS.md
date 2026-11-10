@@ -103,7 +103,7 @@ to try the app without real data.
 
 ## ADR-005: Clients test at home with a mouse
 
-- **Status:** Accepted · **Date:** 2026-11-05 · Replaces the earlier tablet-and-stylus plan · Interruptions narrowed by ADR-036
+- **Status:** Accepted · **Date:** 2026-11-05 · Replaces the earlier tablet-and-stylus plan · Interruptions narrowed by ADR-036 · Full screen narrowed by ADR-038
 
 **Context:** The planning meeting settled how the app is used (A1–A5).
 
@@ -896,3 +896,25 @@ save results, upload sheets and check status will follow the same pattern.
 - A function changed on `dev` is live on development at once, but reaches production
   only at the next release.
 - The release line in CLAUDE.md gains the functions step.
+
+## ADR-038: Leaving full screen doesn't interrupt a test
+
+- **Status:** Accepted, clinicians not yet asked · **Date:** 2026-11-09 · Narrows full screen in ADR-005
+
+**Context:** ADR-005 says tests run full screen. A client can always leave full screen, for
+example with Esc, and only another click can bring it back. A message asking for that click
+inside a timed part would either cost the client time or mean pausing the clock.
+
+**Decision:**
+
+- Nothing interrupts a test when the client leaves full screen. The test carries on at
+  window size.
+- Full screen comes back at the client's next click outside a test: the sound check's
+  "Yes, I can hear it" and the break screen's click (roadmap 7.4).
+
+**Consequences:**
+
+- A client could finish a timed part at window size, with smaller circles or boxes. The
+  clinician is watching and judges that. Raise it when the clinicians are asked.
+- Trail Making's too-small-screen message still covers a window that gets too small.
+- Leaving full screen isn't recorded. The focus log only records a hidden tab or lost focus.

@@ -5,6 +5,7 @@ import { createRoot } from "react-dom/client";
 import { BrowserRouter, Route, Routes } from "react-router";
 import "./index.css";
 import App from "./App.tsx";
+import ClientPage from "./client/ClientPage.tsx";
 
 // Only the dev server has this page, so the production build leaves it out.
 const DevTestPage = import.meta.env.DEV ? lazy(() => import("./dev/DevTestPage")) : null;
@@ -17,6 +18,7 @@ createRoot(document.getElementById("root")!).render(
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<App />} />
+        <Route path="/t/:token" element={<ClientPage />} />
         {DevTestPage && (
           <Route
             path="/dev/test/:testId"
