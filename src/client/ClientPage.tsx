@@ -3,16 +3,33 @@
 
 import { useEffect, useState } from "react";
 import { useParams } from "react-router";
+import { createFakeResultStore } from "../dev/fake-result-store";
 import { enterFullScreen } from "../shared/full-screen";
+import SequenceRunner from "../shared/SequenceRunner";
+import TryAgainScreen from "../shared/TryAgainScreen";
+import { testsForIds } from "../tests/registry";
 import { checkLink, type LinkCheck } from "./check-link";
 import SoundCheck from "./sound-check/SoundCheck";
-import TryAgainScreen from "./TryAgainScreen";
+
+// Temporary: the real ResultStore replaces this at roadmap 7.7.
+const store = createFakeResultStore();
+
+// One message for every refused link, whatever the reason (ADR-037).
+function LinkNotWorking() {
+  return (
+    <main className="mx-auto max-w-2xl p-8">
+      <h1 className="text-5xl font-bold">This link isn't working</h1>
+      <p className="mt-4">Please tell your clinician.</p>
+    </main>
+  );
+}
 
 function ClientPage() {
   const { token = "" } = useParams();
   const [check, setCheck] = useState<LinkCheck | "checking">("checking");
   const [attempt, setAttempt] = useState(0);
   const [heard, setHeard] = useState(false);
+  const [finished, setFinished] = useState(false);
 
   // Ask about the link when the page loads, and again on each "Try again".
   useEffect(() => {
@@ -46,26 +63,34 @@ function ClientPage() {
     );
   }
 
-  // One message for every refused link, whatever the reason (ADR-037).
-  if (check.status === "notValid") {
-    return (
-      <main className="mx-auto max-w-2xl p-8">
-        <h1 className="text-5xl font-bold">This link isn't working</h1>
-        <p className="mt-4">Please tell your clinician.</p>
-      </main>
-    );
-  }
+  if (check.status === "notValid") return <LinkNotWorking />;
 
   if (check.status === "failed") {
     return <TryAgainScreen onTryAgain={tryAgain} />;
   }
 
-  // Temporary: the sequence runner goes here (roadmap 7.3).
+  const tests = testsForIds(check.link.tests);
+
+  // Skipping a test the app doesn't have would leave it missing from the visit with no record.
+  if (!tests) return <LinkNotWorking />;
+
   if (heard) {
+    // Temporary: the end screen goes here (roadmap 7.8).
+    if (finished || tests.length === 0) {
+      return (
+        <main className="mx-auto max-w-2xl p-8">
+          <p>All done. The end screen will go here.</p>
+        </main>
+      );
+    }
+
     return (
-      <main className="mx-auto max-w-2xl p-8">
-        <p>Sound check done. The tests will start here.</p>
-      </main>
+      <SequenceRunner
+        sequenceId={check.link.sequenceId}
+        tests={tests}
+        store={store}
+        onFinished={() => setFinished(true)}
+      />
     );
   }
 

@@ -5,16 +5,15 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router";
 import SoundCheck from "../client/sound-check/SoundCheck";
 import type { TestResult } from "../shared/test-module";
-import { swaps } from "../tests/swaps";
-import { trailMaking } from "../tests/trail-making";
+import { testModules } from "../tests/registry";
 import { createFakeResultStore, type SavedResult } from "./fake-result-store";
 
 const store = createFakeResultStore();
-const tests = [trailMaking, swaps];
+const reportLoadFailed = () => console.warn("Clips failed to load");
 
 function DevTestPage() {
   const { testId } = useParams();
-  const test = tests.find((candidate) => candidate.id === testId);
+  const test = testModules.find((candidate) => candidate.id === testId);
   const [heard, setHeard] = useState(false);
   const [saved, setSaved] = useState<SavedResult[]>([]);
   const [stopRequested, setStopRequested] = useState(false);
@@ -64,7 +63,14 @@ function DevTestPage() {
 
   const { Component: Test } = test;
 
-  return <Test sequenceId="dev-sequence" stopRequested={stopRequested} onComplete={handleComplete} />;
+  return (
+    <Test
+      sequenceId="dev-sequence"
+      stopRequested={stopRequested}
+      onComplete={handleComplete}
+      onLoadFailed={reportLoadFailed}
+    />
+  );
 }
 
 export default DevTestPage;

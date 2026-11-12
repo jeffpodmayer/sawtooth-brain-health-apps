@@ -5,7 +5,7 @@
 
 import { useEffect, useReducer, useRef, useState } from "react";
 import { withAudioLog } from "../../shared/audio-log";
-import { createAudioPlayer } from "../../shared/audio-player";
+import { createAudioPlayer, readyInTime } from "../../shared/audio-player";
 import { browserFrom } from "../../shared/browser-info";
 import { elapsedClock, realClock } from "../../shared/clock";
 import { recordFocus, type FocusLogEntry } from "../../shared/focus-log";
@@ -46,7 +46,7 @@ function checkScreen() {
   return isScreenLargeEnough(window.innerWidth, window.innerHeight);
 }
 
-function TrailMaking({ sequenceId, stopRequested, onComplete }: TestProps) {
+function TrailMaking({ sequenceId, stopRequested, onComplete, onLoadFailed }: TestProps) {
   const [startedAt] = useState(() => new Date().toISOString());
   const handedOver = useRef(false);
   const [testClock] = useState(() => elapsedClock(realClock));
@@ -120,7 +120,12 @@ function TrailMaking({ sequenceId, stopRequested, onComplete }: TestProps) {
     }
 
     async function readInstructions() {
-      await player.ready;
+      try {
+        await readyInTime(player);
+      } catch {
+        if (!cancelled) onLoadFailed();
+        return;
+      }
 
       if (!cancelled) {
         setArrowOn(null);
@@ -135,7 +140,7 @@ function TrailMaking({ sequenceId, stopRequested, onComplete }: TestProps) {
       window.clearTimeout(holdTimer);
       player.stop();
     };
-  }, [player, pageIndex, screenOk, phase]);
+  }, [player, pageIndex, screenOk, phase, onLoadFailed]);
 
   // Ends a timed part at its limit. Finishing first clears this, because timedPart goes back to null.
   useEffect(() => {

@@ -12,6 +12,16 @@ export type AudioPlayer = {
   stop: () => void;
 };
 
+const LOAD_TIME_LIMIT_MS = 30_000;
+
+// Fails if the clips haven't downloaded in time, so a stalled download can't hang a screen.
+export function readyInTime(player: Pick<AudioPlayer, "ready">): Promise<void> {
+  return new Promise((resolve, reject) => {
+    setTimeout(() => reject(new Error("Clip download timed out")), LOAD_TIME_LIMIT_MS);
+    player.ready.then(resolve, reject);
+  });
+}
+
 // Development only: reads a line aloud when its clip doesn't exist yet (roadmap 4.8).
 function speakWithBrowserVoice(text: string): Promise<void> {
   return new Promise((resolve, reject) => {

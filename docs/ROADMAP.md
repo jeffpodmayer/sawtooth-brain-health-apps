@@ -3,7 +3,7 @@
 The build, broken into small steps. Each step is about one session and teaches
 one thing. Tick a box only when its "Check" passes.
 
-**Current step:** 7.3
+**Current step:** 7.4
 
 How to use this file:
 
@@ -320,7 +320,7 @@ or the seed file.
   - Note: decide what happens if a client leaves full screen during a test, for example with Esc. The page keeps working at window size, but only another click can bring full screen back (found at 5.3)
   - Note: every load of the link starts here, never inside a test (ADR-036). A refused link gets one message, whatever the reason (ADR-037); decide its wording, with no help phone number
 
-- [ ] **7.3 The sequence runner**
+- [x] **7.3 The sequence runner**
   - Learn: a test registry; using the plug-in contract from the outside
   - Check: both tests run back to back on the development test page, with the fake ResultStore
   - Note: run only the tests `check-link` returns, in that order, and never restore a test partway (ADR-036)
@@ -346,6 +346,8 @@ or the seed file.
 - [ ] **7.7 The real ResultStore**
   - Learn: swapping one implementation of an interface for another
   - Check: tests now save through the Edge Functions with no changes to the test modules
+  - Note: decide what the client sees if a save fails. The runner waits for the save before moving on, so a save that fails or hangs would leave the client on the finished test (found at 7.3)
+  - Note: `ClientPage.tsx` uses the fake ResultStore from `src/dev/` until this step. Replace it here (added at 7.3)
 
 - [ ] **7.8 End of sequence**
   - Learn: closing a sequence so its link stops working
@@ -356,6 +358,7 @@ or the seed file.
   - Learn: an end-to-end manual test plan; measuring a timing gap across browsers
   - Check: a full sequence (sound check → Trail Making → break → SWAPS → end) works in Chrome, Edge, Safari and Firefox, and results are in the development database; in each browser, the gap between a clip ending and the next step is measured and written down
   - Note: moved here from 4.9. Timed parts start when a clip ends, and Howler's "end" is a timer set to the clip's length, not a report that the sound finished. A gap of tens of milliseconds is harmless; half a second or more, or one browser differing from the others, needs fixing. Choose the method here: a screen recording, or having a development page measure it. Edge and Firefox need installing on Jeff's Mac.
+  - Note: Howler switches the browser's audio off after 30 seconds of silence, so listen for a clipped first word on any clip that follows a long quiet stretch, such as the first clip after a timed part (found at 7.3)
 
 ## Phase 8 — Clinician dashboard
 

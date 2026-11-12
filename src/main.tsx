@@ -9,6 +9,7 @@ import ClientPage from "./client/ClientPage.tsx";
 
 // Only the dev server has this page, so the production build leaves it out.
 const DevTestPage = import.meta.env.DEV ? lazy(() => import("./dev/DevTestPage")) : null;
+const DevSequencePage = import.meta.env.DEV ? lazy(() => import("./dev/DevSequencePage")) : null;
 const DevTrailPages = import.meta.env.DEV ? lazy(() => import("./dev/DevTrailPages")) : null;
 const DevSwapsForm = import.meta.env.DEV ? lazy(() => import("./dev/DevSwapsForm")) : null;
 const DevSwapsRecall = import.meta.env.DEV ? lazy(() => import("./dev/DevSwapsRecall")) : null;
@@ -25,6 +26,16 @@ createRoot(document.getElementById("root")!).render(
             element={
               <Suspense>
                 <DevTestPage />
+              </Suspense>
+            }
+          />
+        )}
+        {DevSequencePage && (
+          <Route
+            path="/dev/sequence"
+            element={
+              <Suspense>
+                <DevSequencePage />
               </Suspense>
             }
           />

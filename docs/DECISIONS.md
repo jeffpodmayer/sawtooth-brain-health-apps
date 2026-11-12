@@ -10,7 +10,7 @@ rule in CLAUDE.md.
 
 ## ADR-001: One app, tests as plug-ins
 
-- **Status:** Accepted · **Date:** by 2026-11-05 (naming 2026-11-06) · Component props extended by ADR-028 · Result extended by ADR-033
+- **Status:** Accepted · **Date:** by 2026-11-05 (naming 2026-11-06) · Component props extended by ADR-028 and ADR-039 · Result extended by ADR-033
 
 **Context:** The practice will add more tests over time. Each test has its own
 rules, but they all share links, audio, timing, saving and the dashboard.
@@ -918,3 +918,27 @@ inside a timed part would either cost the client time or mean pausing the clock.
   clinician is watching and judges that. Raise it when the clinicians are asked.
 - Trail Making's too-small-screen message still covers a window that gets too small.
 - Leaving full screen isn't recorded. The focus log only records a hidden tab or lost focus.
+
+## ADR-039: A test reports clips it can't download
+
+- **Status:** Accepted · **Date:** 2026-11-09 · Adds to the component props in ADR-001 and ADR-028
+
+**Context:** A test downloads all its clips before its first instruction. A stalled or failed
+download left the client on a silent page that only a reload could fix. The test can't
+recover on its own, and the "Try again" screen belongs to the shared layer.
+
+**Decision:**
+
+- A test also takes an `onLoadFailed` prop. It calls it if its clips fail to download, or
+  haven't downloaded within 30 seconds. This happens before anything is timed.
+- The shared layer then shows "Something went wrong" with "Try again", which starts the test
+  again from its beginning, with a fresh download.
+- The 30-second limit lives in the audio player (`readyInTime`), shared by the sound check
+  and the tests.
+
+**Consequences:**
+
+- Every new test must call `onLoadFailed` when its clips fail, and the shared layer must
+  pass a function that keeps the same identity between renders.
+- A clip that downloaded but refuses to play isn't covered.
+- Nothing records that a test's download failed or was retried.

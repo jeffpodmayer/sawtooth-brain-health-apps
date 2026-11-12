@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { withAudioLog } from "../../shared/audio-log";
-import { createAudioPlayer } from "../../shared/audio-player";
+import { createAudioPlayer, readyInTime } from "../../shared/audio-player";
 import { browserFrom } from "../../shared/browser-info";
 import { elapsedClock, realClock } from "../../shared/clock";
 import { recordFocus, type FocusLogEntry } from "../../shared/focus-log";
@@ -56,7 +56,7 @@ function measureScreen(page: HTMLElement | null): ScreenNote | undefined {
   };
 }
 
-function Swaps({ sequenceId, stopRequested, onComplete }: TestProps) {
+function Swaps({ sequenceId, stopRequested, onComplete, onLoadFailed }: TestProps) {
   const [startedAt] = useState(() => new Date().toISOString());
   const handedOver = useRef(false);
   const [testClock] = useState(() => elapsedClock(realClock));
@@ -113,7 +113,12 @@ function Swaps({ sequenceId, stopRequested, onComplete }: TestProps) {
     }
 
     async function play() {
-      await player.ready;
+      try {
+        await readyInTime(player);
+      } catch {
+        if (!cancelled) onLoadFailed();
+        return;
+      }
 
       if (cancelled || !(await runScript(demoLines, player, applyAction))) {
         return;
@@ -139,7 +144,7 @@ function Swaps({ sequenceId, stopRequested, onComplete }: TestProps) {
       window.clearTimeout(pauseTimer);
       player.stop();
     };
-  }, [player, activeStage]);
+  }, [player, activeStage, onLoadFailed]);
 
   // After practice: the test instructions, ending with the pad on and item 7 selected.
   useEffect(() => {

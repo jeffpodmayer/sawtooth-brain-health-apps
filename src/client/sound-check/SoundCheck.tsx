@@ -1,9 +1,9 @@
 // The client's first sound (ADR-006). The Start click unlocks audio in the browser.
 
 import { useState, type ReactNode } from "react";
-import { createAudioPlayer, type AudioPlayer } from "../../shared/audio-player";
+import { createAudioPlayer, readyInTime } from "../../shared/audio-player";
 import type { SpokenLine } from "../../shared/test-script";
-import TryAgainScreen from "../TryAgainScreen";
+import TryAgainScreen from "../../shared/TryAgainScreen";
 import script from "./script.json";
 
 const line = script.sections.check[0] as SpokenLine;
@@ -13,15 +13,8 @@ const buttonClass =
 // Moves keyboard and screen reader users to the question when it appears.
 const focusOnShow = (element: HTMLElement | null) => element?.focus();
 
-const LOAD_TIME_LIMIT_MS = 15_000;
-
-// Fails if the clip hasn't downloaded in time, so a stalled download can't hang the screen.
-function readyInTime(player: AudioPlayer): Promise<void> {
-  return new Promise((resolve, reject) => {
-    setTimeout(() => reject(new Error("Clip download timed out")), LOAD_TIME_LIMIT_MS);
-    player.ready.then(resolve, reject);
-  });
-}
+// A computer's sound output can take a moment to wake up, which clipped the first word.
+const WAKE_PAUSE_MS = 500;
 
 type SoundCheckProps = {
   // Shown above the first button, e.g. the welcome text.
@@ -66,8 +59,11 @@ function SoundCheck({
     playClip(fresh);
   }
 
-  function start() {
+  async function start() {
     onStart?.();
+    setStarted(true);
+    setPlaying(true);
+    await new Promise((resolve) => setTimeout(resolve, WAKE_PAUSE_MS));
     playClip();
   }
 

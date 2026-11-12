@@ -31,6 +31,11 @@ export type TestProps = {
 
   // Called once, whether the test finished, timed out or was stopped.
   onComplete: (result: TestResult) => void;
+
+  // Called if the test's clips can't be downloaded, before anything has been timed.
+  // The shared layer then offers "Try again", which starts the test from its beginning.
+  // Must keep the same identity between renders, because a test's effects depend on it.
+  onLoadFailed: () => void;
 };
 
 export type TestModule = {
