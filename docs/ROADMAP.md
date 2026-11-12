@@ -3,7 +3,7 @@
 The build, broken into small steps. Each step is about one session and teaches
 one thing. Tick a box only when its "Check" passes.
 
-**Current step:** 8.2
+**Current step:** 8.3
 
 How to use this file:
 
@@ -363,9 +363,7 @@ see their own practice.
   - Check: `/dashboard` redirects to sign-in when signed out; sign-out works; a client link never shows the dashboard
   - Note: the production build warns that the script is over 500 KB (587 KB, 205 KB compressed, at the Phases 5–7 release). Load `/dashboard` and the client screens as separate pieces (React Router lazy routes), so a client never downloads dashboard code
 
-- [ ] **8.2 Clinician accounts for all three**
-  - Learn: inviting users from the Supabase dashboard (no admin screens in the app yet)
-  - Check: each clinician has their own login in development and belongs to Sawtooth
+**8.2 Clinician accounts for all three:** moved to 10.4 (decided 2026-11-11, since development resets delete every login).
 
 - [ ] **8.3 Clients list and new client codes**
   - Learn: reading and writing through RLS from the browser
@@ -451,6 +449,7 @@ see their own practice.
   - Note: Howler switches the browser's audio off after 30 seconds of silence, so listen for a clipped first word on any clip that follows a long quiet stretch, such as the first clip after a timed part (found at 7.3)
   - Note: in each browser, also try a failed save (DevTools offline before a test ends, then Try again), and open both tests' sheets. The 409 path (two tabs finishing the same test on one link) wasn't tried by hand at 7.7. The SWAPS sheet hasn't been opened in Safari or Firefox yet
   - Note: first add each clinician's email to the preview's Cloudflare Access policy (only Jeff's is on it, see 1.9)
+  - Note: first create each clinician's development login (moved from 8.2). Authentication → Users → Add user → Create new user, with a password of 12+ characters and "Auto confirm user" ticked (invites don't work, since Supabase's built-in email only reaches the Supabase team). Then add their `clinicians` row for Sawtooth in the SQL Editor. Real emails never go in `seed.sql`, and a reset deletes these logins, so do this after the last reset before the round
   - Note: questions waiting on the clinicians: ADR-030, ADR-032, ADR-036 and ADR-038; SWAPS SW1, SW2, the timed recall, leaving out the row highlights (SPEC question 8) and ending with no spoken cue (SPEC question 5); and the client wording for the welcome, the refused link, "Something went wrong", the break screen, "Saving…" and the end screen
 
 ## Phase 11 — Custom domain
