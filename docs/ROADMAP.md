@@ -3,7 +3,7 @@
 The build, broken into small steps. Each step is about one session and teaches
 one thing. Tick a box only when its "Check" passes.
 
-**Current step:** 7.8
+**Current step:** 7.9
 
 How to use this file:
 
@@ -351,7 +351,7 @@ or the seed file.
   - Note: `ClientPage.tsx` uses the fake ResultStore from `src/dev/` until this step. Replace it here (added at 7.3)
   - Note: Trail Making's real sheets (`partA`, `partB`) are first saved here. 7.6 was tried by hand with SWAPS and a small test SVG only (found at 7.6)
 
-- [ ] **7.8 End of sequence**
+- [x] **7.8 End of sequence**
   - Learn: closing a sequence so its link stops working
   - Check: a thank-you screen shows at the end; the sequence is marked complete; reopening the link is refused
   - Note: `check-link` returns an empty test list for an open sequence with nothing left to run. Decide what the client sees then
@@ -415,6 +415,7 @@ see their own practice.
   - Note: a stop must be saved before the client's partial result arrives, so the status check (9.3) has something to read. `sequence_tests` doesn't allow that yet; add a stop-request state by migration (Phase 2 code review)
   - Note: a test only learns that it was stopped, not why, so Trail Making can't yet record a part as `notGiven` with code 996 or 997. A stop during a sample needs 996 when the client couldn't do it (ADR-032). Settle how once the clinicians confirm the alphabet check (Phase 3 code review)
   - Note: save-result refuses a result with a stop point (`stopped_not_supported_yet`). Extend it here to save a stopped test's partial result with its reason and clinician (ADR-040)
+  - Note: a sequence closes itself as `completed` once no test is pending (ADR-042). "End whole sequence" must set the sequence to `discontinued` before marking its remaining tests not given (found at 7.8)
 
 - [ ] **9.2 Real-time stop to the client's tab**
   - Learn: Supabase real-time channels; letting a client listen without letting it read tables (approach decided at the start of this step)

@@ -8,3 +8,11 @@ export function enterFullScreen() {
     screenfull.request().catch(() => {});
   }
 }
+
+// Leaves full screen. Browsers allow this without a click.
+// Nothing happens if the page isn't in full screen.
+export function exitFullScreen() {
+  if (screenfull.isEnabled && screenfull.isFullscreen) {
+    screenfull.exit().catch(() => {});
+  }
+}

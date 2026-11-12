@@ -866,7 +866,7 @@ client clicks, which freezes a test that is waiting for a clip to end.
 
 ## ADR-037: How Edge Functions are called and released
 
-- **Status:** Accepted · **Date:** 2026-11-09 · Adds a step to the release routine in ADR-020
+- **Status:** Accepted · **Date:** 2026-11-09 · Adds a step to the release routine in ADR-020 · Exception added by ADR-042
 
 **Context:** The link check (roadmap 7.1) is the first Edge Function. The functions that
 save results, upload sheets and check status will follow the same pattern.
@@ -992,3 +992,30 @@ disagree, or what stops a saved result from being changed later. The save-result
 
 - A sheet's SVG comes from the browser and could contain script. The dashboard must show it
   only as an image or a download (roadmap 8.7).
+
+## ADR-042: A sequence closes itself when its last test is saved
+
+- **Status:** Accepted · **Date:** 2026-11-11 · Adds an exception to ADR-037
+
+**Context:** Roadmap 7.8 closes a sequence when the client finishes, so its link stops working.
+A separate closing step could fail after the last save and leave an open sequence with nothing
+to run. Closing it with the save means a retried last save finds the sequence already closed.
+
+**Decision:**
+
+- A database trigger sets a sequence to `completed` once none of its tests is pending, in the
+  same transaction as the save that finished the last one. A discontinued sequence is left alone.
+- save-result answers a completed sequence with `409 not_pending`, like an already-saved test,
+  and the client counts a 409 as saved (roadmap 7.7). Unknown and discontinued tokens still get
+  the 404 refusal. check-link is unchanged.
+- The end screen says "Thank you" and leaves full screen, so the client can go back to the video call.
+
+**Consequences:**
+
+- A saved last test and a closed link always go together.
+- Through save-result, someone holding a finished link's token can tell it apart from an unknown
+  token. Only the client has the token, so this is accepted.
+- A sequence with stopped or not-given tests is `completed` once nothing is pending. A clinician's
+  "end whole sequence" (roadmap 9.1) must set `discontinued` before marking the remaining tests
+  not given.
+- The end screen wording hasn't been seen by the clinicians.

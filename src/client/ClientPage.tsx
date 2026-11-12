@@ -9,6 +9,7 @@ import SequenceRunner from "../shared/SequenceRunner";
 import TryAgainScreen from "../shared/TryAgainScreen";
 import { testsForIds } from "../tests/registry";
 import { checkLink, type LinkCheck } from "./check-link";
+import EndScreen from "./EndScreen";
 import { createResultStore } from "./save-result";
 import SoundCheck from "./sound-check/SoundCheck";
 
@@ -74,15 +75,11 @@ function ClientPage() {
   // Skipping a test the app doesn't have would leave it missing from the visit with no record.
   if (!tests) return <LinkNotWorking />;
 
+  // Nothing left to run: only a sequence created with no tests, since the last save closes the link.
+  if (tests.length === 0) return <EndScreen />;
+
   if (heard) {
-    // Temporary: the end screen goes here (roadmap 7.8).
-    if (finished || tests.length === 0) {
-      return (
-        <ClientScreen>
-          <p>All done. The end screen will go here.</p>
-        </ClientScreen>
-      );
-    }
+    if (finished) return <EndScreen />;
 
     return (
       <SequenceRunner

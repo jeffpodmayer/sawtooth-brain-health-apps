@@ -78,14 +78,21 @@ export default {
 
     // supabaseAdmin uses the secret key and skips row-level security,
     // so every query here names exactly the columns it needs.
+    // A completed sequence is found too, so a retried last save can be answered (ADR-042).
     const { data: sequence, error: sequenceError } = await ctx.supabaseAdmin
       .from("sequences")
-      .select("id")
+      .select("id, status")
       .eq("link_token", token)
-      .eq("status", "open")
+      .in("status", ["open", "completed"])
       .maybeSingle();
     if (sequenceError) return failed("sequence lookup", sequenceError.message);
     if (!sequence) return refused();
+
+    // A completed sequence has no pending tests left, so this is a retry of a save that
+    // already landed, e.g. the reply to the last test's save was lost (ADR-042).
+    if (sequence.status === "completed") {
+      return Response.json({ error: "not_pending" }, { status: 409 });
+    }
 
     // The sequence comes from the token, never from the browser, so the result's sequenceId isn't read.
     const result: unknown = body.result;
