@@ -3,7 +3,7 @@
 The build, broken into small steps. Each step is about one session and teaches
 one thing. Tick a box only when its "Check" passes.
 
-**Current step:** Release Phases 5–7 (ADR-014), then 8.1
+**Current step:** 8.1
 
 How to use this file:
 
@@ -361,6 +361,7 @@ see their own practice.
 - [ ] **8.1 Clinician sign-in**
   - Learn: Supabase Auth in React; protecting routes (sign-in method decided at the start of this step)
   - Check: `/dashboard` redirects to sign-in when signed out; sign-out works; a client link never shows the dashboard
+  - Note: the production build warns that the script is over 500 KB (587 KB, 205 KB compressed, at the Phases 5–7 release). Load `/dashboard` and the client screens as separate pieces (React Router lazy routes), so a client never downloads dashboard code
 
 - [ ] **8.2 Clinician accounts for all three**
   - Learn: inviting users from the Supabase dashboard (no admin screens in the app yet)
@@ -406,6 +407,8 @@ see their own practice.
   - Note: a test only learns that it was stopped, not why, so Trail Making can't yet record a part as `notGiven` with code 996 or 997. A stop during a sample needs 996 when the client couldn't do it (ADR-032). Settle how once the clinicians confirm the alphabet check (Phase 3 code review)
   - Note: save-result refuses a result with a stop point (`stopped_not_supported_yet`). Extend it here to save a stopped test's partial result with its reason and clinician (ADR-040)
   - Note: a sequence closes itself as `completed` once no test is pending (ADR-042). "End whole sequence" must set the sequence to `discontinued` before marking its remaining tests not given (found at 7.8)
+  - Note: in `seed.sql`, the first visit (Trail Making completed, SWAPS stopped) is still `open`, because the seed inserts finished rows and the closing trigger only runs on update (ADR-042). Set its status to match the rule decided here (found at the Phases 5–7 release)
+  - Note: from the Phases 5–7 code review, while save-result and the close trigger are open here: (a) two saves finishing the last two tests at once can leave the sequence `open`, since neither sees the other's change (lock the sequence row in the trigger); (b) two tabs saving the same test can overwrite the saved test's sheets, since the pending check runs before the upload; (c) save-result doesn't require a finished test's sheets (Trail Making's partA and partB, SWAPS's sheet), only rejects unknown names
 
 - [ ] **9.2 Real-time stop to the client's tab**
   - Learn: Supabase real-time channels; letting a client listen without letting it read tables (approach decided at the start of this step)
