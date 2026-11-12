@@ -1,8 +1,8 @@
 // Turns the recall part's answer log into its score (SPEC: Recall screen, Scoring).
 // Pure: replays every answer, so the server can re-check it from the raw log.
 
-import { keyNumbers } from "./form-a";
-import { timeLimitMs } from "./time-limits";
+import { keyNumbers } from "./form-a.ts";
+import { timeLimitMs } from "./time-limits.ts";
 
 // What scoring reads from a recall log entry. timeMs counts from the end of the instruction.
 export type LoggedRecallAnswer = {

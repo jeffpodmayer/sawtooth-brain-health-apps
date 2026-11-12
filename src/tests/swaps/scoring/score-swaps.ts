@@ -1,8 +1,8 @@
 // Turns the whole test's answer logs into its scores (SPEC: Scoring, Stopped by the clinician).
 // Pure, like scoreGrid.
 
-import { scoreGrid, type GridScore, type LoggedAnswer, type SwapsScores } from "./score-grid";
-import { scoreRecall, type LoggedRecallAnswer, type RecallScore } from "./score-recall";
+import { scoreGrid, type GridScore, type LoggedAnswer, type SwapsScores } from "./score-grid.ts";
+import { scoreRecall, type LoggedRecallAnswer, type RecallScore } from "./score-recall.ts";
 
 export type AnswerLogs = {
   test: readonly LoggedAnswer[];

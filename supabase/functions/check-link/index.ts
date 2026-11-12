@@ -4,6 +4,7 @@
 
 import "@supabase/functions-js/edge-runtime.d.ts";
 import { withSupabase } from "@supabase/server";
+import type { Database } from "../_shared/database.types.ts";
 
 // A link token is 32 random bytes as 64 hex characters (see the sequences migration).
 const TOKEN_FORMAT = /^[0-9a-f]{64}$/;
@@ -21,7 +22,7 @@ function failed(step: string, message: string): Response {
 
 export default {
   // The caller must send the project's publishable key (the app's public key).
-  fetch: withSupabase({ auth: "publishable" }, async (req, ctx) => {
+  fetch: withSupabase<Database>({ auth: "publishable" }, async (req, ctx) => {
     const body = await req.json().catch(() => null);
     const token = body?.token;
     if (typeof token !== "string" || !TOKEN_FORMAT.test(token)) {

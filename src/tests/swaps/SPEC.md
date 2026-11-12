@@ -218,7 +218,9 @@ in each box is the one scored.
 | `correct` | Correct answers, 0–7 (S15)                   |
 | `blank`   | Symbols left empty at 60 s (scored as wrong) |
 
-**Practice:** `wrongAnswers`, the number of wrong practice answers (not scored).
+**Practice:** `wrongAnswers`, the number of wrong practice answers (not scored). No practice
+log is kept, so the server can't re-check it; it checks only that it's a whole number, 0 or
+more (decided 2026-11-11).
 
 ## Recording (`rawData`)
 

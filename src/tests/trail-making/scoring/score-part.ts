@@ -1,9 +1,9 @@
 // Turns one timed part's click log into its score (SPEC: Scoring, Timing).
 // Pure: replays every click through judgeClick, so the server can re-check it from the raw log.
 
-import { judgeClick } from "./judge-click";
-import { expectedOrder } from "./order";
-import { timeLimitMs } from "./time-limits";
+import { judgeClick } from "./judge-click.ts";
+import { expectedOrder } from "./order.ts";
+import { timeLimitMs } from "./time-limits.ts";
 
 export type TimedPart = "partA" | "partB";
 

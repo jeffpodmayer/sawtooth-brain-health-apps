@@ -3,7 +3,7 @@
 The build, broken into small steps. Each step is about one session and teaches
 one thing. Tick a box only when its "Check" passes.
 
-**Current step:** 7.5
+**Current step:** 7.6
 
 How to use this file:
 
@@ -331,7 +331,7 @@ or the seed file.
   - Check: a break screen shows between tests; the client clicks to start the next test; no end or skip button
   - Note: the click that starts the next test also returns to full screen with `enterFullScreen`, in case the client left it. Nothing interrupts a test that has left full screen (decided at 7.2)
 
-- [ ] **7.5 Edge Function: save a result**
+- [x] **7.5 Edge Function: save a result**
   - Learn: checking a token on the server; re-scoring on the server with the same scoring code
   - Check: a result saves to the right sequence; a result with an edited score is rejected or flagged; a result for someone else's token is refused
   - Note: add a database rule so a saved result can't be overwritten and a closed sequence can't reopen (ADR-008), and require `completed_at` to be on or after `started_at` (Phase 2 code review)
@@ -347,6 +347,7 @@ or the seed file.
   - Learn: swapping one implementation of an interface for another
   - Check: tests now save through the Edge Functions with no changes to the test modules
   - Note: decide what the client sees if a save fails. The runner waits for the save before moving on, so a save that fails or hangs would leave the client on the finished test (found at 7.3)
+  - Note: save-result answers `409 not_pending` when the test was already saved, so a retry after a lost reply gets 409, not 200. Decide whether the client treats that as saved (found at 7.5)
   - Note: `ClientPage.tsx` uses the fake ResultStore from `src/dev/` until this step. Replace it here (added at 7.3)
 
 - [ ] **7.8 End of sequence**
@@ -393,6 +394,7 @@ see their own practice.
 - [ ] **8.7 Result detail and sheet viewer**
   - Learn: showing a stored SVG safely; signed URLs for private files
   - Check: scores, status, stop reason and test version show; the sheet opens; raw scores only, no interpretation
+  - Note: show a flag when `browser_scores` is filled: the browser's scores differed from the server's, and `scores` holds the server's (ADR-040)
 
 - [ ] **8.8 Notes on each test**
   - Learn: saving with the signed-in clinician's ID
@@ -409,6 +411,7 @@ see their own practice.
   - Check: "End current test" and "End whole sequence" both require a reason (Gave up / Interrupted); the action saves with the clinician's ID
   - Note: a stop must be saved before the client's partial result arrives, so the status check (9.3) has something to read. `sequence_tests` doesn't allow that yet; add a stop-request state by migration (Phase 2 code review)
   - Note: a test only learns that it was stopped, not why, so Trail Making can't yet record a part as `notGiven` with code 996 or 997. A stop during a sample needs 996 when the client couldn't do it (ADR-032). Settle how once the clinicians confirm the alphabet check (Phase 3 code review)
+  - Note: save-result refuses a result with a stop point (`stopped_not_supported_yet`). Extend it here to save a stopped test's partial result with its reason and clinician (ADR-040)
 
 - [ ] **9.2 Real-time stop to the client's tab**
   - Learn: Supabase real-time channels; letting a client listen without letting it read tables (approach decided at the start of this step)

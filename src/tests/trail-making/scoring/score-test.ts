@@ -1,6 +1,6 @@
 // Turns the whole test's click logs into its scores (SPEC: Scoring, Stopped by the clinician). Pure, like scorePart.
 
-import { pages, type Flow } from "./page-flow";
+import { pages, type Flow } from "./page-flow.ts";
 import {
   scorePart,
   type LoggedClick,
@@ -8,7 +8,7 @@ import {
   type SampleScore,
   type TimedPart,
   type TrailMakingScores,
-} from "./score-part";
+} from "./score-part.ts";
 
 export type ClickLogs = Record<TimedPart, readonly LoggedClick[]>;
 

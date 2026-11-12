@@ -151,7 +151,7 @@ differs between computers, or paraphrased wording, would make results less compa
 
 ## ADR-007: Scoring as pure functions, tested first
 
-- **Status:** Accepted · **Date:** by 2026-11-05
+- **Status:** Accepted · **Date:** by 2026-11-05 · Server check detailed by ADR-040
 
 **Context:** Timing and scoring correctness across browsers is the top risk.
 A scoring mistake changes a clinical result without anyone noticing.
@@ -942,3 +942,36 @@ recover on its own, and the "Try again" screen belongs to the shared layer.
   pass a function that keeps the same identity between renders.
 - A clip that downloaded but refuses to play isn't covered.
 - Nothing records that a test's download failed or was retried.
+
+## ADR-040: How a result is saved and checked
+
+- **Status:** Accepted · **Date:** 2026-11-11 · Details the server check in ADR-007
+
+**Context:** ADR-007 says scores are checked again on the server, and ADR-008 says results
+are never overwritten. Neither says what happens when the browser's and the server's scores
+disagree, or what stops a saved result from being changed later. The save-result function
+(roadmap 7.5) needed answers.
+
+**Decision:**
+
+- save-result finds the sequence from the link token only, never from the result. It
+  re-scores the raw log with each test's `scoring/rescore.ts` and saves the server's scores
+  in `scores`.
+- If the browser's scores differ, the result is still saved, and the browser's are kept in
+  `browser_scores` as a flag. The column is empty when the two agree.
+- A raw log that isn't valid (wrong shape, negative or invalid times) is rejected.
+- `test_version` is stored as the browser sent it: the version that ran the test.
+- SWAPS's count of wrong practice answers is taken from the browser, since no practice log
+  is kept. Only its form is checked (SWAPS SPEC).
+- Stopped results are refused until roadmap 9.1 records the stop's reason and clinician.
+- A test's row is filled once; a second save gets `409 not_pending`. Database triggers block
+  any change to a finished test or a closed sequence, by anyone, including Edge Functions and
+  the SQL Editor. A test can't end before it started.
+
+**Consequences:**
+
+- A bug or a stale tab never loses a result or forces a retake (ADR-036). The clinician sees
+  the flag in the result view (roadmap 8.7).
+- On a flagged result, `scores` came from the server's scoring code, while `test_version`
+  names the browser's.
+- Correcting a saved result needs a deliberate migration, never a quick edit.
