@@ -3,7 +3,7 @@
 The build, broken into small steps. Each step is about one session and teaches
 one thing. Tick a box only when its "Check" passes.
 
-**Current step:** 8.3
+**Current step:** 8.4
 
 How to use this file:
 
@@ -365,14 +365,17 @@ see their own practice.
 
 **8.2 Clinician accounts for all three:** moved to 10.4 (decided 2026-11-11, since development resets delete every login).
 
-- [ ] **8.3 Clients list and new client codes**
-  - Learn: reading and writing through RLS from the browser
-  - Check: the list shows Sawtooth's clients only; a new client code saves; a duplicate code shows a clear message
-  - Note: first ask the clinicians whether they already have an ID for each client, and what one looks like; loosen the code format (2.3) with a new migration if needed
+- [x] **8.3 Clients list**
+  - Learn: reading through RLS from the browser
+  - Check: the list shows Sawtooth's clients only; Fake Practice's clinician sees only theirs
+  - Note: new client codes are added only in Generate Test Sequence (8.4), so a new client and their first visit take one step (decided 2026-11-11)
+  - Note: build with the current code format (2.3). Whether the clinicians already have an ID for each client, and what one looks like, is asked at 10.4; loosen the format with a new migration then if needed (decided 2026-11-11)
 
 - [ ] **8.4 Generate Test Sequence**
   - Learn: a modal with checkboxes; an Edge Function that creates the sequence and link
   - Check: choose or create a client, tick tests (only the practice's enabled tests appear), get a link with a copy button; the link works in another tab
+  - Check: a new client code saves with its first sequence; typing an existing code shows it as an existing client (with the date it was added), not an error; a wrong format shows a clear message
+  - Note: save a new client and its sequence together, so a failed sequence never leaves a client with no visit. The code rules from 8.3 are in `src/dashboard/clientCode.ts` (capitals as typed, the format check, the hint)
 
 - [ ] **8.5 Results list**
   - Learn: grouping, sorting, filtering and searching a list
@@ -450,7 +453,7 @@ see their own practice.
   - Note: in each browser, also try a failed save (DevTools offline before a test ends, then Try again), and open both tests' sheets. The 409 path (two tabs finishing the same test on one link) wasn't tried by hand at 7.7. The SWAPS sheet hasn't been opened in Safari or Firefox yet
   - Note: first add each clinician's email to the preview's Cloudflare Access policy (only Jeff's is on it, see 1.9)
   - Note: first create each clinician's development login (moved from 8.2). Authentication → Users → Add user → Create new user, with a password of 12+ characters and "Auto confirm user" ticked (invites don't work, since Supabase's built-in email only reaches the Supabase team). Then add their `clinicians` row for Sawtooth in the SQL Editor. Real emails never go in `seed.sql`, and a reset deletes these logins, so do this after the last reset before the round
-  - Note: questions waiting on the clinicians: ADR-030, ADR-032, ADR-036 and ADR-038; SWAPS SW1, SW2, the timed recall, leaving out the row highlights (SPEC question 8) and ending with no spoken cue (SPEC question 5); and the client wording for the welcome, the refused link, "Something went wrong", the break screen, "Saving…" and the end screen
+  - Note: questions waiting on the clinicians: whether they already have an ID for each client, and what one looks like (8.3); ADR-030, ADR-032, ADR-036 and ADR-038; SWAPS SW1, SW2, the timed recall, leaving out the row highlights (SPEC question 8) and ending with no spoken cue (SPEC question 5); and the client wording for the welcome, the refused link, "Something went wrong", the break screen, "Saving…" and the end screen
 
 ## Phase 11 — Custom domain
 
