@@ -10,5 +10,6 @@ export type ScreenSize = {
 };
 
 export type ResultStore = {
+  // Resolves once the result is saved. Rejects if it couldn't be saved, so the caller can offer Try again.
   saveResult: (result: TestResult, screen: ScreenSize) => Promise<void>;
 };

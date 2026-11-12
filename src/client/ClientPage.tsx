@@ -1,19 +1,16 @@
 // The page behind a client's link, /t/<link-token> (roadmap 7.2).
 // Every load of the link starts here, never inside a test (ADR-036).
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useParams } from "react-router";
-import { createFakeResultStore } from "../dev/fake-result-store";
 import ClientScreen from "../shared/ClientScreen";
 import { enterFullScreen } from "../shared/full-screen";
 import SequenceRunner from "../shared/SequenceRunner";
 import TryAgainScreen from "../shared/TryAgainScreen";
 import { testsForIds } from "../tests/registry";
 import { checkLink, type LinkCheck } from "./check-link";
+import { createResultStore } from "./save-result";
 import SoundCheck from "./sound-check/SoundCheck";
-
-// Temporary: the real ResultStore replaces this at roadmap 7.7.
-const store = createFakeResultStore();
 
 // One message for every refused link, whatever the reason (ADR-037).
 function LinkNotWorking() {
@@ -27,6 +24,8 @@ function LinkNotWorking() {
 
 function ClientPage() {
   const { token = "" } = useParams();
+  // Saves each result through save-result, with this link's token (roadmap 7.7).
+  const store = useMemo(() => createResultStore(token), [token]);
   const [check, setCheck] = useState<LinkCheck | "checking">("checking");
   const [attempt, setAttempt] = useState(0);
   const [heard, setHeard] = useState(false);

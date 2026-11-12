@@ -1,4 +1,4 @@
-// Shown when something a client needs didn't arrive: the link check or the sound check's clip.
+// Shown when something a client needs didn't arrive or didn't save: the link check, a clip, or a result.
 
 import ClientScreen from "./ClientScreen";
 

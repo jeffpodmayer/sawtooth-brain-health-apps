@@ -3,7 +3,7 @@
 The build, broken into small steps. Each step is about one session and teaches
 one thing. Tick a box only when its "Check" passes.
 
-**Current step:** 7.7
+**Current step:** 7.8
 
 How to use this file:
 
@@ -343,7 +343,7 @@ or the seed file.
   - Check: the SVG lands under `<practice_id>/`; the client can't read it back
   - Note: upload each entry in the result's `sheets`, and decide how files are named and how a result finds them (ADR-033)
 
-- [ ] **7.7 The real ResultStore**
+- [x] **7.7 The real ResultStore**
   - Learn: swapping one implementation of an interface for another
   - Check: tests now save through the Edge Functions with no changes to the test modules
   - Note: decide what the client sees if a save fails. The runner waits for the save before moving on, so a save that fails or hangs would leave the client on the finished test (found at 7.3)
@@ -361,6 +361,7 @@ or the seed file.
   - Check: a full sequence (sound check → Trail Making → break → SWAPS → end) works in Chrome, Edge, Safari and Firefox, and results are in the development database; in each browser, the gap between a clip ending and the next step is measured and written down
   - Note: moved here from 4.9. Timed parts start when a clip ends, and Howler's "end" is a timer set to the clip's length, not a report that the sound finished. A gap of tens of milliseconds is harmless; half a second or more, or one browser differing from the others, needs fixing. Choose the method here: a screen recording, or having a development page measure it. Edge and Firefox need installing on Jeff's Mac.
   - Note: Howler switches the browser's audio off after 30 seconds of silence, so listen for a clipped first word on any clip that follows a long quiet stretch, such as the first clip after a timed part (found at 7.3)
+  - Note: in each browser, also try a failed save (DevTools offline before a test ends, then Try again). The 409 path (two tabs finishing the same test on one link) wasn't tried by hand at 7.7
 
 ## Phase 8 — Clinician dashboard
 
@@ -428,6 +429,7 @@ see their own practice.
 - [ ] **9.4 What the client sees after a stop**
   - Learn: connecting the stop to each test's partial-result hook (5.11, 6.10)
   - Check: the partial result and sheet save with the stop reason; "end current test" goes to the break screen; "end whole sequence" goes to the end screen and closes the link
+  - Note: a failed save offers Try again with the same result, and a 409 counts as saved (decided at 7.7). But a 400 or 404 fails on every retry, so the client stays on Try again. "End whole sequence" closes the link, and save-result only accepts an open sequence, so the stopped test's partial result must be saved before the sequence closes, or save-result must accept it (found at 7.7)
 
 - [ ] **9.5 Test both paths in every browser**
   - Learn: blocking WebSockets in browser dev tools to simulate a home network
