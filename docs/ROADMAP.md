@@ -3,7 +3,7 @@
 The build, broken into small steps. Each step is about one session and teaches
 one thing. Tick a box only when its "Check" passes.
 
-**Current step:** 8.4b
+**Current step:** 8.5
 
 How to use this file:
 
@@ -376,7 +376,7 @@ see their own practice.
   - Check: in the SQL Editor, as each fake clinician: a new code creates the client, the sequence and its tests; an existing code reuses the client; a test the practice hasn't enabled, a repeated test, no tests or a badly formed code saves nothing; a signed-out caller is refused
   - Note: new clients are created here, together with their first sequence (8.3), so a failed sequence never leaves a client with no visit (ADR-044)
 
-- [ ] **8.4b Generate Test Sequence**
+- [x] **8.4b Generate Test Sequence**
   - Learn: a modal with checkboxes; copying to the clipboard
   - Check: type a client code, tick tests (only the practice's enabled tests appear), get a link with a copy button; the link works in another tab
   - Check: a new code saves with its first sequence; an existing code shows as an existing client (with the date it was added), not an error; a wrong format shows a clear message
@@ -389,6 +389,7 @@ see their own practice.
 - [ ] **8.6 Per-client view**
   - Learn: nested data (client → sequences → tests)
   - Check: one client's sequences, tests and scores over time show in one place; nothing is overwritten by a later visit
+  - Note: the clients list doesn't refresh when Generate Test Sequence adds a new client behind it; a reload shows it (found at 8.4b)
 
 - [ ] **8.7 Result detail and sheet viewer**
   - Learn: showing a stored SVG safely; signed URLs for private files
@@ -403,6 +404,7 @@ see their own practice.
 - [ ] **8.9 Dashboard accessibility pass**
   - Learn: checking with keyboard only and a screen reader; contrast checks
   - Check: every dashboard page works by keyboard; text meets WCAG 2.2 AA contrast
+  - Note: polish the dashboard's look, especially the Generate Test Sequence window and the clients list. They were built plain for the MVP (decided at 8.4b)
 
 ## Phase 9 — Stop button with real-time
 
