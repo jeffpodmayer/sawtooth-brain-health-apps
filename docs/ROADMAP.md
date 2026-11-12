@@ -3,7 +3,7 @@
 The build, broken into small steps. Each step is about one session and teaches
 one thing. Tick a box only when its "Check" passes.
 
-**Current step:** 7.4
+**Current step:** 7.5
 
 How to use this file:
 
@@ -326,7 +326,7 @@ or the seed file.
   - Note: run only the tests `check-link` returns, in that order, and never restore a test partway (ADR-036)
   - Note: Trail Making and SWAPS wait for their clips with no time limit, so a stalled download hangs a test, as the sound check did before 7.2. Decide what the client sees (found at 7.2)
 
-- [ ] **7.4 Break screen**
+- [x] **7.4 Break screen**
   - Learn: a simple in-between screen with no way out for the client
   - Check: a break screen shows between tests; the client clicks to start the next test; no end or skip button
   - Note: the click that starts the next test also returns to full screen with `enterFullScreen`, in case the client left it. Nothing interrupts a test that has left full screen (decided at 7.2)
@@ -414,6 +414,7 @@ see their own practice.
   - Learn: Supabase real-time channels; letting a client listen without letting it read tables (approach decided at the start of this step)
   - Check: a stop reaches the client's tab within a second or two; the client can't hear any other sequence's messages
   - Note: consider alerting the dashboard when a client's screen is too small, in case the client can't explain the problem on the call. This needs a client-to-dashboard message and a decision on how it fits with ADR-009 (no live progress view) (raised at 5.4)
+  - Note: the break screen can hold the next test until the clinician unlocks it: `SequenceRunner` takes `breakLocked`, which hides Continue. Offer this if the clinicians want firmer control than asking the client to wait. A clinician-only start (no client click) would call `continueAfterBreak` from the clinician's message, but can't restore full screen, and the first clip after the break must be checked in Safari (decided at 7.4)
 
 - [ ] **9.3 Status-check fallback**
   - Learn: polling an Edge Function every few seconds; stopping the polling cleanly

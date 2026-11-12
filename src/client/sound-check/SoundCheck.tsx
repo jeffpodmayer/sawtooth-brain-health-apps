@@ -2,6 +2,7 @@
 
 import { useState, type ReactNode } from "react";
 import { createAudioPlayer, readyInTime } from "../../shared/audio-player";
+import ClientScreen from "../../shared/ClientScreen";
 import type { SpokenLine } from "../../shared/test-script";
 import TryAgainScreen from "../../shared/TryAgainScreen";
 import script from "./script.json";
@@ -77,21 +78,21 @@ function SoundCheck({
 
   if (!started) {
     return (
-      <main className="mx-auto max-w-2xl p-8">
+      <ClientScreen>
         {children}
         <button type="button" onClick={start} className={buttonClass}>
           {startLabel}
         </button>
-      </main>
+      </ClientScreen>
     );
   }
 
   return (
-    <main className="mx-auto max-w-2xl p-8">
+    <ClientScreen>
       <h1 ref={focusOnShow} tabIndex={-1} className="text-5xl font-bold outline-none">
         {line.text}
       </h1>
-      <div className="mt-8 flex flex-wrap gap-4">
+      <div className="mt-8 flex flex-wrap justify-center gap-4">
         <button
           type="button"
           disabled={playing || !clipPlayed}
@@ -104,7 +105,7 @@ function SoundCheck({
           Play it again
         </button>
       </div>
-    </main>
+    </ClientScreen>
   );
 }
 

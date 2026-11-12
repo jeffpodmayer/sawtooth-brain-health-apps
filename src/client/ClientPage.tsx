@@ -4,6 +4,7 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router";
 import { createFakeResultStore } from "../dev/fake-result-store";
+import ClientScreen from "../shared/ClientScreen";
 import { enterFullScreen } from "../shared/full-screen";
 import SequenceRunner from "../shared/SequenceRunner";
 import TryAgainScreen from "../shared/TryAgainScreen";
@@ -17,10 +18,10 @@ const store = createFakeResultStore();
 // One message for every refused link, whatever the reason (ADR-037).
 function LinkNotWorking() {
   return (
-    <main className="mx-auto max-w-2xl p-8">
+    <ClientScreen>
       <h1 className="text-5xl font-bold">This link isn't working</h1>
       <p className="mt-4">Please tell your clinician.</p>
-    </main>
+    </ClientScreen>
   );
 }
 
@@ -55,11 +56,11 @@ function ClientPage() {
 
   if (check === "checking") {
     return (
-      <main className="mx-auto max-w-2xl p-8">
+      <ClientScreen>
         <p role="status" className="text-ink-muted">
           Loading…
         </p>
-      </main>
+      </ClientScreen>
     );
   }
 
@@ -78,9 +79,9 @@ function ClientPage() {
     // Temporary: the end screen goes here (roadmap 7.8).
     if (finished || tests.length === 0) {
       return (
-        <main className="mx-auto max-w-2xl p-8">
+        <ClientScreen>
           <p>All done. The end screen will go here.</p>
-        </main>
+        </ClientScreen>
       );
     }
 

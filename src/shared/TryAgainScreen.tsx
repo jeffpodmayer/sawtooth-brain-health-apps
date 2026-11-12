@@ -1,5 +1,7 @@
 // Shown when something a client needs didn't arrive: the link check or the sound check's clip.
 
+import ClientScreen from "./ClientScreen";
+
 const buttonClass =
   "mt-8 h-14 rounded-lg bg-accent px-8 font-bold text-white focus-visible:outline-4 focus-visible:outline-offset-4 focus-visible:outline-accent";
 
@@ -12,7 +14,7 @@ type TryAgainScreenProps = {
 
 function TryAgainScreen({ onTryAgain }: TryAgainScreenProps) {
   return (
-    <main className="mx-auto max-w-2xl p-8">
+    <ClientScreen>
       <h1 ref={focusOnShow} tabIndex={-1} className="text-5xl font-bold outline-none">
         Something went wrong
       </h1>
@@ -20,7 +22,7 @@ function TryAgainScreen({ onTryAgain }: TryAgainScreenProps) {
       <button type="button" onClick={onTryAgain} className={buttonClass}>
         Try again
       </button>
-    </main>
+    </ClientScreen>
   );
 }
 
