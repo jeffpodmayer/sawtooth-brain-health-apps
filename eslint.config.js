@@ -20,6 +20,13 @@ export default defineConfig([
     },
   },
   {
+    // The entry file exports nothing and is never hot-reloaded, so this rule doesn't apply to it.
+    files: ['src/main.tsx'],
+    rules: {
+      'react-refresh/only-export-components': 'off',
+    },
+  },
+  {
     // Client screens, shared code and tests never reach Supabase directly (CLAUDE.md, ADR-037, ADR-043).
     files: ['src/client/**', 'src/shared/**', 'src/tests/**'],
     rules: {

@@ -3,7 +3,7 @@
 The build, broken into small steps. Each step is about one session and teaches
 one thing. Tick a box only when its "Check" passes.
 
-**Current step:** 8.1
+**Current step:** 8.2
 
 How to use this file:
 
@@ -358,7 +358,7 @@ or the seed file.
 Everything here reads through row-level security (2.7), so clinicians only ever
 see their own practice.
 
-- [ ] **8.1 Clinician sign-in**
+- [x] **8.1 Clinician sign-in**
   - Learn: Supabase Auth in React; protecting routes (sign-in method decided at the start of this step)
   - Check: `/dashboard` redirects to sign-in when signed out; sign-out works; a client link never shows the dashboard
   - Note: the production build warns that the script is over 500 KB (587 KB, 205 KB compressed, at the Phases 5–7 release). Load `/dashboard` and the client screens as separate pieces (React Router lazy routes), so a client never downloads dashboard code
