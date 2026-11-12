@@ -1019,3 +1019,29 @@ to run. Closing it with the save means a retried last save finds the sequence al
   "end whole sequence" (roadmap 9.1) must set `discontinued` before marking the remaining tests
   not given.
 - The end screen wording hasn't been seen by the clinicians.
+
+## ADR-043: Clinicians sign in with email and password
+
+- **Status:** Accepted · **Date:** 2026-11-11 · Answers the sign-in question in ADR-022
+
+**Context:** ADR-022 left the clinicians' sign-in method to roadmap 8.1. There are three
+clinicians, and their accounts are created by hand (8.2). Public sign-up was still on, so
+anyone with the publishable key could make an account. RLS showed such an account nothing,
+since it has no `clinicians` row.
+
+**Decision:**
+
+- Clinicians sign in with email and password, through Supabase Auth.
+- Public sign-up is off in both projects. Accounts are made only by Jeff, in the Supabase
+  dashboard.
+- Passwords are at least 12 characters, with no rules about character types.
+- Only dashboard code talks to Supabase from the browser, through one client in
+  `src/dashboard/`. Client screens still use only the Edge Functions (ADR-037).
+
+**Consequences:**
+
+- Signing in never waits on an email. A password reset does, and Supabase's built-in email
+  is limited to a few an hour, so a real email service is needed before launch (12.5).
+- Another method (an emailed code, Google) can be added later without a database change.
+- A second sign-in step (an authenticator app) isn't required yet. Ask the lawyer (12.1)
+  and decide at the security review (12.5).

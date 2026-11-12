@@ -474,6 +474,7 @@ Nothing real goes into production until every box here is ticked.
 - [ ] **12.1 Legal and privacy review with a lawyer**
   - Learn: what HIPAA, Washington's My Health My Data Act and Idaho law ask of an app like this
   - Check: written answers on whether a business associate agreement (BAA) is needed with Supabase and other vendors, what clients must be told or agree to, and how long data is kept
+  - Note: ask whether a second sign-in step (an authenticator app code) is expected for clinicians (ADR-043)
 
 - [ ] **12.2 Permissions on file**
   - Learn: keeping license records with the project
@@ -491,6 +492,7 @@ Nothing real goes into production until every box here is ticked.
 - [ ] **12.5 Security review**
   - Learn: Supabase's security advisor; reviewing keys and auth settings
   - Check: the advisor shows no warnings; RLS is on for every table; no secret key in `src/` or the built app; production Edge Function secrets are set; sign-in settings are final
+  - Note: set up a real email service for password resets, since Supabase's built-in email is limited to a few an hour; decide on a second sign-in step after 12.1 (ADR-043)
 
 - [ ] **12.6 Set up the real practice in production**
   - Learn: adding real (non-seed) setup data safely
