@@ -3,7 +3,7 @@
 The build, broken into small steps. Each step is about one session and teaches
 one thing. Tick a box only when its "Check" passes.
 
-**Current step:** 7.9
+**Current step:** Release Phases 5–7 (ADR-014), then 8.1
 
 How to use this file:
 
@@ -242,10 +242,7 @@ Steps 5.7 and 5.8 were built on working answers (ADR-030, ADR-032). The clinicia
   - Check: a fake stop mid-test returns the partial score and the sheet as it stood
   - Note: use the audio player's stop function (added at 5.6), so a stop silences the voice and the test isn't left waiting for the clip to end (ADR-028, Phase 4 code review)
 
-- [ ] **5.12 Clinician look on the preview (going to wait on this**
-  - Learn: running a feedback round
-  - Check: each clinician has tried it in at least one browser; feedback is in the running list
-  - Note: first add each clinician's email to the preview's Cloudflare Access policy (only Jeff's is on it, see 1.9)
+**5.12 Clinician look:** moved to 10.4 (decided 2026-11-11).
 
 ## Phase 6 — SWAPS test
 
@@ -297,9 +294,7 @@ the stop wording and the recall instruction (see the brief).
   - Check: a fake stop mid-test returns the partial score and the sheet as it stood
   - Note: `Swaps.tsx` doesn't read `stopRequested` yet. Add the stop time to `rawData`, and make test and recall `notGiven` where the SPEC says so (left from 6.9)
 
-- [ ] **6.11 Clinician look on the preview(not doing this now)**
-  - Learn: comparing feedback across tests
-  - Check: each clinician has tried it; feedback is in the running list
+**6.11 Clinician look:** moved to 10.4 (decided 2026-11-11).
 
 ## Phase 7 — Client link, sequence runner and break screen
 
@@ -356,12 +351,7 @@ or the seed file.
   - Check: a thank-you screen shows at the end; the sequence is marked complete; reopening the link is refused
   - Note: `check-link` returns an empty test list for an open sequence with nothing left to run. Decide what the client sees then
 
-- [ ] **7.9 Full run in every browser**
-  - Learn: an end-to-end manual test plan; measuring a timing gap across browsers
-  - Check: a full sequence (sound check → Trail Making → break → SWAPS → end) works in Chrome, Edge, Safari and Firefox, and results are in the development database; in each browser, the gap between a clip ending and the next step is measured and written down
-  - Note: moved here from 4.9. Timed parts start when a clip ends, and Howler's "end" is a timer set to the clip's length, not a report that the sound finished. A gap of tens of milliseconds is harmless; half a second or more, or one browser differing from the others, needs fixing. Choose the method here: a screen recording, or having a development page measure it. Edge and Firefox need installing on Jeff's Mac.
-  - Note: Howler switches the browser's audio off after 30 seconds of silence, so listen for a clipped first word on any clip that follows a long quiet stretch, such as the first clip after a timed part (found at 7.3)
-  - Note: in each browser, also try a failed save (DevTools offline before a test ends, then Try again). The 409 path (two tabs finishing the same test on one link) wasn't tried by hand at 7.7
+**7.9 Full run in every browser:** moved to 10.4 (decided 2026-11-11, not measured yet).
 
 ## Phase 8 — Clinician dashboard
 
@@ -449,6 +439,16 @@ see their own practice.
 - [ ] **10.3 Check what leaves the app**
   - Learn: reviewing exports for privacy
   - Check: the CSV and sheets contain client codes only, with no names or details beyond what the brief allows
+
+- [ ] **10.4 Full run in every browser, and the clinicians' round**
+  - Learn: an end-to-end manual test plan; measuring a timing gap across browsers; running a feedback round
+  - Check: a full sequence (sound check → Trail Making → break → SWAPS → end) works in Chrome, Edge, Safari and Firefox, and results are in the development database; in each browser, the gap between a clip ending and the next step is measured and written down; each clinician has tried both tests and the dashboard in at least one browser; their feedback and answers are in the running list
+  - Note: brings together 5.12, 6.11 and 7.9 (moved here 2026-11-11), so the clinicians see everything in one round. 7.9 had already moved from 4.9
+  - Note: timed parts start when a clip ends, and Howler's "end" is a timer set to the clip's length, not a report that the sound finished. A gap of tens of milliseconds is harmless; half a second or more, or one browser differing from the others, needs fixing. Choose the method here: a screen recording, or having a development page measure it. Edge and Firefox need installing on Jeff's Mac
+  - Note: Howler switches the browser's audio off after 30 seconds of silence, so listen for a clipped first word on any clip that follows a long quiet stretch, such as the first clip after a timed part (found at 7.3)
+  - Note: in each browser, also try a failed save (DevTools offline before a test ends, then Try again), and open both tests' sheets. The 409 path (two tabs finishing the same test on one link) wasn't tried by hand at 7.7. The SWAPS sheet hasn't been opened in Safari or Firefox yet
+  - Note: first add each clinician's email to the preview's Cloudflare Access policy (only Jeff's is on it, see 1.9)
+  - Note: questions waiting on the clinicians: ADR-030, ADR-032, ADR-036 and ADR-038; SWAPS SW1, SW2, the timed recall, leaving out the row highlights (SPEC question 8) and ending with no spoken cue (SPEC question 5); and the client wording for the welcome, the refused link, "Something went wrong", the break screen, "Saving…" and the end screen
 
 ## Phase 11 — Custom domain
 
