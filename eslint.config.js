@@ -19,4 +19,22 @@ export default defineConfig([
       globals: globals.browser,
     },
   },
+  {
+    // Client screens, shared code and tests never reach Supabase directly (CLAUDE.md, ADR-037, ADR-043).
+    files: ['src/client/**', 'src/shared/**', 'src/tests/**'],
+    rules: {
+      'no-restricted-imports': ['error', {
+        patterns: [
+          {
+            group: ['@supabase/*'],
+            message: 'Only dashboard code talks to Supabase (ADR-043). Client screens use the Edge Functions.',
+          },
+          {
+            group: ['**/dashboard', '**/dashboard/**'],
+            message: 'Client screens, shared code and tests must not import dashboard code.',
+          },
+        ],
+      }],
+    },
+  },
 ])
