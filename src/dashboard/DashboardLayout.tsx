@@ -1,6 +1,7 @@
 // The bar across the top of every dashboard page, with the page links and sign-out.
 
 import { NavLink, Outlet } from "react-router";
+import GenerateSequence from "./GenerateSequence";
 import { supabase } from "./supabase";
 
 const navLinkClass =
@@ -20,9 +21,12 @@ function DashboardLayout() {
             </NavLink>
           </nav>
         </div>
-        <button type="button" onClick={() => supabase.auth.signOut()} className={signOutClass}>
-          Sign out
-        </button>
+        <div className="flex items-center gap-4">
+          <GenerateSequence />
+          <button type="button" onClick={() => supabase.auth.signOut()} className={signOutClass}>
+            Sign out
+          </button>
+        </div>
       </header>
       <Outlet />
     </>

@@ -2,6 +2,7 @@
 // Reads go through RLS, so a clinician only ever sees their own practice.
 
 import { useEffect, useState } from "react";
+import { formatDate } from "./formatDate";
 import { supabase } from "./supabase";
 
 type Client = { id: string; code: string; created_at: string };
@@ -10,11 +11,6 @@ type Load =
   | { state: "loading" }
   | { state: "failed" }
   | { state: "loaded"; clients: Client[] };
-
-// "Nov 11, 2026", in the clinician's own time zone.
-function formatDate(isoText: string): string {
-  return new Date(isoText).toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" });
-}
 
 function ClientsPage() {
   const [load, setLoad] = useState<Load>({ state: "loading" });
