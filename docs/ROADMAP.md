@@ -3,7 +3,7 @@
 The build, broken into small steps. Each step is about one session and teaches
 one thing. Tick a box only when its "Check" passes.
 
-**Current step:** 8.4
+**Current step:** 8.4b
 
 How to use this file:
 
@@ -371,11 +371,16 @@ see their own practice.
   - Note: new client codes are added only in Generate Test Sequence (8.4), so a new client and their first visit take one step (decided 2026-11-11)
   - Note: build with the current code format (2.3). Whether the clinicians already have an ID for each client, and what one looks like, is asked at 10.4; loosen the format with a new migration then if needed (decided 2026-11-11)
 
-- [ ] **8.4 Generate Test Sequence**
-  - Learn: a modal with checkboxes; an Edge Function that creates the sequence and link
-  - Check: choose or create a client, tick tests (only the practice's enabled tests appear), get a link with a copy button; the link works in another tab
-  - Check: a new client code saves with its first sequence; typing an existing code shows it as an existing client (with the date it was added), not an error; a wrong format shows a clear message
-  - Note: save a new client and its sequence together, so a failed sequence never leaves a client with no visit. The code rules from 8.3 are in `src/dashboard/clientCode.ts` (capitals as typed, the format check, the hint)
+- [x] **8.4a Create a sequence in the database**
+  - Learn: a database function that saves several rows as one transaction; using `security definer` safely; calling it with `supabase.rpc`
+  - Check: in the SQL Editor, as each fake clinician: a new code creates the client, the sequence and its tests; an existing code reuses the client; a test the practice hasn't enabled, a repeated test, no tests or a badly formed code saves nothing; a signed-out caller is refused
+  - Note: new clients are created here, together with their first sequence (8.3), so a failed sequence never leaves a client with no visit (ADR-044)
+
+- [ ] **8.4b Generate Test Sequence**
+  - Learn: a modal with checkboxes; copying to the clipboard
+  - Check: type a client code, tick tests (only the practice's enabled tests appear), get a link with a copy button; the link works in another tab
+  - Check: a new code saves with its first sequence; an existing code shows as an existing client (with the date it was added), not an error; a wrong format shows a clear message
+  - Note: the code rules from 8.3 are in `src/dashboard/clientCode.ts` (capitals as typed, the format check, the hint)
 
 - [ ] **8.5 Results list**
   - Learn: grouping, sorting, filtering and searching a list
