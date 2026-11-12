@@ -774,7 +774,7 @@ but misclicks.
 
 ## ADR-033: Sheets are their own part of a test's result
 
-- **Status:** Accepted · **Date:** 2026-11-08 · Adds to the result in ADR-001
+- **Status:** Accepted · **Date:** 2026-11-08 · Adds to the result in ADR-001 · Answered by ADR-041
 
 **Context:** ADR-001's result has only `scores` and `rawData`, and both SPECs listed
 the sheet under `rawData`. But a sheet is saved as its own file in Storage (ADR-008,
@@ -975,3 +975,20 @@ disagree, or what stops a saved result from being changed later. The save-result
 - On a flagged result, `scores` came from the server's scoring code, while `test_version`
   names the browser's.
 - Correcting a saved result needs a deliberate migration, never a quick edit.
+
+## ADR-041: Sheets are saved with their result, and listed on its row
+
+- **Status:** Accepted · **Date:** 2026-11-11 · Answers the open question in ADR-033
+
+**Decision:**
+
+- Sheets travel in the same save-result request as the result, and are uploaded before the
+  row is saved, so a saved result always has its files.
+- Each file is `<practice_id>/<sequence_test_id>/<sheet name>.svg`. `sequence_tests.sheets`
+  lists each sheet's name and path (`{}` when there are none).
+- Only each test's own sheet names are accepted, so the browser can't choose where a file goes.
+
+**Consequences:**
+
+- A sheet's SVG comes from the browser and could contain script. The dashboard must show it
+  only as an image or a download (roadmap 8.7).

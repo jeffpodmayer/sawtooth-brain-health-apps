@@ -63,7 +63,7 @@ values (
 -- A finished Trail Making result. Scores follow its SPEC; the numbers are made up.
 insert into public.sequence_tests (
   id, practice_id, sequence_id, test_id, position, status, test_version,
-  started_at, completed_at, scores, raw_data, screen_width, screen_height
+  started_at, completed_at, scores, raw_data, screen_width, screen_height, sheets
 )
 values (
   '40000000-0000-4000-8000-000000000001',
@@ -78,14 +78,15 @@ values (
     "sampleB": {"passed": true}
   }',
   '{"seed": true}',
-  1440, 900
+  1440, 900,
+  '{}'
 );
 
 -- A SWAPS result stopped partway by a clinician, so its partial score is kept.
 insert into public.sequence_tests (
   id, practice_id, sequence_id, test_id, position, status, test_version,
   started_at, completed_at, scores, raw_data, screen_width, screen_height,
-  stop_reason, stopped_by
+  stop_reason, stopped_by, sheets
 )
 values (
   '40000000-0000-4000-8000-000000000002',
@@ -100,7 +101,8 @@ values (
   }',
   '{"seed": true}',
   1440, 900,
-  'gave_up', '10000000-0000-4000-8000-000000000001'
+  'gave_up', '10000000-0000-4000-8000-000000000001',
+  '{}'
 );
 
 insert into public.sequence_test_notes (id, practice_id, sequence_test_id, body, created_by)
@@ -145,7 +147,7 @@ values
 -- The finished Trail Making in the reopened sequence. Same made-up scores as above.
 insert into public.sequence_tests (
   id, practice_id, sequence_id, test_id, position, status, test_version,
-  started_at, completed_at, scores, raw_data, screen_width, screen_height
+  started_at, completed_at, scores, raw_data, screen_width, screen_height, sheets
 )
 values (
   '40000000-0000-4000-8000-000000000005',
@@ -160,5 +162,6 @@ values (
     "sampleB": {"passed": true}
   }',
   '{"seed": true}',
-  1440, 900
+  1440, 900,
+  '{}'
 );

@@ -181,6 +181,7 @@ export type Database = {
           screen_height: number | null
           screen_width: number | null
           sequence_id: string
+          sheets: Json | null
           started_at: string | null
           status: string
           stop_reason: string | null
@@ -200,6 +201,7 @@ export type Database = {
           screen_height?: number | null
           screen_width?: number | null
           sequence_id: string
+          sheets?: Json | null
           started_at?: string | null
           status?: string
           stop_reason?: string | null
@@ -219,6 +221,7 @@ export type Database = {
           screen_height?: number | null
           screen_width?: number | null
           sequence_id?: string
+          sheets?: Json | null
           started_at?: string | null
           status?: string
           stop_reason?: string | null

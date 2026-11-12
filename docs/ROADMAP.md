@@ -3,7 +3,7 @@
 The build, broken into small steps. Each step is about one session and teaches
 one thing. Tick a box only when its "Check" passes.
 
-**Current step:** 7.6
+**Current step:** 7.7
 
 How to use this file:
 
@@ -338,7 +338,7 @@ or the seed file.
   - Note: add `.ts` to the scoring modules' relative imports so Deno can load them, and reject logs with negative or invalid times (Phase 3 code review)
   - Note: build it like `check-link` (ADR-037). VS Code shows false errors in function files until the Deno extension is set up; decide whether to add it
 
-- [ ] **7.6 Upload the sheet**
+- [x] **7.6 Upload the sheet**
   - Learn: uploading to Storage through an Edge Function
   - Check: the SVG lands under `<practice_id>/`; the client can't read it back
   - Note: upload each entry in the result's `sheets`, and decide how files are named and how a result finds them (ADR-033)
@@ -349,6 +349,7 @@ or the seed file.
   - Note: decide what the client sees if a save fails. The runner waits for the save before moving on, so a save that fails or hangs would leave the client on the finished test (found at 7.3)
   - Note: save-result answers `409 not_pending` when the test was already saved, so a retry after a lost reply gets 409, not 200. Decide whether the client treats that as saved (found at 7.5)
   - Note: `ClientPage.tsx` uses the fake ResultStore from `src/dev/` until this step. Replace it here (added at 7.3)
+  - Note: Trail Making's real sheets (`partA`, `partB`) are first saved here. 7.6 was tried by hand with SWAPS and a small test SVG only (found at 7.6)
 
 - [ ] **7.8 End of sequence**
   - Learn: closing a sequence so its link stops working
@@ -395,6 +396,7 @@ see their own practice.
   - Learn: showing a stored SVG safely; signed URLs for private files
   - Check: scores, status, stop reason and test version show; the sheet opens; raw scores only, no interpretation
   - Note: show a flag when `browser_scores` is filled: the browser's scores differed from the server's, and `scores` holds the server's (ADR-040)
+  - Note: a sheet is SVG sent by the browser and could contain script. Show it only as an `<img>` or as a download, never put it straight into the page (ADR-041)
 
 - [ ] **8.8 Notes on each test**
   - Learn: saving with the signed-in clinician's ID

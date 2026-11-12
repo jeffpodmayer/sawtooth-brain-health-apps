@@ -11,11 +11,20 @@ import { rescore as rescoreTrailMaking } from "../../../src/tests/trail-making/s
 // A link token is 32 random bytes as 64 hex characters (see the sequences migration).
 const TOKEN_FORMAT = /^[0-9a-f]{64}$/;
 
-// Each test's re-scoring, by test id. null means the raw log isn't one the test could have written.
-const rescorers = new Map<string, (rawData: unknown, scores: unknown) => Json | null>([
-  ["trail-making", (rawData) => rescoreTrailMaking(rawData)],
-  ["swaps", (rawData, scores) => rescoreSwaps(rawData, scores)],
+// What the server knows about each test, by test id:
+// - rescore works the scores out again. null means the raw log isn't one the test could have written.
+// - sheetNames are the only sheets the test hands over (each test's SPEC). Any other name is
+//   rejected, so the browser can't choose where a file goes.
+const tests = new Map<string, {
+  rescore: (rawData: unknown, scores: unknown) => Json | null;
+  sheetNames: string[];
+}>([
+  ["trail-making", { rescore: (rawData) => rescoreTrailMaking(rawData), sheetNames: ["partA", "partB"] }],
+  ["swaps", { rescore: (rawData, scores) => rescoreSwaps(rawData, scores), sheetNames: ["sheet"] }],
 ]);
+
+// The sheets bucket's own limit (see the sheets bucket migration).
+const MAX_SHEET_BYTES = 5_242_880;
 
 // One reply for every refusal, so a caller can't tell an unknown link from an ended one.
 function refused(): Response {
@@ -49,6 +58,15 @@ function isSize(value: unknown): value is number {
   return typeof value === "number" && Number.isInteger(value) && value > 0;
 }
 
+// The result's sheets: names this test hands over, each SVG text within the bucket's limit.
+function isSheets(value: unknown, sheetNames: string[]): value is Record<string, string> {
+  return isRecord(value) && Object.entries(value).every(([name, svg]) =>
+    sheetNames.includes(name)
+    && typeof svg === "string"
+    && svg.startsWith("<svg ")
+    && new TextEncoder().encode(svg).length <= MAX_SHEET_BYTES);
+}
+
 export default {
   // The caller must send the project's publishable key (the app's public key).
   fetch: withSupabase<Database>({ auth: "publishable" }, async (req, ctx) => {
@@ -76,15 +94,16 @@ export default {
       return rejected("bad_result", "no result or screen");
     }
 
-    const { testId, testVersion, scores: browserScores, rawData } = result;
-    const rescore = typeof testId === "string" ? rescorers.get(testId) : undefined;
+    const { testId, testVersion, scores: browserScores, rawData, sheets } = result;
+    const test = typeof testId === "string" ? tests.get(testId) : undefined;
     const startedAt = parseTime(result.startedAt);
     const completedAt = parseTime(result.completedAt);
     const { width, height } = screen;
 
-    if (typeof testId !== "string" || !rescore || typeof testVersion !== "string" || testVersion === ""
+    if (typeof testId !== "string" || !test || typeof testVersion !== "string" || testVersion === ""
       || startedAt === null || completedAt === null || completedAt < startedAt
-      || !isRecord(browserScores) || !isRecord(rawData) || !isSize(width) || !isSize(height)) {
+      || !isRecord(browserScores) || !isRecord(rawData) || !isSheets(sheets, test.sheetNames)
+      || !isSize(width) || !isSize(height)) {
       return rejected("bad_result", "result fields");
     }
 
@@ -94,7 +113,7 @@ export default {
       return rejected("stopped_not_supported_yet", "stopped test");
     }
 
-    const scores = rescore(rawData, browserScores);
+    const scores = test.rescore(rawData, browserScores);
     if (scores === null) {
       return rejected("bad_result", "raw log");
     }
@@ -103,7 +122,37 @@ export default {
     // Both come from the same code, so when they agree their fields are in the same order.
     const scoresDiffer = JSON.stringify(browserScores) !== JSON.stringify(scores);
 
+    // The test's row gives the folder: <practice_id>/<sequence_test_id>/ (ADR-003, ADR-033).
     // Only a pending test in this sequence is saved, and only once (ADR-008).
+    const { data: row, error: rowError } = await ctx.supabaseAdmin
+      .from("sequence_tests")
+      .select("id, practice_id")
+      .eq("sequence_id", sequence.id)
+      .eq("test_id", testId)
+      .eq("status", "pending")
+      .maybeSingle();
+    if (rowError) return failed("test lookup", rowError.message);
+    if (!row) {
+      return Response.json({ error: "not_pending" }, { status: 409 });
+    }
+
+    // Sheets go up before the row is saved, so a saved result always has its files.
+    // upsert replaces a file left by an earlier try whose save failed. Files are only
+    // ever written here, while the test is pending.
+    const sheetPaths: Record<string, string> = {};
+    for (const [name, svg] of Object.entries(sheets)) {
+      const path = `${row.practice_id}/${row.id}/${name}.svg`;
+      const { error: uploadError } = await ctx.supabaseAdmin.storage
+        .from("sheets")
+        .upload(path, new Blob([svg], { type: "image/svg+xml" }), {
+          contentType: "image/svg+xml",
+          upsert: true,
+        });
+      if (uploadError) return failed("sheet upload", uploadError.message);
+      sheetPaths[name] = path;
+    }
+
+    // The status check stays, in case two saves arrive at once.
     // rawData arrived as JSON, so it can be stored as JSON.
     const { data: saved, error: saveError } = await ctx.supabaseAdmin
       .from("sequence_tests")
@@ -117,9 +166,9 @@ export default {
         raw_data: rawData as Json,
         screen_width: width,
         screen_height: height,
+        sheets: sheetPaths,
       })
-      .eq("sequence_id", sequence.id)
-      .eq("test_id", testId)
+      .eq("id", row.id)
       .eq("status", "pending")
       .select("id")
       .maybeSingle();
