@@ -1045,3 +1045,36 @@ since it has no `clinicians` row.
 - Another method (an emailed code, Google) can be added later without a database change.
 - A second sign-in step (an authenticator app) isn't required yet. Ask the lawyer (12.1)
   and decide at the security review (12.5).
+
+## ADR-044: Dashboard saves across several tables go through one database function
+
+- **Status:** Accepted · **Date:** 2026-11-11 · Changes how roadmap 8.4 creates a sequence
+
+**Context:** A new client and their first sequence are created together (roadmap 8.3). The
+roadmap planned an Edge Function, but it would send each insert as a separate request, so a
+failure partway could leave a client with no visit, or a sequence with no tests. The browser
+can't run a transaction either.
+
+**Decision:**
+
+- The dashboard calls a Postgres function with `supabase.rpc`. It runs as one transaction:
+  every row saves, or none does.
+- The function runs with its owner's rights (`security definer`, empty `search_path`), so
+  `sequences` and `sequence_tests` stay closed to the browser (ADR-027). Only signed-in
+  clinicians can call it.
+- The practice and clinician come from the sign-in (`private.current_practice_id()`,
+  `auth.uid()`), never from what the browser sends.
+- The function checks its own inputs, since it skips row-level security.
+- First use: `create_sequence` (roadmap 8.4a). It returns the link token and whether the client
+  was new.
+
+**Consequences:**
+
+- 8.4 has no Edge Function. The migration carries the function, so a release needs nothing extra.
+- The function lives in `public` so the API can reach it. Who can run it is granted explicitly;
+  `anon` gets nothing.
+- Each such function must repeat the practice checks RLS would otherwise do, so it gets the same
+  line-by-line walkthrough as a policy.
+- The browser's insert grant on `clients` (ADR-027) is no longer used by the dashboard. It stays
+  for now.
+- Clients still reach the database only through Edge Functions (ADR-037).

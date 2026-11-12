@@ -317,7 +317,14 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      create_sequence: {
+        Args: { client_code: string; test_ids: string[] }
+        Returns: {
+          client_created_at: string
+          client_is_new: boolean
+          link_token: string
+        }[]
+      }
     }
     Enums: {
       [_ in never]: never
