@@ -3,7 +3,7 @@
 The build, broken into small steps. Each step is about one session and teaches
 one thing. Tick a box only when its "Check" passes.
 
-**Current step:** 8.8
+**Current step:** 8.9
 
 How to use this file:
 
@@ -402,9 +402,11 @@ see their own practice.
   - Note: a sheet is SVG sent by the browser and could contain script. Show it only as an `<img>` or as a download, never put it straight into the page (ADR-041)
   - Note: details open in place on the client page, not on a page of their own (ADR-046). The browser-scores flag wasn't seen in the browser, since no development row has one
 
-- [ ] **8.8 Notes on each test**
+- [x] **8.8 Notes on each test**
   - Learn: saving with the signed-in clinician's ID
   - Check: a note saves and shows who wrote it and when; clients never see notes
+  - Note: notes show in a test's details, newest first. Clinicians add notes and edit or delete their own, and Delete asks first (ADR-025). Only completed or stopped tests have notes for now; notes on tests that weren't given can come with 9.1 (decided at 8.8)
+  - Note: migration `restrict_sequence_test_notes_grants` narrows what the browser can write: adding sets only the practice, test, text and author, and editing changes only the text (ADR-027). It goes to production with `create_sequence` at the Phase 8 release
 
 - [ ] **8.9 Dashboard accessibility pass**
   - Learn: checking with keyboard only and a screen reader; contrast checks
@@ -412,6 +414,7 @@ see their own practice.
   - Note: polish the dashboard's look, especially the Generate Test Sequence window and the clients list. They were built plain for the MVP (decided at 8.4b)
   - Note: add a client-code search to the Clients list. The Results list had one until it was removed at 8.7
   - Note: rework the client page's layout, including how a test's details open (8.7). The layout can change freely; what each test provides and how sheets are shown can't (ADR-046)
+  - Note: after saving, cancelling or deleting a note, keyboard focus isn't moved anywhere. Put it somewhere sensible (left at 8.8)
 
 ## Phase 9 — Stop button with real-time
 
