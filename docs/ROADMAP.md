@@ -3,7 +3,7 @@
 The build, broken into small steps. Each step is about one session and teaches
 one thing. Tick a box only when its "Check" passes.
 
-**Current step:** 8.5
+**Current step:** 8.6
 
 How to use this file:
 
@@ -382,9 +382,11 @@ see their own practice.
   - Check: a new code saves with its first sequence; an existing code shows as an existing client (with the date it was added), not an error; a wrong format shows a clear message
   - Note: the code rules from 8.3 are in `src/dashboard/clientCode.ts` (capitals as typed, the format check, the hint)
 
-- [ ] **8.5 Results list**
+- [x] **8.5 Results list**
   - Learn: grouping, sorting, filtering and searching a list
-  - Check: results are grouped under client ID; sort, filter and search by date or client ID all work
+  - Check: results are grouped under client ID, newest first; filter by date and search by client ID both work
+  - Note: only completed and stopped tests are listed, with date (`completed_at`), test and status; scores show in the result detail (8.7). No sort choice, since the clinicians can ask for one (decided at 8.5)
+  - Note: filters reset when leaving the page. Keep them in the page address if going back from a client (8.6) needs it (decided at 8.5)
 
 - [ ] **8.6 Per-client view**
   - Learn: nested data (client → sequences → tests)
