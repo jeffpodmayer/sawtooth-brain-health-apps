@@ -10,7 +10,7 @@ rule in CLAUDE.md.
 
 ## ADR-001: One app, tests as plug-ins
 
-- **Status:** Accepted · **Date:** by 2026-11-05 (naming 2026-11-06) · Component props extended by ADR-028 and ADR-039 · Result extended by ADR-033
+- **Status:** Accepted · **Date:** by 2026-11-05 (naming 2026-11-06) · Component props extended by ADR-028 and ADR-039 · Result extended by ADR-033 · Score summary added by ADR-045
 
 **Context:** The practice will add more tests over time. Each test has its own
 rules, but they all share links, audio, timing, saving and the dashboard.
@@ -1078,3 +1078,27 @@ can't run a transaction either.
 - The browser's insert grant on `clients` (ADR-027) is no longer used by the dashboard. It stays
   for now.
 - Clients still reach the database only through Edge Functions (ADR-037).
+
+## ADR-045: Each test summarizes its own scores for the dashboard
+
+- **Status:** Accepted · **Date:** 2026-11-12 · Adds to the test plug-in in ADR-001
+
+**Context:** The per-client view (roadmap 8.6) shows each test's scores. Shared code must never
+know how a test is scored (ADR-001), and each test's `scores` has its own shape.
+
+**Decision:**
+
+- Each test has a `summary.ts` with `summarizeScores(scores)`, which returns a few lines of text:
+  raw numbers only, the fields its SPEC records, and whether a part timed out, was stopped or
+  wasn't given. Sample and practice results are left out.
+- The dashboard lists each test's summary function in `sequence-tests.ts`, next to its name, and
+  only prints the lines.
+- `summary.ts` treats the stored scores as its own score type. Only save-result's server scoring
+  writes `scores` (ADR-040).
+
+**Consequences:**
+
+- A new test needs a `summary.ts` with its own unit tests, and a line in `sequence-tests.ts`.
+- If a test's score shape changes in a later version, its summary must handle both shapes,
+  since older results keep theirs.
+- The full scores, test version and stop reason are shown in the result detail (8.7).

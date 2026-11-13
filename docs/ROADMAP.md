@@ -3,7 +3,7 @@
 The build, broken into small steps. Each step is about one session and teaches
 one thing. Tick a box only when its "Check" passes.
 
-**Current step:** 8.6
+**Current step:** 8.7
 
 How to use this file:
 
@@ -388,10 +388,11 @@ see their own practice.
   - Note: only completed and stopped tests are listed, with date (`completed_at`), test and status; scores show in the result detail (8.7). No sort choice, since the clinicians can ask for one (decided at 8.5)
   - Note: filters reset when leaving the page. Keep them in the page address if going back from a client (8.6) needs it (decided at 8.5)
 
-- [ ] **8.6 Per-client view**
+- [x] **8.6 Per-client view**
   - Learn: nested data (client → sequences → tests)
   - Check: one client's sequences, tests and scores over time show in one place; nothing is overwritten by a later visit
-  - Note: the clients list doesn't refresh when Generate Test Sequence adds a new client behind it; a reload shows it (found at 8.4b)
+  - Note: the clients list and the client page re-read their data after Generate Test Sequence (found at 8.4b, fixed at 8.6). Another clinician's new sequence shows after a reload
+  - Note: each test's scores show as a few lines of raw numbers from its own `summary.ts` (ADR-045)
 
 - [ ] **8.7 Result detail and sheet viewer**
   - Learn: showing a stored SVG safely; signed URLs for private files
