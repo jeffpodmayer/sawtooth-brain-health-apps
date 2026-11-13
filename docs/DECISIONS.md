@@ -10,7 +10,7 @@ rule in CLAUDE.md.
 
 ## ADR-001: One app, tests as plug-ins
 
-- **Status:** Accepted · **Date:** by 2026-11-05 (naming 2026-11-06) · Component props extended by ADR-028 and ADR-039 · Result extended by ADR-033 · Score summary added by ADR-045
+- **Status:** Accepted · **Date:** by 2026-11-05 (naming 2026-11-06) · Component props extended by ADR-028 and ADR-039 · Result extended by ADR-033 · Score summary added by ADR-045 · Full scores and sheet labels added by ADR-046
 
 **Context:** The practice will add more tests over time. Each test has its own
 rules, but they all share links, audio, timing, saving and the dashboard.
@@ -1081,7 +1081,7 @@ can't run a transaction either.
 
 ## ADR-045: Each test summarizes its own scores for the dashboard
 
-- **Status:** Accepted · **Date:** 2026-11-12 · Adds to the test plug-in in ADR-001
+- **Status:** Accepted · **Date:** 2026-11-12 · Adds to the test plug-in in ADR-001 · Extended by ADR-046
 
 **Context:** The per-client view (roadmap 8.6) shows each test's scores. Shared code must never
 know how a test is scored (ADR-001), and each test's `scores` has its own shape.
@@ -1102,3 +1102,33 @@ know how a test is scored (ADR-001), and each test's `scores` has its own shape.
 - If a test's score shape changes in a later version, its summary must handle both shapes,
   since older results keep theirs.
 - The full scores, test version and stop reason are shown in the result detail (8.7).
+
+## ADR-046: Results show on the client page, with each test's full detail and sheets
+
+- **Status:** Accepted · **Date:** 2026-11-12 · Removes the results list (roadmap 8.5) · Adds to the test plug-in in ADR-001 and ADR-045
+
+**Context:** Roadmap 8.5 built a results list across all clients, and 8.7 planned a page for each result.
+Clinicians look at results one client at a time, so the list and a separate page added a step
+without adding anything.
+
+**Decision:**
+
+- The dashboard has a Clients list and a page for each client. There is no results list.
+- Each completed or stopped test on a client page opens its full detail: stop reason and who stopped
+  it, start and finish times, test version, screen size, the browser-scores flag (ADR-040), the full
+  scores and the sheets. For the MVP, a Details button opens it in place. That layout is plain on
+  purpose and can change at the dashboard polish (8.9) without a new ADR.
+- Each test's `summary.ts` also has `detailScores(scores)`: the summary lines plus sample or practice
+  results. Raw numbers only.
+- Each test's `test-info.ts` has `sheetLabels`, naming its sheets in the order shown.
+- Sheets are fetched only when a test's details are opened, with signed URLs that work for 10 minutes.
+  They show only as `<img>` (ADR-041). The URLs are marked as downloads, so opening one in a new tab
+  downloads the file instead of showing it as a page.
+
+**Consequences:**
+
+- A new test needs `detailScores` (with unit tests) and `sheetLabels`, as well as `summary.ts`
+  (ADR-045), and both go in `sequence-tests.ts`.
+- Search by client code and the date filter went with the results list. A client-code search is
+  planned for the Clients list (8.9).
+- The CSV export (10.1) was planned to match the results list, so where it lives is decided at 10.1.

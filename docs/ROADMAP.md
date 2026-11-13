@@ -3,7 +3,7 @@
 The build, broken into small steps. Each step is about one session and teaches
 one thing. Tick a box only when its "Check" passes.
 
-**Current step:** 8.7
+**Current step:** 8.8
 
 How to use this file:
 
@@ -387,6 +387,7 @@ see their own practice.
   - Check: results are grouped under client ID, newest first; filter by date and search by client ID both work
   - Note: only completed and stopped tests are listed, with date (`completed_at`), test and status; scores show in the result detail (8.7). No sort choice, since the clinicians can ask for one (decided at 8.5)
   - Note: filters reset when leaving the page. Keep them in the page address if going back from a client (8.6) needs it (decided at 8.5)
+  - Note: removed at 8.7. Results show only on each client's page, so the dashboard has a Clients list and client pages only (decided at 8.7)
 
 - [x] **8.6 Per-client view**
   - Learn: nested data (client → sequences → tests)
@@ -394,11 +395,12 @@ see their own practice.
   - Note: the clients list and the client page re-read their data after Generate Test Sequence (found at 8.4b, fixed at 8.6). Another clinician's new sequence shows after a reload
   - Note: each test's scores show as a few lines of raw numbers from its own `summary.ts` (ADR-045)
 
-- [ ] **8.7 Result detail and sheet viewer**
+- [x] **8.7 Result detail and sheet viewer**
   - Learn: showing a stored SVG safely; signed URLs for private files
-  - Check: scores, status, stop reason and test version show; the sheet opens; raw scores only, no interpretation
+  - Check: on the client page, each completed or stopped test opens its details: status, stop reason and who stopped it, start and finish times, test version, screen size and the full scores, raw only, with no interpretation; the sheets open
   - Note: show a flag when `browser_scores` is filled: the browser's scores differed from the server's, and `scores` holds the server's (ADR-040)
   - Note: a sheet is SVG sent by the browser and could contain script. Show it only as an `<img>` or as a download, never put it straight into the page (ADR-041)
+  - Note: details open in place on the client page, not on a page of their own (ADR-046). The browser-scores flag wasn't seen in the browser, since no development row has one
 
 - [ ] **8.8 Notes on each test**
   - Learn: saving with the signed-in clinician's ID
@@ -408,6 +410,8 @@ see their own practice.
   - Learn: checking with keyboard only and a screen reader; contrast checks
   - Check: every dashboard page works by keyboard; text meets WCAG 2.2 AA contrast
   - Note: polish the dashboard's look, especially the Generate Test Sequence window and the clients list. They were built plain for the MVP (decided at 8.4b)
+  - Note: add a client-code search to the Clients list. The Results list had one until it was removed at 8.7
+  - Note: rework the client page's layout, including how a test's details open (8.7). The layout can change freely; what each test provides and how sheets are shown can't (ADR-046)
 
 ## Phase 9 — Stop button with real-time
 
@@ -445,6 +449,7 @@ see their own practice.
 - [ ] **10.1 CSV export**
   - Learn: Papa Parse; protecting spreadsheets from formula injection
   - Check: the download matches what's filtered on screen, one row per test, grouped by client ID; a value starting with `=` opens as text in Excel
+  - Note: the check was written for the Results list, removed at 8.7. Decide where the export lives first: one download of every result on the Clients list, or one per client page (decided at 8.7)
 
 - [ ] **10.2 Sheet download**
   - Learn: making an SVG that stands alone (font embedded)
@@ -461,6 +466,7 @@ see their own practice.
   - Note: timed parts start when a clip ends, and Howler's "end" is a timer set to the clip's length, not a report that the sound finished. A gap of tens of milliseconds is harmless; half a second or more, or one browser differing from the others, needs fixing. Choose the method here: a screen recording, or having a development page measure it. Edge and Firefox need installing on Jeff's Mac
   - Note: Howler switches the browser's audio off after 30 seconds of silence, so listen for a clipped first word on any clip that follows a long quiet stretch, such as the first clip after a timed part (found at 7.3)
   - Note: in each browser, also try a failed save (DevTools offline before a test ends, then Try again), and open both tests' sheets. The 409 path (two tabs finishing the same test on one link) wasn't tried by hand at 7.7. The SWAPS sheet hasn't been opened in Safari or Firefox yet
+  - Note: in each browser, check that sheets show in a test's details on the client page, and that "Open image in new tab" downloads the file instead of opening it (8.7, ADR-046). Only Chrome was tried at 8.7
   - Note: first add each clinician's email to the preview's Cloudflare Access policy (only Jeff's is on it, see 1.9)
   - Note: first create each clinician's development login (moved from 8.2). Authentication → Users → Add user → Create new user, with a password of 12+ characters and "Auto confirm user" ticked (invites don't work, since Supabase's built-in email only reaches the Supabase team). Then add their `clinicians` row for Sawtooth in the SQL Editor. Real emails never go in `seed.sql`, and a reset deletes these logins, so do this after the last reset before the round
   - Note: questions waiting on the clinicians: whether they already have an ID for each client, and what one looks like (8.3); ADR-030, ADR-032, ADR-036 and ADR-038; SWAPS SW1, SW2, the timed recall, leaving out the row highlights (SPEC question 8) and ending with no spoken cue (SPEC question 5); and the client wording for the welcome, the refused link, "Something went wrong", the break screen, "Saving…" and the end screen
