@@ -15,9 +15,12 @@ function DashboardLayout() {
       <header className="flex items-center justify-between border-b-2 border-form-gray px-8 py-4">
         <div className="flex items-center gap-8">
           <p className="text-xl font-bold">Sawtooth Assessments</p>
-          <nav aria-label="Dashboard">
+          <nav aria-label="Dashboard" className="flex gap-6">
             <NavLink to="/dashboard/clients" className={navLinkClass}>
               Clients
+            </NavLink>
+            <NavLink to="/dashboard/results" className={navLinkClass}>
+              Results
             </NavLink>
           </nav>
         </div>

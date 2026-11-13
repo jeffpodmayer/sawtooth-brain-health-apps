@@ -4,6 +4,7 @@ import { Navigate, Route, Routes } from "react-router";
 import ClientsPage from "./ClientsPage";
 import DashboardLayout from "./DashboardLayout";
 import RequireSignIn from "./RequireSignIn";
+import ResultsPage from "./ResultsPage";
 import SignInPage from "./SignInPage";
 
 function DashboardRoutes() {
@@ -14,6 +15,7 @@ function DashboardRoutes() {
         <Route element={<DashboardLayout />}>
           <Route index element={<Navigate to="/dashboard/clients" replace />} />
           <Route path="clients" element={<ClientsPage />} />
+          <Route path="results" element={<ResultsPage />} />
         </Route>
       </Route>
     </Routes>
