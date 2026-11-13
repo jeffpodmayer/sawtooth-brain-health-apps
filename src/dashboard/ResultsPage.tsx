@@ -2,9 +2,11 @@
 // Reads go through RLS, so a clinician only ever sees their own practice.
 
 import { useEffect, useState } from "react";
+import { Link } from "react-router";
 import { formatDate } from "./formatDate";
 import { listResults, type ListOptions, type ResultRow } from "./results-list";
 import { sequenceTests } from "./sequence-tests";
+import { testStatusLabels } from "./statusLabels";
 import { supabase } from "./supabase";
 
 type Load =
@@ -13,7 +15,6 @@ type Load =
   | { state: "loaded"; rows: ResultRow[] };
 
 const testNames = new Map(sequenceTests.map((test) => [test.id, test.name]));
-const statusLabels = { completed: "Completed", stopped: "Stopped" } as const;
 
 const noFilters: ListOptions = { search: "", fromDate: "", toDate: "" };
 
@@ -22,13 +23,15 @@ const fieldClass =
   "mt-2 block h-14 w-full rounded-lg border-2 border-ink-muted bg-white px-4 font-normal text-ink focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-accent";
 const clearButtonClass =
   "h-14 rounded-lg border-2 border-accent px-8 font-bold text-accent focus-visible:outline-4 focus-visible:outline-offset-4 focus-visible:outline-accent";
+const linkClass =
+  "text-accent underline underline-offset-4 focus-visible:outline-4 focus-visible:outline-offset-4 focus-visible:outline-accent";
 
 type Fetched = {
   id: string;
   test_id: string;
   status: string;
   completed_at: string | null;
-  sequences: { clients: { code: string } };
+  sequences: { clients: { id: string; code: string } };
 };
 
 // The database guarantees a completed or stopped test has a completed_at (sequence_tests_result_check).
@@ -38,6 +41,7 @@ function toResultRow(row: Fetched): ResultRow[] {
   return [
     {
       id: row.id,
+      clientId: row.sequences.clients.id,
       clientCode: row.sequences.clients.code,
       testId: row.test_id,
       status: row.status,
@@ -59,7 +63,7 @@ function ResultsPage() {
     let cancelled = false;
     supabase
       .from("sequence_tests")
-      .select("id, test_id, status, completed_at, sequences(clients(code))")
+      .select("id, test_id, status, completed_at, sequences(clients(id, code))")
       .in("status", ["completed", "stopped"])
       .then(({ data, error }) => {
         if (cancelled) return;
@@ -137,8 +141,12 @@ function ResultsPage() {
       )}
 
       {groups.map((group) => (
-        <section key={group.clientCode} className="mt-10">
-          <h2 className="text-2xl font-bold">{group.clientCode}</h2>
+        <section key={group.clientId} className="mt-10">
+          <h2 className="text-2xl font-bold">
+            <Link to={`/dashboard/clients/${group.clientId}`} className={linkClass}>
+              {group.clientCode}
+            </Link>
+          </h2>
           <table className="mt-3 w-full text-left">
             <thead>
               <tr className="border-b-2 border-form-gray">
@@ -152,7 +160,7 @@ function ResultsPage() {
                 <tr key={result.id} className="border-b border-form-gray">
                   <td className="py-3 pr-8">{formatDate(result.completedAt)}</td>
                   <td className="py-3 pr-8">{testNames.get(result.testId) ?? result.testId}</td>
-                  <td className="py-3">{statusLabels[result.status]}</td>
+                  <td className="py-3">{testStatusLabels[result.status]}</td>
                 </tr>
               ))}
             </tbody>

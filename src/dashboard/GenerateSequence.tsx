@@ -9,7 +9,9 @@ import SequenceLink from "./SequenceLink";
 const openButtonClass =
   "h-12 rounded-lg bg-accent px-6 font-bold text-white focus-visible:outline-4 focus-visible:outline-offset-4 focus-visible:outline-accent";
 
-function GenerateSequence() {
+type Props = { onCreated: () => void };
+
+function GenerateSequence({ onCreated }: Props) {
   const dialogRef = useRef<HTMLDialogElement>(null);
   const [open, setOpen] = useState(false);
   const [created, setCreated] = useState<CreatedSequence | null>(null);
@@ -42,7 +44,13 @@ function GenerateSequence() {
               Generate Test Sequence
             </h2>
             {created === null ? (
-              <SequenceForm onCreated={setCreated} onCancel={() => dialogRef.current?.close()} />
+              <SequenceForm
+                onCreated={(sequence) => {
+                  setCreated(sequence);
+                  onCreated();
+                }}
+                onCancel={() => dialogRef.current?.close()}
+              />
             ) : (
               <SequenceLink created={created} onDone={() => dialogRef.current?.close()} />
             )}

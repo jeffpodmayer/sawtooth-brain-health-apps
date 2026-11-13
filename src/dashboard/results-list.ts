@@ -4,6 +4,7 @@
 // One test that ran, from a sequence_tests row with its client's code.
 export type ResultRow = {
   id: string;
+  clientId: string;
   clientCode: string;
   testId: string;
   status: "completed" | "stopped";
@@ -16,7 +17,7 @@ export type ListOptions = {
   toDate: string; // the same; both days are included
 };
 
-export type ClientGroup = { clientCode: string; results: ResultRow[] };
+export type ClientGroup = { clientId: string; clientCode: string; results: ResultRow[] };
 
 export function listResults(rows: readonly ResultRow[], options: ListOptions): ClientGroup[] {
   const search = options.search.trim().toUpperCase();
@@ -34,13 +35,13 @@ export function listResults(rows: readonly ResultRow[], options: ListOptions): C
   const sorted = matching.toSorted((a, b) => Date.parse(b.completedAt) - Date.parse(a.completedAt));
 
   // Group in the order each client first appears, so the client with the newest result comes first.
-  const groups = new Map<string, ResultRow[]>();
+  const groups = new Map<string, ClientGroup>();
   for (const row of sorted) {
-    const group = groups.get(row.clientCode);
-    if (group) group.push(row);
-    else groups.set(row.clientCode, [row]);
+    const group = groups.get(row.clientId);
+    if (group) group.results.push(row);
+    else groups.set(row.clientId, { clientId: row.clientId, clientCode: row.clientCode, results: [row] });
   }
-  return Array.from(groups, ([clientCode, results]) => ({ clientCode, results }));
+  return Array.from(groups.values());
 }
 
 // The result's date in the clinician's own time zone, as "YYYY-MM-DD", to compare with a date box.

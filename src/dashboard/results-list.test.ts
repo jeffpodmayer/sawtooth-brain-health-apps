@@ -5,10 +5,10 @@ import { describe, expect, it } from "vitest";
 import { listResults, type ClientGroup, type ListOptions, type ResultRow } from "./results-list";
 
 const rows: ResultRow[] = [
-  { id: "1", clientCode: "SBH-0042", testId: "trail-making", status: "completed", completedAt: "2026-11-02T19:00:00Z" },
-  { id: "2", clientCode: "SBH-0042", testId: "swaps", status: "stopped", completedAt: "2026-11-09T19:00:00Z" },
-  { id: "3", clientCode: "SBH-0007", testId: "trail-making", status: "completed", completedAt: "2026-11-05T19:00:00Z" },
-  { id: "4", clientCode: "ABC-1", testId: "swaps", status: "completed", completedAt: "2026-10-28T19:00:00Z" },
+  { id: "1", clientId: "c42", clientCode: "SBH-0042", testId: "trail-making", status: "completed", completedAt: "2026-11-02T19:00:00Z" },
+  { id: "2", clientId: "c42", clientCode: "SBH-0042", testId: "swaps", status: "stopped", completedAt: "2026-11-09T19:00:00Z" },
+  { id: "3", clientId: "c07", clientCode: "SBH-0007", testId: "trail-making", status: "completed", completedAt: "2026-11-05T19:00:00Z" },
+  { id: "4", clientId: "c1", clientCode: "ABC-1", testId: "swaps", status: "completed", completedAt: "2026-10-28T19:00:00Z" },
 ];
 
 const everything: ListOptions = { search: "", fromDate: "", toDate: "" };

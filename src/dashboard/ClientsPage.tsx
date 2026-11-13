@@ -2,8 +2,13 @@
 // Reads go through RLS, so a clinician only ever sees their own practice.
 
 import { useEffect, useState } from "react";
+import { Link } from "react-router";
 import { formatDate } from "./formatDate";
 import { supabase } from "./supabase";
+import { useSequencesMade } from "./useSequencesMade";
+
+const linkClass =
+  "text-accent underline underline-offset-4 focus-visible:outline-4 focus-visible:outline-offset-4 focus-visible:outline-accent";
 
 type Client = { id: string; code: string; created_at: string };
 
@@ -14,6 +19,7 @@ type Load =
 
 function ClientsPage() {
   const [load, setLoad] = useState<Load>({ state: "loading" });
+  const sequencesMade = useSequencesMade();
 
   useEffect(() => {
     let cancelled = false;
@@ -28,7 +34,8 @@ function ClientsPage() {
     return () => {
       cancelled = true;
     };
-  }, []);
+    // sequencesMade isn't used inside: it's here so a new sequence re-reads the list.
+  }, [sequencesMade]);
 
   return (
     <main className="mx-auto max-w-5xl p-8">
@@ -55,7 +62,11 @@ function ClientsPage() {
           <tbody>
             {load.clients.map((client) => (
               <tr key={client.id} className="border-b border-form-gray">
-                <td className="py-3 pr-8 font-bold">{client.code}</td>
+                <td className="py-3 pr-8 font-bold">
+                  <Link to={`/dashboard/clients/${client.id}`} className={linkClass}>
+                    {client.code}
+                  </Link>
+                </td>
                 <td className="py-3">{formatDate(client.created_at)}</td>
               </tr>
             ))}
