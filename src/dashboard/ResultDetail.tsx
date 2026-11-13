@@ -6,8 +6,11 @@ import { formatDateTime } from "./formatDate";
 import { sequenceTests } from "./sequence-tests";
 import SheetImages from "./SheetImages";
 import { stopReasonLabels } from "./statusLabels";
+import TestNotes from "./TestNotes";
 
 export type ResultDetails = {
+  id: string;
+  practice_id: string;
   test_id: string;
   test_version: string | null;
   started_at: string | null;
@@ -71,6 +74,8 @@ function ResultDetail({ result }: { result: ResultDetails }) {
         {result.scores !== null &&
           (details.get(result.test_id)?.(result.scores) ?? []).map((line) => <li key={line}>{line}</li>)}
       </ul>
+
+      <TestNotes sequenceTestId={result.id} practiceId={result.practice_id} />
 
       <SheetImages
         testId={result.test_id}

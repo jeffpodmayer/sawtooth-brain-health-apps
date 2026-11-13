@@ -38,7 +38,7 @@ const detailsButtonClass =
 // raw_data (the full click or answer log) is never read: the page doesn't show it.
 // clinicians is whoever stopped the test (empty unless it was stopped).
 const columns =
-  "code, created_at, sequences(id, status, created_at, sequence_tests(id, test_id, status, test_version, started_at, completed_at, screen_width, screen_height, scores, browser_scores, stop_reason, sheets, clinicians(display_name)))";
+  "code, created_at, sequences(id, status, created_at, sequence_tests(id, practice_id, test_id, status, test_version, started_at, completed_at, screen_width, screen_height, scores, browser_scores, stop_reason, sheets, clinicians(display_name)))";
 
 function ClientPage() {
   const { clientId = "" } = useParams();
