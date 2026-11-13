@@ -4,3 +4,6 @@
 export const testId = "swaps";
 export const testName = "SWAPS";
 export const testVersion = "0.1.0";
+
+// The sheets this test saves (SPEC: Recording), labeled and in the order the dashboard shows them (roadmap 8.7).
+export const sheetLabels: Record<string, string> = { sheet: "Answer sheet" };

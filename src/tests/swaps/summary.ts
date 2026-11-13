@@ -1,5 +1,5 @@
 // One line for the test and one for recall, for the dashboard's client page (roadmap 8.6).
-// Raw scores only (SPEC: Scoring). Practice isn't scored, so it isn't shown.
+// Raw scores only (SPEC: Scoring). Practice isn't scored, so it shows only in the result detail (8.7).
 
 import { keyNumbers } from "./scoring/form-a";
 import type { GridScore, SwapsScores } from "./scoring/score-grid";
@@ -12,6 +12,12 @@ const recallSymbols = Object.keys(keyNumbers).length;
 export function summarizeScores(scores: unknown): string[] {
   const { test, recall } = scores as SwapsScores;
   return [summarizeTest(test), summarizeRecall(recall)];
+}
+
+// Practice, then the test and recall lines, for the result detail (roadmap 8.7).
+export function detailScores(scores: unknown): string[] {
+  const { practice } = scores as SwapsScores;
+  return [`Practice: ${count(practice.wrongAnswers, "wrong answer")} (not scored)`, ...summarizeScores(scores)];
 }
 
 function summarizeTest(test: GridScore): string {

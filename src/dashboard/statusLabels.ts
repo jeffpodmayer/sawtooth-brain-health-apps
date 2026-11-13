@@ -8,6 +8,12 @@ export const testStatusLabels: Record<string, string> = {
   not_given: "Not given",
 };
 
+export const stopReasonLabels: Record<string, string> = {
+  gave_up: "Gave up",
+  interrupted: "Interrupted",
+  unable_to_complete: "Unable to complete",
+};
+
 export const sequenceStatusLabels: Record<string, string> = {
   open: "Open",
   completed: "Completed",

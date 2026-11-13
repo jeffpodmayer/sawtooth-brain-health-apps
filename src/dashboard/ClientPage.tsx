@@ -1,10 +1,11 @@
 // One client's visits and tests, newest visit first (roadmap 8.6).
 // Reads go through RLS, so another practice's client looks the same as one that doesn't exist.
 
-import { useEffect, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 import { Link, useParams } from "react-router";
-import type { Json } from "../../supabase/functions/_shared/database.types.ts";
 import { formatDate } from "./formatDate";
+import { isUuid } from "./isUuid";
+import ResultDetail, { type ResultDetails } from "./ResultDetail";
 import { sequenceTests } from "./sequence-tests";
 import { sequenceStatusLabels, testStatusLabels } from "./statusLabels";
 import { supabase } from "./supabase";
@@ -14,7 +15,7 @@ type Visit = {
   id: string;
   status: string;
   created_at: string;
-  sequence_tests: { id: string; test_id: string; status: string; completed_at: string | null; scores: Json | null }[];
+  sequence_tests: (ResultDetails & { id: string; status: string })[];
 };
 
 type Client = { code: string; created_at: string; sequences: Visit[] };
@@ -25,25 +26,43 @@ type Load =
   | { state: "failed"; clientId: string }
   | { state: "loaded"; clientId: string; client: Client | null };
 
-const ID_FORMAT = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const testNames = new Map(sequenceTests.map((test) => [test.id, test.name]));
 const summaries = new Map(sequenceTests.map((test) => [test.id, test.summarize]));
 
 const backLinkClass =
   "inline-flex h-12 items-center font-bold text-accent underline underline-offset-4 focus-visible:outline-4 focus-visible:outline-offset-4 focus-visible:outline-accent";
+// The same look as Sign out.
+const detailsButtonClass =
+  "h-12 rounded-lg border-2 border-accent px-6 font-bold text-accent focus-visible:outline-4 focus-visible:outline-offset-4 focus-visible:outline-accent";
+
+// raw_data (the full click or answer log) is never read: the page doesn't show it.
+// clinicians is whoever stopped the test (empty unless it was stopped).
+const columns =
+  "code, created_at, sequences(id, status, created_at, sequence_tests(id, test_id, status, test_version, started_at, completed_at, screen_width, screen_height, scores, browser_scores, stop_reason, sheets, clinicians(display_name)))";
 
 function ClientPage() {
   const { clientId = "" } = useParams();
-  const validId = ID_FORMAT.test(clientId);
+  const validId = isUuid(clientId);
   const [load, setLoad] = useState<Load>({ state: "loading" });
   const sequencesMade = useSequencesMade();
+  // Which tests have their details open. Several can be open at once.
+  const [openTests, setOpenTests] = useState<Set<string>>(new Set());
+
+  function toggle(testId: string) {
+    setOpenTests((current) => {
+      const next = new Set(current);
+      if (next.has(testId)) next.delete(testId);
+      else next.add(testId);
+      return next;
+    });
+  }
 
   useEffect(() => {
     if (!validId) return;
     let cancelled = false;
     supabase
       .from("clients")
-      .select("code, created_at, sequences(id, status, created_at, sequence_tests(id, test_id, status, completed_at, scores))")
+      .select(columns)
       .eq("id", clientId)
       .order("created_at", { referencedTable: "sequences", ascending: false })
       .order("position", { referencedTable: "sequences.sequence_tests" })
@@ -100,23 +119,51 @@ function ClientPage() {
                     <th scope="col" className="py-3 pr-8">Test</th>
                     <th scope="col" className="py-3 pr-8">Status</th>
                     <th scope="col" className="py-3 pr-8">Date</th>
-                    <th scope="col" className="py-3">Scores</th>
+                    <th scope="col" className="py-3 pr-8">Scores</th>
+                    <th scope="col" className="py-3">Details</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {visit.sequence_tests.map((test) => (
-                    <tr key={test.id} className="border-b border-form-gray">
-                      <td className="py-3 pr-8">{testNames.get(test.test_id) ?? test.test_id}</td>
-                      <td className="py-3 pr-8">{testStatusLabels[test.status] ?? test.status}</td>
-                      <td className="py-3 pr-8">{test.completed_at ? formatDate(test.completed_at) : "—"}</td>
-                      <td className="py-3">
-                        <ul>
-                          {test.scores !== null &&
-                            (summaries.get(test.test_id)?.(test.scores) ?? []).map((line) => <li key={line}>{line}</li>)}
-                        </ul>
-                      </td>
-                    </tr>
-                  ))}
+                  {visit.sequence_tests.map((test) => {
+                    const ran = test.status === "completed" || test.status === "stopped";
+                    const open = openTests.has(test.id);
+                    return (
+                      <Fragment key={test.id}>
+                        <tr className="border-b border-form-gray">
+                          <td className="py-3 pr-8">{testNames.get(test.test_id) ?? test.test_id}</td>
+                          <td className="py-3 pr-8">{testStatusLabels[test.status] ?? test.status}</td>
+                          <td className="py-3 pr-8">{test.completed_at ? formatDate(test.completed_at) : "—"}</td>
+                          <td className="py-3 pr-8">
+                            <ul>
+                              {test.scores !== null &&
+                                (summaries.get(test.test_id)?.(test.scores) ?? []).map((line) => (
+                                  <li key={line}>{line}</li>
+                                ))}
+                            </ul>
+                          </td>
+                          <td className="py-3">
+                            {ran && (
+                              <button
+                                type="button"
+                                aria-expanded={open}
+                                aria-controls={`detail-${test.id}`}
+                                onClick={() => toggle(test.id)}
+                                className={detailsButtonClass}
+                              >
+                                Details
+                              </button>
+                            )}
+                          </td>
+                        </tr>
+                        {/* Built only while open, so a closed test fetches nothing. */}
+                        {ran && (
+                          <tr id={`detail-${test.id}`} hidden={!open} className="border-b border-form-gray">
+                            <td colSpan={5}>{open && <ResultDetail result={test} />}</td>
+                          </tr>
+                        )}
+                      </Fragment>
+                    );
+                  })}
                 </tbody>
               </table>
             </section>

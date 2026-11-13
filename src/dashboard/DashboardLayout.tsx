@@ -22,9 +22,6 @@ function DashboardLayout() {
             <NavLink to="/dashboard/clients" className={navLinkClass}>
               Clients
             </NavLink>
-            <NavLink to="/dashboard/results" className={navLinkClass}>
-              Results
-            </NavLink>
           </nav>
         </div>
         <div className="flex items-center gap-4">

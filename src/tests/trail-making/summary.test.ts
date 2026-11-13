@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import type { GivenPartScore, TrailMakingScores } from "./scoring/score-part";
-import { summarizeScores } from "./summary";
+import { detailScores, summarizeScores } from "./summary";
 
 const finished: GivenPartScore = {
   status: "completed", code: null, timeMs: 38000, timeSeconds: 38, correctLines: 24, correctClicks: 25, errors: 0,
@@ -40,5 +40,26 @@ describe("Trail Making score summary", () => {
   it("one correct line is singular", () => {
     const partA = { ...finished, status: "stopped" as const, correctLines: 1, errors: 0 };
     expect(summarizeScores(scores(partA, finished))[0]).toBe("Part A: stopped at 38 s, 1 correct line, 0 errors");
+  });
+});
+
+describe("Trail Making full scores", () => {
+  it("lists every page in the order given, samples included", () => {
+    expect(detailScores(scores(finished, finished))).toEqual([
+      "Sample A: passed",
+      "Part A: 38 s, 24 correct lines, 0 errors",
+      "Sample B: passed",
+      "Part B: 38 s, 24 correct lines, 0 errors",
+    ]);
+  });
+
+  it("a sample the clinician ended is not passed, and the parts after it are not given", () => {
+    const notGiven = { status: "notGiven" as const, code: null };
+    expect(detailScores({ partA: notGiven, partB: notGiven, sampleA: { passed: false }, sampleB: null })).toEqual([
+      "Sample A: not passed",
+      "Part A: not given",
+      "Sample B: not reached",
+      "Part B: not given",
+    ]);
   });
 });

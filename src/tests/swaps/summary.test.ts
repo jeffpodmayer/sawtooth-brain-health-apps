@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import type { GivenGridScore, SwapsScores } from "./scoring/score-grid";
-import { summarizeScores } from "./summary";
+import { detailScores, summarizeScores } from "./summary";
 
 const timedOut: GivenGridScore = { status: "timedOut", timeMs: 60000, attempted: 24, correct: 23, errors: 1, corrections: 1 };
 const practice = { wrongAnswers: 0 };
@@ -50,5 +50,21 @@ describe("SWAPS score summary", () => {
     expect(summarizeScores(scores(test, { status: "notGiven" }))[0]).toBe(
       "Test: 23 correct, 24 attempted, 2 errors, 2 corrections",
     );
+  });
+});
+
+describe("SWAPS full scores", () => {
+  it("practice first, then the test and recall lines", () => {
+    const withPractice = { ...scores(timedOut, { status: "completed", correct: 5, blank: 1 }), practice: { wrongAnswers: 2 } };
+    expect(detailScores(withPractice)).toEqual([
+      "Practice: 2 wrong answers (not scored)",
+      "Test: 23 correct, 24 attempted, 1 error, 1 correction",
+      "Recall: 5 of 7 correct, 1 blank",
+    ]);
+  });
+
+  it("one wrong practice answer is singular", () => {
+    const withPractice = { ...scores(timedOut, { status: "notGiven" }), practice: { wrongAnswers: 1 } };
+    expect(detailScores(withPractice)[0]).toBe("Practice: 1 wrong answer (not scored)");
   });
 });
