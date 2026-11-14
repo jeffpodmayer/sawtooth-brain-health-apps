@@ -120,6 +120,30 @@ it("leaves Sample B empty when stopped in the pause after Part A", () => {
   expect(scores.partB).toEqual(notGiven);
 });
 
+it("counts a page as not reached when stopped at the hold before it, like the pause", () => {
+  const scores = scoreTest({ partA: fullA, partB: [] }, stopAt("sampleB", "waiting"));
+
+  expect(scores.partA.status).toBe("completed");
+  expect(scores.sampleB).toBeNull();
+  expect(scores.partB).toEqual(notGiven);
+});
+
+it("passes Sample A and doesn't give Part A when stopped at the hold before Part A", () => {
+  const scores = scoreTest(noClicks, stopAt("partA", "waiting"));
+
+  expect(scores.sampleA).toEqual({ passed: true });
+  expect(scores.partA).toEqual(notGiven);
+});
+
+it("reaches nothing when stopped at the first hold", () => {
+  expect(scoreTest(noClicks, stopAt("sampleA", "waiting"))).toEqual({
+    partA: notGiven,
+    partB: notGiven,
+    sampleA: null,
+    sampleB: null,
+  });
+});
+
 it("scores a whole test normally when stopped in the last pause", () => {
   const scores = scoreTest({ partA: fullA, partB: fullB }, stopAt("partB", "finished"));
 

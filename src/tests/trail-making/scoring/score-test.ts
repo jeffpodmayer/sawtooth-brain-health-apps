@@ -35,7 +35,8 @@ function pageProgress(page: Page, stop: StopPoint | null): "finished" | "current
     return "finished";
   }
 
-  return pageIndex === stopIndex ? "current" : "notReached";
+  // The hold before a page comes after the pause, so the page itself wasn't reached (SPEC).
+  return pageIndex === stopIndex && stop.phase !== "waiting" ? "current" : "notReached";
 }
 
 function scoreSample(page: Page, stop: StopPoint | null): SampleScore | null {

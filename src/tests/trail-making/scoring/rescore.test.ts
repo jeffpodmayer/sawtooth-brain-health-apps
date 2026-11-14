@@ -14,6 +14,12 @@ it("scores a log the same way the browser does", () => {
   expect(rescore({ clicks: { partA, partB }, stop })).toEqual(scoreTest({ partA, partB }, stop));
 });
 
+it("accepts a stop at a hold", () => {
+  const atHold: StopPoint = { page: "sampleB", phase: "waiting", stoppedAtMs: null };
+
+  expect(rescore({ clicks: { partA, partB: [] }, stop: atHold })).toEqual(scoreTest({ partA, partB: [] }, atHold));
+});
+
 it.each([
   ["no rawData", null],
   ["no click logs", { stop: null }],

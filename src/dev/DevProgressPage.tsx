@@ -1,4 +1,4 @@
-// Development only (roadmap 9.3): stands in for the client's tab until the tests use holds and stops (9.5).
+// Development only (roadmap 9.3): sends single reports by hand, to try the server without running a test.
 // Open /dev/progress/<link-token>?test=<test-id> with the dashboard open on that client in another window.
 // The buttons report through report-progress; each "check now" ping (and each connect) asks check-status.
 
@@ -6,8 +6,9 @@ import { useEffect, useState } from "react";
 import { useParams, useSearchParams } from "react-router";
 import { checkStatus } from "../client/check-status";
 import { listenForChecks } from "../client/listen-for-checks";
-import { reportProgress, type ProgressReport } from "../client/report-progress";
+import { reportProgress } from "../client/report-progress";
 import { watchTest } from "../client/watch-test";
+import type { ProgressReport } from "../shared/result-store";
 
 // A log line with the time it happened, for reading only (nothing here is measured).
 function stamped(line: string): string {
@@ -36,8 +37,8 @@ function DevProgressPage() {
   );
 
   async function send(report: ProgressReport) {
-    const saved = await reportProgress(token, testId, report);
-    setLog((lines) => [stamped(`report ${JSON.stringify(report)} → ${saved ? "saved" : "NOT saved"}`), ...lines]);
+    const outcome = await reportProgress(token, testId, report);
+    setLog((lines) => [stamped(`report ${JSON.stringify(report)} → ${outcome}`), ...lines]);
   }
 
   return (

@@ -5,7 +5,7 @@ import { pages, type Flow } from "./page-flow.ts";
 import type { LoggedClick, TrailMakingScores } from "./score-part.ts";
 import { scoreTest, type StopPoint } from "./score-test.ts";
 
-const phases: readonly Flow["phase"][] = ["instructions", "practice", "test", "finished", "done"];
+const phases: readonly Flow["phase"][] = ["waiting", "instructions", "practice", "test", "finished", "done"];
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null;

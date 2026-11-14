@@ -1,21 +1,26 @@
 // Which page the test is on and what stage that page is at. Pure: same inputs, same answer.
+// Each page starts "waiting": the hold before it, until the clinician's Continue (ADR-050).
 
 export const pages = ["sampleA", "partA", "sampleB", "partB"] as const;
 
 export type Flow = {
   pageIndex: number;
-  phase: "instructions" | "practice" | "test" | "finished" | "done";
+  phase: "waiting" | "instructions" | "practice" | "test" | "finished" | "done";
 };
 
-export type FlowEvent = "clicksEnabled" | "pageCompleted" | "timeUp" | "pauseOver" | "stopped";
+export type FlowEvent = "released" | "clicksEnabled" | "pageCompleted" | "timeUp" | "pauseOver" | "stopped";
 
-export const startFlow: Flow = { pageIndex: 0, phase: "instructions" };
+export const startFlow: Flow = { pageIndex: 0, phase: "waiting" };
 
 export function nextFlow(flow: Flow, event: FlowEvent): Flow {
   const { pageIndex, phase } = flow;
 
   if (event === "stopped") {
     return { pageIndex, phase: "done" };
+  }
+
+  if (event === "released" && phase === "waiting") {
+    return { pageIndex, phase: "instructions" };
   }
 
   if (event === "clicksEnabled" && phase === "instructions") {
@@ -33,7 +38,7 @@ export function nextFlow(flow: Flow, event: FlowEvent): Flow {
   if (event === "pauseOver" && phase === "finished") {
     return pageIndex === pages.length - 1
       ? { pageIndex, phase: "done" }
-      : { pageIndex: pageIndex + 1, phase: "instructions" };
+      : { pageIndex: pageIndex + 1, phase: "waiting" };
   }
 
   return flow;

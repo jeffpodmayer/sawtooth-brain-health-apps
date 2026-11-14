@@ -1,4 +1,6 @@
 // Runs SWAPS: the introduction and demo, practice, the test, then recall (SPEC: Flow).
+// Each of the three waits at a hold until the clinician's Continue (ADR-050), with the
+// finished practice or grid left on screen.
 
 import { useEffect, useRef, useState } from "react";
 import { withAudioLog } from "../../shared/audio-log";
@@ -41,6 +43,10 @@ const spokenLines = Object.values(sections)
 
 type ScreenNote = { width: number; height: number; scale: number };
 
+// The hold before each stage is its number in the test's holds list (test-info.ts):
+// Introduction, Test, Recall.
+const holdBefore = { practice: 1, test: 2, recall: 3 } as const;
+
 // The window's size, and how big the form is drawn in it: pixels per form unit.
 function measureScreen(page: HTMLElement | null): ScreenNote | undefined {
   const drawn = page?.querySelector("svg")?.getBoundingClientRect();
@@ -56,7 +62,16 @@ function measureScreen(page: HTMLElement | null): ScreenNote | undefined {
   };
 }
 
-function Swaps({ sequenceId, stopRequested, onComplete, onLoadFailed }: TestProps) {
+function Swaps({
+  sequenceId,
+  stopRequested,
+  holdsReleased,
+  onHoldReached,
+  onTimedPartStarted,
+  onTimedPartEnded,
+  onComplete,
+  onLoadFailed,
+}: TestProps) {
   const [startedAt] = useState(() => new Date().toISOString());
   const handedOver = useRef(false);
   const [testClock] = useState(() => elapsedClock(realClock));
@@ -68,9 +83,17 @@ function Swaps({ sequenceId, stopRequested, onComplete, onLoadFailed }: TestProp
   const [wrongAnswers, setWrongAnswers] = useState(0);
   const [stage, setStage] = useState<"practice" | "test" | "recall" | "ended">("practice");
 
+  // The stage waits at its hold until Continue releases it.
+  const hold = stage === "ended" ? null : holdBefore[stage];
+  const holding = hold !== null && holdsReleased < hold;
+
   // A clinician's stop ends the test wherever it is. The effects read this, so a stop clears
   // their timers and silences the voice. stage itself still says where the test was.
-  const activeStage = stopRequested ? "ended" : stage;
+  const activeStage = stopRequested ? "ended" : holding ? "holding" : stage;
+
+  // The timed part whose clock started, while its stage is still running.
+  const [clockStarted, setClockStarted] = useState<"test" | "recall" | null>(null);
+  const timedPart = clockStarted !== null && activeStage === clockStarted ? clockStarted : null;
   const timerStartedAt = useRef<number | null>(null);
   const answerLog = useRef<LoggedAnswer[]>([]);
   const [recallView, setRecallView] = useState<ScriptView | null>(null);
@@ -175,6 +198,7 @@ function Swaps({ sequenceId, stopRequested, onComplete, onLoadFailed }: TestProp
 
       if (line.action === "startTimer") {
         timerStartedAt.current = realClock.now();
+        setClockStarted("test");
         screens.current.test = measureScreen(pageRef.current);
         limitTimer = window.setTimeout(timeUp, timeLimitMs.test);
       }
@@ -219,6 +243,7 @@ function Swaps({ sequenceId, stopRequested, onComplete, onLoadFailed }: TestProp
 
       if (line.action === "startTimer") {
         recallStartedAt.current = realClock.now();
+        setClockStarted("recall");
         screens.current.recall = measureScreen(pageRef.current);
         limitTimer = window.setTimeout(timeUp, timeLimitMs.recall);
       }
@@ -241,8 +266,27 @@ function Swaps({ sequenceId, stopRequested, onComplete, onLoadFailed }: TestProp
 
   useEffect(() => recordFocus(testClock, focusLog.current), [testClock]);
 
+  // Tells the shared layer about each hold, so the dashboard can show Continue.
+  useEffect(() => {
+    if (hold !== null) {
+      onHoldReached(hold);
+    }
+  }, [hold, onHoldReached]);
+
+  // Tells the shared layer when a timed part's clock starts and stops, for the dashboard's counter.
+  // The stage ending, a stop or the end of the test ends it, since timedPart goes back to null.
+  useEffect(() => {
+    if (timedPart === null) {
+      return;
+    }
+
+    onTimedPartStarted(timedPart);
+    return () => onTimedPartEnded(timedPart);
+  }, [timedPart, onTimedPartStarted, onTimedPartEnded]);
+
   // Hands the result to the shared layer. The ref keeps it to once, even if the parent redraws.
-  // If stage never reached "ended" itself, a clinician's stop ended the test, and stage says where.
+  // If stage never reached "ended" itself, a clinician's stop ended the test, and stage says where
+  // (a stop at a hold says the stage it was waiting for, with no time).
   useEffect(() => {
     if (activeStage !== "ended" || handedOver.current) {
       return;

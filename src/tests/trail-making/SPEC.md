@@ -233,6 +233,8 @@ reaching it. A `notGiven` part has only `status` and `code`.
   the timed part after it is `notGiven`.
 - If the stop comes in the pause after a page, that page keeps its result and the next
   page counts as not reached.
+- The hold before each page (ADR-050) comes after that pause, so a stop there counts the same way:
+  the page before keeps its result, and the held page counts as not reached.
 - If the stop comes during a timed part's instructions, before the timer starts,
   that part is `notGiven`.
 - Parts not yet reached are `notGiven`.

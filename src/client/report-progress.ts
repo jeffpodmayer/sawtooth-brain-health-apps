@@ -1,24 +1,22 @@
 // Tells the report-progress Edge Function where the running test is (roadmap 9.3, ADR-048, ADR-049).
 // For the dashboard only; nothing here is part of the result. The part key is passed along unread.
 
+import type { ProgressReport } from "../shared/result-store";
 import { env } from "../shared/env";
-
-export type ProgressReport =
-  | { event: "began" }
-  | { event: "holdReached"; hold: number }
-  | { event: "timedPartStarted"; part: string }
-  | { event: "timedPartEnded"; part: string };
 
 const REPORT_TIME_LIMIT_MS = 10_000;
 
-// true: saved, or nothing needed saving (a repeat, or after a stop request).
-// false: not saved (no connection, refused, or a fault). A lost hold report leaves the clinician
-// without Continue, so the caller should try a hold again (settled when the tests use it, 9.5).
+// "saved": saved, or nothing needed saving (a repeat, or after a stop request).
+// "refused": the server won't take it, now or later (the test already has a result, or the report
+// doesn't fit where the test is). Sending it again would get the same answer.
+// "failed": no answer, or a fault on our side. Worth sending again.
+export type ReportOutcome = "saved" | "refused" | "failed";
+
 export async function reportProgress(
   token: string,
   testId: string,
   report: ProgressReport,
-): Promise<boolean> {
+): Promise<ReportOutcome> {
   try {
     const response = await fetch(`${env.supabaseUrl}/functions/v1/report-progress`, {
       method: "POST",
@@ -29,8 +27,9 @@ export async function reportProgress(
       body: JSON.stringify({ token, testId, ...report }),
       signal: AbortSignal.timeout(REPORT_TIME_LIMIT_MS),
     });
-    return response.ok;
+    if (response.ok) return "saved";
+    return response.status === 400 || response.status === 404 ? "refused" : "failed";
   } catch {
-    return false;
+    return "failed";
   }
 }

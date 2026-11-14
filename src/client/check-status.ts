@@ -3,12 +3,7 @@
 // The token goes in the body, never in the address (ADR-037).
 
 import { env } from "../shared/env";
-
-export type TestStatus = {
-  stopRequested: boolean;
-  holdsReleased: number;
-  sequenceOpen: boolean;
-};
+import type { TestStatus } from "../shared/result-store";
 
 // "notValid": the link is unknown, or this test already has a result.
 // "failed": no answer (no connection, or a fault on our side). The next ping or check asks again.

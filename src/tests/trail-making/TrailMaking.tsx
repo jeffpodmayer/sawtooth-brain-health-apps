@@ -1,6 +1,7 @@
 // Runs all four pages in order, then hands the result to the shared layer. Each page's instructions
 // play first, with their arrows (SPEC: Voice and arrows). Correct clicks draw lines; wrong clicks
-// get the full error response (SPEC: Errors). A finished page moves on by itself after a short pause.
+// get the full error response (SPEC: Errors). A finished page stays on screen at the hold before the
+// next one until the clinician's Continue (ADR-050).
 // Shows a message instead if the screen is too small.
 
 import { useEffect, useReducer, useRef, useState } from "react";
@@ -42,11 +43,23 @@ type RecordedClick = LoggedClick & Point & { outcome: ClickOutcome };
 
 type TooSmallEntry = { part: "partA" | "partB"; startedMs: number; endedMs: number | null };
 
+// A finished page as it stood, kept on screen at the hold before the next page (ADR-048).
+type HeldPage = { layout: (typeof pageLayouts)[keyof typeof pageLayouts]; connected: readonly string[]; wrongLines: readonly WrongLine[] };
+
 function checkScreen() {
   return isScreenLargeEnough(window.innerWidth, window.innerHeight);
 }
 
-function TrailMaking({ sequenceId, stopRequested, onComplete, onLoadFailed }: TestProps) {
+function TrailMaking({
+  sequenceId,
+  stopRequested,
+  holdsReleased,
+  onHoldReached,
+  onTimedPartStarted,
+  onTimedPartEnded,
+  onComplete,
+  onLoadFailed,
+}: TestProps) {
   const [startedAt] = useState(() => new Date().toISOString());
   const handedOver = useRef(false);
   const [testClock] = useState(() => elapsedClock(realClock));
@@ -57,6 +70,7 @@ function TrailMaking({ sequenceId, stopRequested, onComplete, onLoadFailed }: Te
   const [wrongLines, setWrongLines] = useState<readonly WrongLine[]>([]);
   const [arrowOn, setArrowOn] = useState<string | null>(null);
   const [lastWrong, setLastWrong] = useState<string | null>(null);
+  const [heldPage, setHeldPage] = useState<HeldPage | null>(null);
   const correcting = useRef(false);
   const timerStartedAt = useRef<number | null>(null);
   const clickLogs = useRef<Record<"partA" | "partB", RecordedClick[]>>({ partA: [], partB: [] });
@@ -72,6 +86,9 @@ function TrailMaking({ sequenceId, stopRequested, onComplete, onLoadFailed }: Te
 
   // The part whose clock is running. Null during the instructions, the samples and the pause.
   const timedPart = phase === "test" && (page === "partA" || page === "partB") ? page : null;
+
+  // The hold before each page is its number in the test's holds list (test-info.ts): Sample A is 1.
+  const hold = phase === "waiting" ? pageIndex + 1 : null;
 
   useEffect(() => {
     function recheck() {
@@ -167,6 +184,31 @@ function TrailMaking({ sequenceId, stopRequested, onComplete, onLoadFailed }: Te
 
   useEffect(() => recordFocus(testClock, focusLog.current), [testClock]);
 
+  // Tells the shared layer about each hold, so the dashboard can show Continue.
+  useEffect(() => {
+    if (hold !== null) {
+      onHoldReached(hold);
+    }
+  }, [hold, onHoldReached]);
+
+  // Continue: starts the held page's instructions.
+  useEffect(() => {
+    if (hold !== null && holdsReleased >= hold) {
+      dispatchFlow("released");
+    }
+  }, [hold, holdsReleased]);
+
+  // Tells the shared layer when a timed part's clock starts and stops, for the dashboard's counter.
+  // A stop or the end of the test ends it too, since timedPart goes back to null.
+  useEffect(() => {
+    if (timedPart === null) {
+      return;
+    }
+
+    onTimedPartStarted(timedPart);
+    return () => onTimedPartEnded(timedPart);
+  }, [timedPart, onTimedPartStarted, onTimedPartEnded]);
+
   // Notes when the too-small message covers a timed part. The clock keeps running underneath.
   useEffect(() => {
     if (timedPart === null || screenOk) {
@@ -208,13 +250,15 @@ function TrailMaking({ sequenceId, stopRequested, onComplete, onLoadFailed }: Te
     dispatchFlow("stopped");
   }, [stopRequested, phase, page, timedPart, layout, connected, wrongLines, player]);
 
-  // Leaves a finished page on screen for a moment, then clears it and moves to the next one.
+  // Leaves a finished page on screen for a moment, then clears it and moves to the hold before the
+  // next one, which shows the finished page as it stood until Continue.
   useEffect(() => {
     if (phase !== "finished") {
       return;
     }
 
     const pauseTimer = window.setTimeout(() => {
+      setHeldPage({ layout, connected, wrongLines });
       setConnected([]);
       setWrongLines([]);
       setArrowOn(null);
@@ -223,7 +267,7 @@ function TrailMaking({ sequenceId, stopRequested, onComplete, onLoadFailed }: Te
     }, pagePauseMs);
 
     return () => window.clearTimeout(pauseTimer);
-  }, [phase]);
+  }, [phase, layout, connected, wrongLines]);
 
   // Hands the result to the shared layer. The ref keeps it to once, even if the parent redraws.
   useEffect(() => {
@@ -314,6 +358,18 @@ function TrailMaking({ sequenceId, stopRequested, onComplete, onLoadFailed }: Te
         <h1 className="text-4xl font-bold">This screen is too small for the test.</h1>
         <p>Please tell your clinician.</p>
       </main>
+    );
+  }
+
+  if (phase === "waiting" && heldPage !== null) {
+    return (
+      <TrailPage
+        layout={heldPage.layout}
+        connected={heldPage.connected}
+        wrongLines={heldPage.wrongLines}
+        arrowOn={null}
+        onPress={handlePress}
+      />
     );
   }
 

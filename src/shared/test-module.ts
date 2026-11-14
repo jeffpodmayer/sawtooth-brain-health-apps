@@ -46,6 +46,19 @@ export type TestProps = {
   // and clicks, and calls onComplete with its partial result.
   stopRequested: boolean;
 
+  // How many of the test's holds the clinician has released with Continue (ADR-049, ADR-050).
+  // Starts at 0. The test waits before step n until this reaches n.
+  holdsReleased: number;
+
+  // Called when the test reaches hold n (1 for the first), with the finished step left on screen.
+  // Must keep the same identity between renders.
+  onHoldReached: (hold: number) => void;
+
+  // Called when a timed part starts and when it ends, with the part's key (e.g. "partA").
+  // The shared layer passes the key along without reading it. Both must keep the same identity between renders.
+  onTimedPartStarted: (part: string) => void;
+  onTimedPartEnded: (part: string) => void;
+
   // Called once, whether the test finished, timed out or was stopped.
   onComplete: (result: TestResult) => void;
 
