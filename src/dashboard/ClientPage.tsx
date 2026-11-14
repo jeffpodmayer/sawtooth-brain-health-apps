@@ -150,6 +150,9 @@ function ClientPage() {
               <div className="mt-8 overflow-hidden rounded-xl border border-line bg-surface">
                 {visits.map((visit) => {
                   const open = openVisits.has(visit.id);
+                  // The running test: the first one still pending in an open visit (ADR-048).
+                  const runningId =
+                    visit.status === "open" ? visit.sequence_tests.find((test) => test.status === "pending")?.id : undefined;
                   return (
                     <section key={visit.id} className="border-b border-line last:border-b-0">
                       <div className="flex items-center gap-4 pr-6 hover:bg-hover">
@@ -185,7 +188,13 @@ function ClientPage() {
                         {open &&
                           visit.sequence_tests.map((test) => (
                             <div key={test.id}>
-                              <TestBlock test={test} clientCode={client.code} visitCreatedAt={visit.created_at} />
+                              <TestBlock
+                                test={test}
+                                clientCode={client.code}
+                                visitCreatedAt={visit.created_at}
+                                running={test.id === runningId}
+                                onChanged={() => setReloads((count) => count + 1)}
+                              />
                             </div>
                           ))}
                       </div>

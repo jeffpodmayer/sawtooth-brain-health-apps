@@ -9,6 +9,7 @@ import Chevron from "./Chevron";
 import { formatDate } from "./formatDate";
 import { testsById } from "./sequence-tests";
 import type { NoteDialogState } from "./NoteDialog";
+import RunningTestControls from "./RunningTestControls";
 import SetupInfo from "./SetupInfo";
 import SheetButtons from "./SheetButtons";
 import { stopReasonLabels, testStatusLabels } from "./statusLabels";
@@ -38,6 +39,7 @@ export type VisitTest = {
 };
 
 const statusColors: Record<string, string> = { completed: "text-success-ink", stopped: "text-warning-ink" };
+const warningColor = "text-warning-ink"; // "Waiting for you" and "Ending…" too
 // Score table widths: the row names and each score column get this share of the width (about 150px on a
 // laptop); the sheet buttons get what's left, at least 16% with SWAPS's five columns.
 const columnPercent = 14;
@@ -64,9 +66,15 @@ function fileDate(isoText: string): string {
   return new Date(isoText).toLocaleDateString("en-CA");
 }
 
-type Props = { test: VisitTest; clientCode: string; visitCreatedAt: string };
+type Props = {
+  test: VisitTest;
+  clientCode: string;
+  visitCreatedAt: string;
+  running: boolean; // the first pending test in an open visit (ADR-048)
+  onChanged: () => void; // re-reads the visits after Continue or End test
+};
 
-function TestBlock({ test, clientCode, visitCreatedAt }: Props) {
+function TestBlock({ test, clientCode, visitCreatedAt, running, onChanged }: Props) {
   const [noteDialog, setNoteDialog] = useState<NoteDialogState>(null); // the note window, if open
   const [open, setOpen] = useState(true); // every test starts open when its visit opens
   const plugin = testsById.get(test.test_id);
@@ -79,8 +87,17 @@ function TestBlock({ test, clientCode, visitCreatedAt }: Props) {
     test.completed_at && formatDate(test.completed_at) !== formatDate(visitCreatedAt)
       ? formatDate(test.completed_at)
       : null;
+  const holding = test.holds_reached > test.holds_released;
+  // A stop waiting for the client's tab shows on any pending test, including after End session (ADR-049).
+  const ending = test.status === "pending" && test.stop_requested_at !== null;
+  let liveLabel = testStatusLabels[test.status] ?? test.status;
+  if (ending) liveLabel = "Ending… waiting for the client's screen";
+  else if (running && holding) liveLabel = "Waiting for you";
+  else if (running && test.began_at) liveLabel = "In progress";
+  const statusColor = ending || (running && holding) ? warningColor : (statusColors[test.status] ?? "text-ink-muted");
+
   const status = [
-    testStatusLabels[test.status] ?? test.status,
+    liveLabel,
     test.stop_reason && (stopReasonLabels[test.stop_reason] ?? plugin?.stopReasons[test.stop_reason] ?? test.stop_reason),
     test.stop_reason && test.clinicians && `by ${test.clinicians.display_name}`,
     otherDay,
@@ -91,7 +108,7 @@ function TestBlock({ test, clientCode, visitCreatedAt }: Props) {
   const nameAndStatus = (
     <span className="flex flex-wrap items-baseline gap-x-3">
       <span className="font-semibold">{name}</span>
-      <span className={`text-base font-semibold ${statusColors[test.status] ?? "text-ink-muted"}`}>{status}</span>
+      <span className={`text-base font-semibold ${statusColor}`}>{status}</span>
     </span>
   );
 
@@ -128,6 +145,16 @@ function TestBlock({ test, clientCode, visitCreatedAt }: Props) {
             />
           )}
         </div>
+        {running && !test.stop_requested_at && (
+          <RunningTestControls
+            sequenceTestId={test.id}
+            testName={name}
+            subtitle={`${clientCode} · ${formatDate(visitCreatedAt)}`}
+            holding={holding}
+            testReasons={plugin?.stopReasons ?? {}}
+            onChanged={onChanged}
+          />
+        )}
       </div>
 
       {/* Hidden rather than removed when closed, so notes aren't loaded again each time it opens. */}
