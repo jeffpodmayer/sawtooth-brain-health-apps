@@ -1,6 +1,6 @@
 // check-status: what the client's tab asks when a "check now" ping arrives (roadmap 9.3, ADR-051),
 // and every few seconds as the fallback (9.4). Given a link token and the test the tab is on,
-// it says whether a stop was requested and how many holds Continue has released.
+// it says whether a stop was requested, how many holds Continue has released, and any skip (ADR-055).
 // Read only: it never changes anything.
 
 import "@supabase/functions-js/edge-runtime.d.ts";
@@ -44,20 +44,24 @@ export default {
     if (sequenceError) return failed("sequence lookup", sequenceError.message);
     if (!sequence) return refused();
 
-    // The test the tab is on, only while it has no result. Once saved, there's nothing to tell.
+    // The test the tab is on, while it has no result. Once saved, there's nothing to tell, with one exception:
+    // a test stopped before it began is settled as not given at once (ADR-057), and a tab still waiting at its
+    // first hold must hear of that stop, answer it and move on.
     const { data: test, error: testError } = await ctx.supabaseAdmin
       .from("sequence_tests")
-      .select("stop_requested_at, holds_released")
+      .select("status, stop_requested_at, holds_released, skip_requested")
       .eq("sequence_id", sequence.id)
       .eq("test_id", testId)
-      .eq("status", "pending")
       .maybeSingle();
     if (testError) return failed("test lookup", testError.message);
-    if (!test) return refused();
+    const settledBeforeBegun =
+      test?.status === "not_given" && test.stop_requested_at !== null && test.holds_released === 0;
+    if (!test || (test.status !== "pending" && !settledBeforeBegun)) return refused();
 
     return Response.json({
       stopRequested: test.stop_requested_at !== null,
       holdsReleased: test.holds_released,
+      skipRequested: test.skip_requested,
       sequenceOpen: sequence.status === "open",
     });
   }),

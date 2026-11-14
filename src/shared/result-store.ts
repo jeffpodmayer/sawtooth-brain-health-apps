@@ -27,6 +27,8 @@ export type ProgressReport =
 export type TestStatus = {
   stopRequested: boolean;
   holdsReleased: number;
+  // The key of a step the clinician skipped (e.g. "partA"), or null. Passed to the test unread (ADR-055).
+  skipRequested: string | null;
   sequenceOpen: boolean;
 };
 

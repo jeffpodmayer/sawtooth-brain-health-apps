@@ -35,6 +35,7 @@ export async function checkStatus(token: string, testId: string): Promise<Status
       test: {
         stopRequested: body.stopRequested,
         holdsReleased: body.holdsReleased,
+        skipRequested: body.skipRequested ?? null,
         sequenceOpen: body.sequenceOpen,
       },
     };

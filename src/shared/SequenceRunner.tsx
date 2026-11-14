@@ -34,7 +34,7 @@ function SavingScreen() {
 }
 
 // Before the server's first answer about a test: nothing released, nothing stopped.
-const noAnswerYet: TestStatus = { stopRequested: false, holdsReleased: 0, sequenceOpen: true };
+const noAnswerYet: TestStatus = { stopRequested: false, holdsReleased: 0, skipRequested: null, sequenceOpen: true };
 
 function SequenceRunner({ sequenceId, tests, store, onFinished }: SequenceRunnerProps) {
   const [index, setIndex] = useState(0);
@@ -177,6 +177,7 @@ function SequenceRunner({ sequenceId, tests, store, onFinished }: SequenceRunner
       sequenceId={sequenceId}
       stopRequested={status.stopRequested}
       holdsReleased={status.holdsReleased}
+      skipRequested={status.skipRequested}
       onHoldReached={handleHoldReached}
       onTimedPartStarted={handleTimedPartStarted}
       onTimedPartEnded={handleTimedPartEnded}

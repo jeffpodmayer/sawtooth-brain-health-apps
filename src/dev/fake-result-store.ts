@@ -9,7 +9,7 @@ export type SavedResult = {
   screen: ScreenSize;
 };
 
-type FakeTest = { reached: number; released: number; stopRequested: boolean };
+type FakeTest = { reached: number; released: number; stopRequested: boolean; skip: string | null };
 
 export function createFakeResultStore() {
   const saved: SavedResult[] = [];
@@ -22,7 +22,7 @@ export function createFakeResultStore() {
   function testFor(testId: string): FakeTest {
     let test = tests.get(testId);
     if (!test) {
-      test = { reached: 0, released: 0, stopRequested: false };
+      test = { reached: 0, released: 0, stopRequested: false, skip: null };
       tests.set(testId, test);
     }
     return test;
@@ -32,8 +32,8 @@ export function createFakeResultStore() {
   function answerWatchers() {
     queueMicrotask(() => {
       for (const { testId, onStatus } of watchers) {
-        const { released, stopRequested } = testFor(testId);
-        onStatus({ stopRequested, holdsReleased: released, sequenceOpen });
+        const { released, stopRequested, skip } = testFor(testId);
+        onStatus({ stopRequested, holdsReleased: released, skipRequested: skip, sequenceOpen });
       }
     });
   }
@@ -76,6 +76,16 @@ export function createFakeResultStore() {
       if (running === null) return;
       const test = testFor(running);
       test.released = test.reached;
+      answerWatchers();
+    },
+
+    // Skip: records the skip and moves the holds to just before where it lands, like request_skip (ADR-055).
+    skipStep(key: string, toHold: number) {
+      if (running === null) return;
+      const test = testFor(running);
+      test.skip = key;
+      test.reached = toHold - 1;
+      test.released = toHold - 1;
       answerWatchers();
     },
 

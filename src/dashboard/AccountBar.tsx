@@ -17,7 +17,9 @@ function AccountBar({ displayName }: { displayName: string | null }) {
       <button
         type="button"
         onClick={() => supabase.auth.signOut()}
-        className={`h-9 px-3 text-base ${textButtonClass}`}
+        // Pulled left by its own padding, so "Sign out" sits as far from the divider as the name does. The padding
+        // is small enough that the hover shape stops short of the divider.
+        className={`-ml-2 h-9 px-2 text-base ${textButtonClass}`}
       >
         Sign out
       </button>

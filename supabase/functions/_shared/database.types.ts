@@ -185,6 +185,7 @@ export type Database = {
           screen_width: number | null
           sequence_id: string
           sheets: Json | null
+          skip_requested: string | null
           started_at: string | null
           status: string
           stop_reason: string | null
@@ -211,6 +212,7 @@ export type Database = {
           screen_width?: number | null
           sequence_id: string
           sheets?: Json | null
+          skip_requested?: string | null
           started_at?: string | null
           status?: string
           stop_reason?: string | null
@@ -237,6 +239,7 @@ export type Database = {
           screen_width?: number | null
           sequence_id?: string
           sheets?: Json | null
+          skip_requested?: string | null
           started_at?: string | null
           status?: string
           stop_reason?: string | null
@@ -346,6 +349,15 @@ export type Database = {
       }
       end_sequence: {
         Args: { reason: string; sequence_id: string }
+        Returns: undefined
+      }
+      request_skip: {
+        Args: {
+          sequence_test_id: string
+          skip: string
+          to_hold: number
+          while_released: number
+        }
         Returns: undefined
       }
       request_test_stop: {

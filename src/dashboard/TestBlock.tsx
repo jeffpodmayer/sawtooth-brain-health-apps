@@ -5,6 +5,7 @@
 
 import { useState } from "react";
 import type { Json } from "../../supabase/functions/_shared/database.types.ts";
+import type { ScoreTable } from "../shared/test-module";
 import Chevron from "./Chevron";
 import { formatDate } from "./formatDate";
 import { testsById } from "./sequence-tests";
@@ -34,6 +35,7 @@ export type VisitTest = {
   stop_requested_at: string | null;
   holds_reached: number;
   holds_released: number;
+  skip_requested: string | null; // the key of a step the clinician skipped (ADR-055)
   began_at: string | null; // the client's tab began this test (9.3)
   timed_part: string | null; // the running timed part's key, e.g. "partA" (9.3)
   timed_part_started_at: string | null; // when it started (9.3)
@@ -46,6 +48,12 @@ const statusColors: Record<string, string> = { completed: "text-success-ink", st
 // Score table widths: the row names and each score column get this share of the width (about 150px on a
 // laptop); the sheet buttons get what's left, at least 16% with SWAPS's five columns.
 const columnPercent = 14;
+
+// Numbers sit centred under their headings. A Status column holds words, which line up from the left, under the
+// left edge of its heading, set in a little so it isn't crowded against the numbers before it.
+function alignFor(column: string): string {
+  return column === "Status" ? "pl-12 text-left" : "text-center";
+}
 
 // sheets is {name: path}, written only by save-result (ADR-041). Anything else counts as no sheet.
 function sheetPath(sheets: Json | null, name: string | null): string | null {
@@ -91,8 +99,61 @@ type Props = {
   clientCode: string;
   visitCreatedAt: string;
   running: boolean; // the first pending test in an open visit (ADR-048)
-  onChanged: () => void; // re-reads the visits after Continue or End test
+  onChanged: () => void; // re-reads the visits after Continue or Discontinue
 };
+
+// The table while a test runs (ADR-048): the finished table's columns and rows, dashes where the numbers will
+// go, and no sheet column until the result is saved. The running timed part's Time cell shows the live counter,
+// which stops at a stop request.
+function LiveTable({ table, test }: { table: ScoreTable; test: VisitTest }) {
+  const timeColumn = table.columns.findIndex((column) => column.startsWith("Time"));
+  return (
+    <table className="mt-3 w-full table-fixed tabular-nums">
+      <colgroup>
+        <col style={{ width: `${columnPercent}%` }} />
+        {table.columns.map((column) => (
+          <col key={column} style={{ width: `${columnPercent}%` }} />
+        ))}
+        <col />
+      </colgroup>
+      <thead>
+        <tr className="border-b border-line text-base text-ink-muted">
+          <td />
+          {table.columns.map((column) => (
+            <th key={column} scope="col" className={`py-3 font-normal ${alignFor(column)}`}>
+              {column}
+            </th>
+          ))}
+          <td />
+        </tr>
+      </thead>
+      <tbody>
+        {table.rows.map((row) => {
+          const counting = row.timedPart === test.timed_part && test.timed_part_started_at;
+          return (
+            <tr key={row.label} className="h-14 border-b border-line">
+              <th scope="row" className="text-left font-normal">
+                {row.label}
+              </th>
+              {row.cells.map((cell, index) => (
+                <td key={table.columns[index]} className={`whitespace-nowrap ${alignFor(table.columns[index])}`}>
+                  {counting && index === timeColumn ? (
+                    <span className="font-semibold">
+                      <TimedCounter startedAt={test.timed_part_started_at!} stoppedAt={test.stop_requested_at} />
+                    </span>
+                  ) : (
+                    <span className="text-ink-muted">{cell}</span>
+                  )}
+                </td>
+              ))}
+              <td />
+            </tr>
+          );
+        })}
+      </tbody>
+    </table>
+  );
+}
 
 function TestBlock({ test, clientCode, visitCreatedAt, running, onChanged }: Props) {
   const [noteDialog, setNoteDialog] = useState<NoteDialogState>(null); // the note window, if open
@@ -108,6 +169,15 @@ function TestBlock({ test, clientCode, visitCreatedAt, running, onChanged }: Pro
       ? formatDate(test.completed_at)
       : null;
   const holding = test.holds_reached > test.holds_released;
+
+  // The test's skip that fits where it is now (ADR-055), e.g. Skip Part A from Sample A until Part A finishes:
+  // at one of its released counts, before the test reaches where the skip lands. Only one skip, once.
+  const offeredSkip =
+    test.skip_requested === null
+      ? (Object.entries(plugin?.skips ?? {})
+          .map(([key, skip]) => ({ key, ...skip }))
+          .find((skip) => skip.whileReleased.includes(test.holds_released) && test.holds_reached < skip.toHold) ?? null)
+      : null;
   // A stop waiting for the client's tab shows on any pending test, including after End session (ADR-049).
   const ending = test.status === "pending" && test.stop_requested_at !== null;
   let liveLabel = testStatusLabels[test.status] ?? test.status;
@@ -199,6 +269,9 @@ function TestBlock({ test, clientCode, visitCreatedAt, running, onChanged }: Pro
             holding={holding}
             nextStep={plugin?.holds[test.holds_released] ?? null}
             testReasons={plugin?.stopReasons ?? {}}
+            reasonHints={plugin?.stopReasonHints ?? {}}
+            skip={offeredSkip}
+            holdsReleased={test.holds_released}
             onChanged={onChanged}
           />
         )}
@@ -208,49 +281,15 @@ function TestBlock({ test, clientCode, visitCreatedAt, running, onChanged }: Pro
       <div id={`test-body-${test.id}`} hidden={!open} className="pl-16 pr-6">
         {/* While the test runs, its timed parts as rows; the running part's row shows the counter (ADR-048).
             The saved result's score table replaces these once the test is saved. */}
-        {test.status === "pending" && test.began_at && plugin && (
-          <table className="mt-3 w-full table-fixed tabular-nums">
-            <colgroup>
-              <col style={{ width: `${columnPercent}%` }} />
-              <col style={{ width: `${columnPercent}%` }} />
-              <col />
-            </colgroup>
-            <thead>
-              <tr className="border-b border-line text-base text-ink-muted">
-                <td />
-                <th scope="col" className="py-3 text-center font-normal">
-                  Time
-                </th>
-                <td />
-              </tr>
-            </thead>
-            <tbody>
-              {Object.entries(plugin.timedParts).map(([key, label]) => (
-                <tr key={key} className="border-b border-line">
-                  <th scope="row" className="py-4 text-left font-normal">
-                    {label}
-                  </th>
-                  <td className="py-4 text-center font-semibold">
-                    {key === test.timed_part && test.timed_part_started_at ? (
-                      <TimedCounter startedAt={test.timed_part_started_at} stoppedAt={test.stop_requested_at} />
-                    ) : (
-                      <span className="font-normal text-ink-muted">—</span>
-                    )}
-                  </td>
-                  <td />
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        )}
+        {test.status === "pending" && test.began_at && plugin && <LiveTable table={plugin.emptyTable()} test={test} />}
 
         {/* The samples or practice row (each test's practiceRow) is hidden for now (8.9); only scored rows show. */}
         {table && table.rows.length > 0 && (
           <div className="mt-3">
             {/* Row names are row headings and the test's columns are column headings, so a screen reader hears
                 "Part B, Errors, 3". Each column is the same share of the width, with its heading and numbers
-                centered; the last column (the sheet buttons, no heading) takes the rest. Shares, not fixed
-                widths, so the table narrows with the window and never scrolls sideways. */}
+                centered (Status from the left); the last column (the sheet buttons, no heading) takes the rest.
+                Shares, not fixed widths, so the table narrows with the window and never scrolls sideways. */}
             <table className="w-full table-fixed tabular-nums">
               <colgroup>
                 <col style={{ width: `${columnPercent}%` }} />
@@ -263,7 +302,7 @@ function TestBlock({ test, clientCode, visitCreatedAt, running, onChanged }: Pro
                 <tr className="border-b border-line text-base text-ink-muted">
                   <td />
                   {table.columns.map((column) => (
-                    <th key={column} scope="col" className="py-3 text-center font-normal">
+                    <th key={column} scope="col" className={`py-3 font-normal ${alignFor(column)}`}>
                       {column}
                     </th>
                   ))}
@@ -273,19 +312,20 @@ function TestBlock({ test, clientCode, visitCreatedAt, running, onChanged }: Pro
                 </tr>
               </thead>
               <tbody>
+                {/* Every row the same height (56px), whether it has sheet icons or "No sheet". */}
                 {table.rows.map((row) => {
                   const path = sheetPath(test.sheets, row.sheet);
                   const label = (row.sheet && plugin?.sheetLabels[row.sheet]) || row.label;
                   return (
-                    <tr key={row.label} className="border-b border-line">
-                      <th scope="row" className="py-4 text-left font-normal">
+                    <tr key={row.label} className="h-14 border-b border-line">
+                      <th scope="row" className="text-left font-normal">
                         {row.label}
                       </th>
                       {/* The first value is the headline (time, or correct), so it's bold. */}
                       {row.cells.map((cell, index) => (
                         <td
                           key={table.columns[index]}
-                          className={`whitespace-nowrap py-4 text-center ${index === 0 ? "font-semibold" : ""}`}
+                          className={`whitespace-nowrap ${alignFor(table.columns[index])} ${index === 0 ? "font-semibold" : ""}`}
                         >
                           {cell}
                         </td>
@@ -294,12 +334,12 @@ function TestBlock({ test, clientCode, visitCreatedAt, running, onChanged }: Pro
                       {row.cells.length < table.columns.length && (
                         <td
                           colSpan={table.columns.length - row.cells.length}
-                          className="py-4 pl-6 text-left text-base text-ink-muted"
+                          className="pl-6 text-left text-base text-ink-muted"
                         >
                           {row.note}
                         </td>
                       )}
-                      <td className="py-4 text-right">
+                      <td className="text-right">
                         {path && test.completed_at ? (
                           <SheetButtons
                             path={path}

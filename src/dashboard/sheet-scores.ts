@@ -9,7 +9,8 @@ export function sheetScoreLines(table: ScoreTable, sheet: string): string[] {
   return table.rows
     .filter((row) => row.sheet === sheet || row.sheet === null)
     .map((row) => {
-      const parts = row.cells.map((cell, index) => `${table.columns[index]}: ${cell}`);
+      // A blank value (a part not given, in a table with a status column) is left out.
+      const parts = row.cells.flatMap((cell, index) => (cell === "" ? [] : [`${table.columns[index]}: ${cell}`]));
       if (row.note) parts.push(row.note);
       return `${row.label} — ${parts.join(" · ")}`;
     });

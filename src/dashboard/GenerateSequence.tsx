@@ -50,7 +50,8 @@ function GenerateSequence({ onCreated, clientCode }: Props) {
     if (data) navigate(`/dashboard/clients/${data.id}`);
   }
 
-  let subtitle: ReactNode = clientCode ? `New visit for ${clientCode}` : null;
+  // No subtitle on the form: opened from a client's page, the form itself shows the client ID.
+  let subtitle: ReactNode = null;
   if (created) {
     subtitle = (
       <>

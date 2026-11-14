@@ -18,10 +18,10 @@ import { buildSheet } from "./sheet/build-sheet";
 import { findCircleAt } from "./screen/find-circle";
 import { judgeClick, type ClickOutcome } from "./scoring/judge-click";
 import { expectedOrder } from "./scoring/order";
-import { nextFlow, pages, startFlow } from "./scoring/page-flow";
+import { canSkipPartA, nextFlow, pages, startFlow } from "./scoring/page-flow";
 import { pageLayouts, type Point } from "./screen/page-layouts";
 import type { LoggedClick } from "./scoring/score-part";
-import { scoreTest, type StopPoint } from "./scoring/score-test";
+import { scoreTest, type SkipPoint, type StopPoint } from "./scoring/score-test";
 import { isScreenLargeEnough, pageScale } from "./screen/screen-check";
 import script from "./script.json";
 import { testId, testVersion } from "./test-info";
@@ -47,6 +47,19 @@ type TooSmallEntry = { part: "partA" | "partB"; startedMs: number; endedMs: numb
 // A finished page as it stood, kept on screen at the hold before the next page (ADR-048).
 type HeldPage = { layout: (typeof pageLayouts)[keyof typeof pageLayouts]; connected: readonly string[]; wrongLines: readonly WrongLine[] };
 
+// Time on the page's running clock: a timed part's from the end of "Begin.", or a sample's from when its clicks
+// were allowed. Null when no clock is running (instructions, pauses and holds).
+function runningClockMs(
+  timedPart: string | null,
+  phase: string,
+  timerStartedAt: number | null,
+  sampleStartedAt: number | null,
+): number | null {
+  if (timedPart !== null && timerStartedAt !== null) return realClock.now() - timerStartedAt;
+  if (phase === "practice" && sampleStartedAt !== null) return realClock.now() - sampleStartedAt;
+  return null;
+}
+
 function checkScreen() {
   return isScreenLargeEnough(window.innerWidth, window.innerHeight);
 }
@@ -55,6 +68,7 @@ function TrailMaking({
   sequenceId,
   stopRequested,
   holdsReleased,
+  skipRequested,
   onHoldReached,
   onTimedPartStarted,
   onTimedPartEnded,
@@ -74,12 +88,20 @@ function TrailMaking({
   const [heldPage, setHeldPage] = useState<HeldPage | null>(null);
   const correcting = useRef(false);
   const timerStartedAt = useRef<number | null>(null);
-  const clickLogs = useRef<Record<"partA" | "partB", RecordedClick[]>>({ partA: [], partB: [] });
+  // When the current sample's clicks were allowed: its clock, for sample scores (no time limit).
+  const sampleStartedAt = useRef<number | null>(null);
+  const clickLogs = useRef<Record<(typeof pages)[number], RecordedClick[]>>({
+    sampleA: [],
+    partA: [],
+    sampleB: [],
+    partB: [],
+  });
   const sheets = useRef<Record<string, string>>({});
   const screens = useRef<Partial<Record<"partA" | "partB", { width: number; height: number; scale: number }>>>({});
   const focusLog = useRef<FocusLogEntry[]>([]);
   const tooSmallLog = useRef<TooSmallEntry[]>([]);
   const stopPoint = useRef<StopPoint | null>(null);
+  const skipPoint = useRef<SkipPoint | null>(null);
 
   const layout = pageLayouts[pages[pageIndex]];
   const order = expectedOrder[pages[pageIndex]];
@@ -90,6 +112,11 @@ function TrailMaking({
 
   // The hold before each page is its number in the test's holds list (test-info.ts): Sample A is 1.
   const hold = phase === "waiting" ? pageIndex + 1 : null;
+
+  // Skip Part A (ADR-055) applies from Sample A until Part A finishes. Once acted on, the test is past Part A,
+  // so it never applies twice. Until then Continue mustn't start Part A, since the skip's holds arrive in the
+  // same answer from the server. During Part A itself, leaving the page stops its clock and its time limit.
+  const skipPending = skipRequested === "partA" && canSkipPartA({ pageIndex, phase });
 
   useEffect(() => {
     function recheck() {
@@ -146,7 +173,12 @@ function TrailMaking({
       }
 
       if (!cancelled) {
+        // A fresh page. Normally the pause after the last page cleared it already; after Skip Part A,
+        // Sample A's lines are still here (ADR-055).
         setArrowOn(null);
+        setConnected([]);
+        setWrongLines([]);
+        setLastWrong(null);
         await runScript(lines, player, handleAction);
       }
     }
@@ -185,6 +217,13 @@ function TrailMaking({
 
   useEffect(() => recordFocus(testClock, focusLog.current), [testClock]);
 
+  // A sample's clock starts when its clicks are allowed, at the end of its instructions.
+  useEffect(() => {
+    if (phase === "practice") {
+      sampleStartedAt.current = realClock.now();
+    }
+  }, [phase, pageIndex]);
+
   // Tells the shared layer about each hold, so the dashboard can show Continue.
   useEffect(() => {
     if (hold !== null) {
@@ -192,12 +231,32 @@ function TrailMaking({
     }
   }, [hold, onHoldReached]);
 
+  // Skip Part A: notes where it found the test, keeps the page as it stood if the client was working on it,
+  // and goes to the wait before Sample B, which shows the break screen like the wait after Part A. During the
+  // timed Part A, what was done is kept as a stop with code 996; earlier, Part A is not given (996).
+  // The page's lines are cleared when Sample B's instructions start.
+  useEffect(() => {
+    if (!skipPending) {
+      return;
+    }
+
+    const stoppedAtMs = runningClockMs(timedPart, phase, timerStartedAt.current, sampleStartedAt.current);
+    skipPoint.current = { page: page as SkipPoint["page"], phase, stoppedAtMs };
+
+    if (phase === "practice" || phase === "test") {
+      sheets.current[page] = buildSheet(layout, connected, wrongLines);
+    }
+
+    player.stop();
+    dispatchFlow("skipped");
+  }, [skipPending, page, phase, timedPart, layout, connected, wrongLines, player]);
+
   // Continue: starts the held page's instructions.
   useEffect(() => {
-    if (hold !== null && holdsReleased >= hold) {
+    if (hold !== null && holdsReleased >= hold && !skipPending) {
       dispatchFlow("released");
     }
-  }, [hold, holdsReleased]);
+  }, [hold, holdsReleased, skipPending]);
 
   // Tells the shared layer when a timed part's clock starts and stops, for the dashboard's counter.
   // A stop or the end of the test ends it too, since timedPart goes back to null.
@@ -224,9 +283,10 @@ function TrailMaking({
     };
   }, [screenOk, testClock, timedPart]);
 
-  // Keeps a timed part's sheet as it ended, before the pause clears the page.
+  // Keeps each page's sheet as it ended, before the pause clears the page: the timed parts, and the samples
+  // too, in case the clinic needs them (ADR-055).
   useEffect(() => {
-    if (phase === "finished" && (page === "partA" || page === "partB")) {
+    if (phase === "finished") {
       sheets.current[page] = buildSheet(layout, connected, wrongLines);
     }
   }, [phase, page, layout, connected, wrongLines]);
@@ -238,13 +298,13 @@ function TrailMaking({
       return;
     }
 
-    const stoppedAtMs =
-      timedPart !== null && timerStartedAt.current !== null ? realClock.now() - timerStartedAt.current : null;
+    const stoppedAtMs = runningClockMs(timedPart, phase, timerStartedAt.current, sampleStartedAt.current);
 
     stopPoint.current = { page, phase, stoppedAtMs };
 
-    if (timedPart !== null) {
-      sheets.current[timedPart] = buildSheet(layout, connected, wrongLines);
+    // The page as it stood, if the client was working on it: a timed part or a sample.
+    if (phase === "practice" || phase === "test") {
+      sheets.current[page] = buildSheet(layout, connected, wrongLines);
     }
 
     player.stop();
@@ -283,10 +343,11 @@ function TrailMaking({
       sequenceId,
       startedAt,
       completedAt: new Date().toISOString(),
-      scores: scoreTest(clickLogs.current, stopPoint.current),
+      scores: scoreTest(clickLogs.current, stopPoint.current, skipPoint.current),
       rawData: {
         clicks: clickLogs.current,
         stop: stopPoint.current,
+        skip: skipPoint.current,
         audio: player.log,
         screen: screens.current,
         browser: browserFrom(navigator.userAgent),
@@ -318,8 +379,10 @@ function TrailMaking({
     const circle = findCircleAt(layout.circles, x, y);
     const outcome = circle === null ? "ignored" : judgeClick(order, connected.length, circle, lastWrong);
 
-    if (timedPart !== null && timerStartedAt.current !== null) {
-      clickLogs.current[timedPart].push({ timeMs: realClock.now() - timerStartedAt.current, x, y, circle, outcome });
+    // Every click on a page in progress is logged, samples too, timed from that page's clock.
+    const clockMs = runningClockMs(timedPart, phase, timerStartedAt.current, sampleStartedAt.current);
+    if (clockMs !== null) {
+      clickLogs.current[page].push({ timeMs: clockMs, x, y, circle, outcome });
     }
 
     if (circle === null) {

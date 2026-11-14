@@ -7,6 +7,7 @@
 import { useEffect, useState, type SubmitEvent } from "react";
 import { formatDateTime } from "./formatDate";
 import NoteDialog, { type Note, type NoteDialogState } from "./NoteDialog";
+import { NotesSkeleton } from "./Skeleton";
 import { iconButtonClass } from "./styles";
 import { supabase } from "./supabase";
 import { useMe } from "./useMe";
@@ -169,7 +170,7 @@ function TestNotes({ sequenceTestId, practiceId, subtitle, dialog, setDialog }: 
 
   return (
     <div className="mt-2">
-      {load.state === "loading" && <p className="text-base text-ink-muted">Loading notes…</p>}
+      {load.state === "loading" && <NotesSkeleton />}
       {load.state === "failed" && (
         <p role="alert" className="text-base">
           Couldn't load the notes. Reload the page to try again.

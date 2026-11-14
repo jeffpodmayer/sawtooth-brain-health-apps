@@ -9,6 +9,7 @@ import EndVisitButton from "./EndVisitButton";
 import { formatDate } from "./formatDate";
 import GenerateSequence from "./GenerateSequence";
 import { isUuid } from "./isUuid";
+import { ClientPageSkeleton } from "./Skeleton";
 import { testsById } from "./sequence-tests";
 import { buttonClass } from "./styles";
 import { supabase } from "./supabase";
@@ -19,8 +20,7 @@ type Visit = {
   status: string;
   created_at: string;
   link_token: string;
-  clinicians: { display_name: string } | null; // whoever created the visit
-  sequence_tests: VisitTest[];
+  sequence_tests: VisitTest[]; // in the order they're given
 };
 
 type Client = { code: string; sequences: Visit[] };
@@ -35,18 +35,12 @@ const breadcrumbLinkClass =
   "rounded-lg font-semibold text-accent underline-offset-8 hover:text-accent-strong hover:underline focus-visible:outline-3 focus-visible:outline-offset-4 focus-visible:outline-accent";
 
 // Of raw_data (the full click or answer log), only the browser is read (ADR-047); the log itself isn't.
-// A visit's clinicians is who created it.
 const columns =
-  "code, sequences(id, status, created_at, link_token, clinicians(display_name), sequence_tests(id, practice_id, test_id, status, test_version, started_at, completed_at, screen_width, screen_height, scores, browser_scores, stop_reason, stop_requested_at, holds_reached, holds_released, began_at, timed_part, timed_part_started_at, sheets, browser:raw_data->browser))";
+  "code, sequences(id, status, created_at, link_token, sequence_tests(id, practice_id, test_id, status, test_version, started_at, completed_at, screen_width, screen_height, scores, browser_scores, stop_reason, stop_requested_at, holds_reached, holds_released, skip_requested, began_at, timed_part, timed_part_started_at, sheets, browser:raw_data->browser))";
 
 const hasResults = (visit: Visit) =>
   visit.sequence_tests.some((test) => test.status === "completed" || test.status === "stopped");
 
-// The running test's own stop reasons: the first test still pending (ADR-048).
-function runningTestReasons(visit: Visit): Record<string, string> {
-  const running = visit.sequence_tests.find((test) => test.status === "pending");
-  return (running && testsById.get(running.test_id)?.stopReasons) ?? {};
-}
 
 function ClientPage() {
   const { clientId = "" } = useParams();
@@ -56,6 +50,7 @@ function ClientPage() {
   // Which visits are open. Several can be open at once.
   const [openVisits, setOpenVisits] = useState<Set<string>>(new Set());
   const openedFor = useRef<string | null>(null); // the client whose visits were last opened by default
+  const seenVisits = useRef<Set<string>>(new Set()); // every visit already shown, so a new one can be spotted
 
   useEffect(() => {
     if (!validId) return;
@@ -71,12 +66,20 @@ function ClientPage() {
         if (cancelled) return;
         setLoad(error ? { state: "failed", clientId } : { state: "loaded", clientId, client: data });
         // On a client's first load, any open visit and the newest visit with results start open.
-        // A re-read (after New sequence or a stop) keeps what the clinician has opened.
+        // A re-read (after New sequence or a stop) keeps what the clinician has opened, and also opens a new
+        // visit that's running, so after Copy link the clinician sees its first test, ready for Continue.
         if (!error && openedFor.current !== clientId) {
           openedFor.current = clientId;
+          seenVisits.current = new Set(data?.sequences.map((visit) => visit.id));
           const first = data?.sequences.find(hasResults);
           const live = data?.sequences.filter((visit) => visit.status === "open").map((visit) => visit.id) ?? [];
           setOpenVisits(new Set([...live, ...(first ? [first.id] : [])]));
+        } else if (!error && data) {
+          const newLive = data.sequences
+            .filter((visit) => !seenVisits.current.has(visit.id) && visit.status === "open")
+            .map((visit) => visit.id);
+          data.sequences.forEach((visit) => seenVisits.current.add(visit.id));
+          if (newLive.length > 0) setOpenVisits((current) => new Set([...current, ...newLive]));
         }
       });
     return () => {
@@ -167,7 +170,7 @@ function ClientPage() {
 
       {notFound && <p className="mt-4">No client in your practice has this address.</p>}
 
-      {!notFound && current === null && <p className="mt-8">Loading…</p>}
+      {!notFound && current === null && <ClientPageSkeleton />}
 
       {!notFound && current?.state === "failed" && (
         <p role="alert" className="mt-8">
@@ -201,8 +204,22 @@ function ClientPage() {
                             <Chevron open={open} />
                             <span className="flex-1">
                               <span className="block font-semibold">{formatDate(visit.created_at)}</span>
+                              {/* All the visit's tests (given, to come or not given), in order, with pipes between them,
+                                  under a neutral "Tests:". The pipes are
+                                  only seen; a screen reader hears a comma instead of "vertical bar". */}
                               <span className="block text-base text-ink-muted">
-                                Created by {visit.clinicians?.display_name ?? "—"}
+                                Tests:{" "}
+                                {visit.sequence_tests.map((test, index) => (
+                                  <span key={test.id}>
+                                    {index > 0 && (
+                                      <>
+                                        <span aria-hidden="true"> | </span>
+                                        <span className="sr-only">, </span>
+                                      </>
+                                    )}
+                                    {testsById.get(test.test_id)?.name ?? test.test_id}
+                                  </span>
+                                ))}
                               </span>
                             </span>
                           </button>
@@ -213,7 +230,6 @@ function ClientPage() {
                           <EndVisitButton
                             sequenceId={visit.id}
                             subtitle={`${client.code} · ${formatDate(visit.created_at)}`}
-                            testReasons={runningTestReasons(visit)}
                             onEnded={() => setReloads((count) => count + 1)}
                           />
                         )}

@@ -11,6 +11,12 @@ export const sheetLabels: Record<string, string> = { sheet: "Answer sheet" };
 // Stop reasons the dashboard offers for this test, on top of the shared ones (ADR-049). None for now.
 export const stopReasons: Record<string, string> = {};
 
+// Notes beside a shared reason in the stop windows, for any code this test records. None.
+export const stopReasonHints: Record<string, string> = {};
+
+// Steps a clinician may skip (ADR-055). None.
+export const skips: Record<string, { label: string; whileReleased: number[]; toHold: number; explanation: string }> = {};
+
 // The timed parts this test reports while running (ADR-048), labeled as in its score table, so the dashboard
 // shows the counter in that part's row.
 export const timedParts: Record<string, string> = { test: "Test", recall: "Recall" };

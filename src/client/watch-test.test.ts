@@ -2,7 +2,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { StatusCheck } from "./check-status";
 import { watchTest } from "./watch-test";
 
-const ok: StatusCheck = { status: "ok", test: { stopRequested: false, holdsReleased: 0, sequenceOpen: true } };
+const ok: StatusCheck = { status: "ok", test: { stopRequested: false, holdsReleased: 0, skipRequested: null, sequenceOpen: true } };
 
 // A check that answers only when the test says so, so a check can be "on its way".
 function controlledCheck() {

@@ -10,13 +10,24 @@ type Props = {
   title: string; // "End Trail Making?" or "End this session?"
   subtitle: string; // "TEST-002 · Nov 13, 2026"
   explanation: string; // what happens on the client's screen
-  confirmLabel: string; // "End test" or "End session"
+  confirmLabel: string; // "Discontinue" or "End session"
   reasons: Record<string, string>; // database value → label, the shared reasons first
+  hints?: Record<string, string>; // database value → a grey note beside its label, e.g. "996 during a sample"
   onConfirm: (reason: string) => Promise<string | null>; // an error to show, or null once saved
   onClosed: () => void;
 };
 
-function StopDialog({ open, title, subtitle, explanation, confirmLabel, reasons, onConfirm, onClosed }: Props) {
+function StopDialog({
+  open,
+  title,
+  subtitle,
+  explanation,
+  confirmLabel,
+  reasons,
+  hints = {},
+  onConfirm,
+  onClosed,
+}: Props) {
   const dialogRef = useRef<HTMLDialogElement>(null);
   const titleId = useId();
   const [reason, setReason] = useState<string | null>(null); // nothing chosen at first
@@ -86,7 +97,10 @@ function StopDialog({ open, title, subtitle, explanation, confirmLabel, reasons,
                       onChange={() => setReason(value)}
                       className="size-5 accent-accent"
                     />
-                    {label}
+                    <span>
+                      {label}
+                      {hints[value] && <span className="text-base text-ink-muted"> ({hints[value]})</span>}
+                    </span>
                   </label>
                 ))}
               </div>

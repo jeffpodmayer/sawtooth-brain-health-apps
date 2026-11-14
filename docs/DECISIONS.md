@@ -1231,7 +1231,7 @@ the test that's running, not on a page of their own.
 
 ## ADR-049: How stop requests, holds and stop reasons are stored
 
-- **Status:** Accepted · **Date:** 2026-11-13 · Builds on ADR-024, ADR-032 and ADR-048 · Hold reset on a reopened link added by ADR-053
+- **Status:** Accepted · **Date:** 2026-11-13 · Builds on ADR-024, ADR-032 and ADR-048 · Hold reset on a reopened link added by ADR-053 · Skips added by ADR-055 · A stop on a test not begun settles at once (ADR-057)
 
 **Context:** A clinician's stop and Continue must be saved before the client's tab acts on them
 (roadmap 9.1). A `sequence_tests` row can only be `stopped` once its partial result is saved, so
@@ -1422,3 +1422,91 @@ the clinicians said what their IDs look like. Jeff learned that every client has
 - If any production client doesn't fit, the migration refuses to apply and changes nothing. Production has
   no clients before launch (12.6), but check with a read-only query before the release.
 - If the practice ever uses a different format, the rule changes by a new migration.
+
+## ADR-055: A clinician can skip a test's step (Trail Making's Skip Part A)
+
+- **Status:** Accepted · **Date:** 2026-11-14 · Builds on ADR-001, ADR-049 and ADR-050 · Answers Trail Making SPEC question 7
+
+**Context:** The NACC instructions say that if the client can't complete Sample A, Part A isn't given (code
+996), but Sample B is still given. The app could only end the whole test, so Sample B and Part B were lost.
+
+**Decision:**
+
+- A test can declare steps a clinician may skip, in its `skips` (test-info.ts), by key: a label, when it's
+  offered (`whileReleased`: the released-hold counts it fits, before the test reaches `toHold`) and where
+  the test waits next (`toHold`). Trail Making declares `partA`: "Skip Part A", offered from Sample A until
+  Part A finishes (Jeff, the same day: it mustn't disappear once the timed Part A starts), landing at the
+  wait before Sample B.
+- The running test's row shows the skip only where it fits, with a confirm window. Once per test.
+- The skip is saved before the tab acts on it (migration `add_skip_requests`): a `skip_requested` column and
+  a clinician function `request_skip`, which checks the practice and the test's state and moves the hold
+  counts up to just before `toHold`, so the tab's next hold report fits and Continue then reads the next step.
+  The ping sends "check now" on a skip too (migration `allow_skip_during_part`, which also lets
+  `request_skip` work during Part A). The reset when a link is reopened (ADR-053) clears it with the holds.
+- check-status passes the skip's key to the tab, and the shared layer hands it to the test unread, as a new
+  prop, `skipRequested`. Shared code still never learns a test's steps (ADR-001).
+- Trail Making records where the skip found it (`rawData.skip`, with a stop time during the timed Part A).
+  Before Part A's clock starts, Part A is not given, code 996. During the timed Part A, what was done is
+  kept, as a stop with code 996 and its sheet as it stood, shown as "(skipped)" (Jeff: keep any progress).
+  save-result re-checks that from the raw log, and requires Part A's sheet only if Part A was drawn.
+- Trail Making also keeps both samples' sheets from now on, in case the clinic needs them (Jeff, the same
+  day). They show on the client page as a row before each part, with the sample's outcome. Older results
+  have none.
+- Trail Making's other codes (996 for Unable to complete at a sample, 997 for Alphabet check not passed) are
+  added by save-result from the clinician's reason (ADR-049), and shown beside the reasons in Discontinue.
+
+**Consequences:**
+
+- A skip can't be undone. If it was a mistake, the clinician can still Discontinue.
+- Each new skip is declared in its test only; no migration, unless a test needs a different kind of skip.
+- End session offers only the shared reasons; a test's own reasons and codes belong to Discontinue.
+
+## ADR-056: Trail Making's samples are scored, and the table has a Status column
+
+- **Status:** Accepted · **Date:** 2026-11-14 · Changes the Trail Making SPEC (samples were pass or fail only) · Builds on ADR-045 and ADR-055
+
+**Context:** The samples were recorded only as passed or not. With the sample sheets now kept (ADR-055), Jeff
+wanted their scores kept too, and the client page's table to say plainly how each page went.
+
+**Decision:**
+
+- Each sample is scored with the same click rules as a timed part: time, lines (of 7), correct clicks and
+  errors. With no time limit, its time runs from when its clicks are allowed to its last correct click, or
+  to the stop or skip that cut it short. Trail Making now logs every page's clicks; save-result re-checks the
+  samples from the log like everything else.
+- The client page's table has a row per page (Sample A, Part A, Sample B, Part B), lines out of the page's
+  own total ("7/7", "24/24"), plain time and errors, and a Status column: Passed, Not passed or Not
+  given for a sample; Completed, Time limit, Stopped, Skipped (code 996) or Not given (with any code) for a
+  part. The sheet PDFs use the same wording and leave blank values out.
+- The CSV export has a row per page too, with the samples' numbers and passed, not passed or not given.
+- SWAPS's table is unchanged.
+
+**Consequences:**
+
+- Samples saved before this have only passed: their rows show the status with blank numbers.
+- Raw scores only, as before; whether sample scores mean anything clinically is for the clinicians.
+
+## ADR-057: A stop on a test the client never began is settled at once
+
+- **Status:** Accepted · **Date:** 2026-11-14 · Changes ADR-049 (the client's tab always answers a stop)
+
+**Context:** Under ADR-049 only the client's tab answers a stop. If the clinician used Discontinue or End
+session before the client opened the link, nothing ever answered, and the test showed "Ending… waiting for
+the client's screen" for good (found by Jeff).
+
+**Decision:**
+
+- The client's screen shows a test only after Continue releases its first hold (ADR-050). So while
+  `holds_released` is 0 the client hasn't seen any of the test, and the only possible answer is "not begun".
+  Discontinue and End session save such a test as not given at once, keeping the reason and clinician
+  (migration `settle_unbegun_stops`). The visit then moves on, or closes, as usual.
+- A stop on a test that began still waits for the client's screen, as before.
+- check-status still reports the stop on a test settled this way, so a tab waiting at the test's first hold
+  answers it; save-result counts that answer as already saved, and the tab moves on.
+
+**Consequences:**
+
+- Ending a visit whose link was never opened no longer gets stuck.
+- A begun test whose tab has gone (closed or offline) still waits. A clinician's "Close without results" was
+  considered and left out for now.
+

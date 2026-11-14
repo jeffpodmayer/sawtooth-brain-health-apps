@@ -7,6 +7,7 @@ import { clientCodeProblem, digitsOnly } from "./clientCode";
 import { loadClients } from "./clients";
 import { formatDate } from "./formatDate";
 import { sequenceTests } from "./sequence-tests";
+import { TestListSkeleton } from "./Skeleton";
 import { buttonClass, fieldClass } from "./styles";
 import { supabase } from "./supabase";
 
@@ -267,7 +268,7 @@ function SequenceForm({ fixedCode, onCreated, onCancel }: Props) {
 
       <fieldset className="mt-6">
         <legend className="font-semibold">Tests</legend>
-        {testsLoad.state === "loading" && <p className="mt-2">Loading…</p>}
+        {testsLoad.state === "loading" && <TestListSkeleton />}
         {testsLoad.state === "failed" && (
           <p role="alert" className="mt-2">
             Couldn't load the tests. Close this window and try again.

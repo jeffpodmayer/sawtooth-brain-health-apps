@@ -18,7 +18,7 @@ const looks = {
 
 const sizes = {
   standard: "h-12 px-6",
-  small: "h-9 px-4 text-base", // the running test's row (Continue, End current test)
+  small: "h-9 px-4 text-base", // the running test's row (Continue, Discontinue)
   icon: "size-12", // a square button with only an icon, such as the ⋯ menu
 };
 

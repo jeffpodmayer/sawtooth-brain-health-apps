@@ -9,6 +9,7 @@ import { loadClients } from "./clients";
 import ClientsMenu from "./ClientsMenu";
 import { formatDate } from "./formatDate";
 import GenerateSequence from "./GenerateSequence";
+import { ClientsListSkeleton } from "./Skeleton";
 import { fieldClass } from "./styles";
 
 type Load = { state: "loading" } | { state: "failed" } | { state: "loaded"; clients: ClientSummary[] };
@@ -81,7 +82,7 @@ function ClientsPage() {
         </div>
       </div>
 
-      {load.state === "loading" && <p className="mt-8">Loading…</p>}
+      {load.state === "loading" && <ClientsListSkeleton />}
 
       {load.state === "failed" && (
         <p role="alert" className="mt-8">

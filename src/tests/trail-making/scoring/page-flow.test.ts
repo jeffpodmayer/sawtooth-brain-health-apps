@@ -1,4 +1,4 @@
-import { expect, it } from "vitest";
+import { describe, expect, it } from "vitest";
 import { nextFlow, startFlow, type Flow } from "./page-flow";
 
 function at(pageIndex: number, phase: Flow["phase"]): Flow {
@@ -75,4 +75,27 @@ it("ignores an event that doesn't fit the current stage", () => {
   expect(nextFlow(at(1, "test"), "clicksEnabled")).toEqual(at(1, "test"));
   expect(nextFlow(at(0, "practice"), "pauseOver")).toEqual(at(0, "practice"));
   expect(nextFlow(at(1, "waiting"), "clicksEnabled")).toEqual(at(1, "waiting"));
+});
+
+// Skip Part A (ADR-055): from Sample A until Part A finishes, the test goes to the wait before Sample B.
+describe("Skip Part A", () => {
+  it.each([
+    ["Sample A's instructions", { pageIndex: 0, phase: "instructions" }],
+    ["Sample A itself", { pageIndex: 0, phase: "practice" }],
+    ["the pause after Sample A", { pageIndex: 0, phase: "finished" }],
+    ["the wait before Part A", { pageIndex: 1, phase: "waiting" }],
+    ["Part A's instructions", { pageIndex: 1, phase: "instructions" }],
+    ["Part A itself", { pageIndex: 1, phase: "test" }],
+  ] as const)("from %s, goes to the wait before Sample B", (_, flow) => {
+    expect(nextFlow(flow, "skipped")).toEqual({ pageIndex: 2, phase: "waiting" });
+  });
+
+  it.each([
+    ["before Sample A starts", { pageIndex: 0, phase: "waiting" }],
+    ["once Part A is finished", { pageIndex: 1, phase: "finished" }],
+    ["at Sample B", { pageIndex: 2, phase: "practice" }],
+    ["once the test is done", { pageIndex: 1, phase: "done" }],
+  ] as const)("does nothing %s", (_, flow) => {
+    expect(nextFlow(flow, "skipped")).toEqual(flow);
+  });
 });

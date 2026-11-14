@@ -34,6 +34,7 @@ export type ScoreRow = {
   cells: string[]; // the row's values for the first columns, in order (none for a part not given)
   note: string | null; // shown grey across the columns after the cells: "1 blank", "Not given (code 996)"
   sheet: string | null; // the name of this row's sheet (a key of the test's sheetLabels), if it has one
+  timedPart?: string; // in the table shown while the test runs: this row's timed part key, for the live counter
 };
 
 // A test's samples or practice: not scored, and not shown on the dashboard for now (ADR-047).
@@ -53,6 +54,10 @@ export type TestProps = {
   // How many of the test's holds the clinician has released with Continue (ADR-049, ADR-050).
   // Starts at 0. The test waits before step n until this reaches n.
   holdsReleased: number;
+
+  // The key of a step the clinician skipped (ADR-055), one the test declared in its skips, or null.
+  // The shared layer passes it along without reading it. A test with no skips ignores it.
+  skipRequested: string | null;
 
   // Called when the test reaches hold n (1 for the first), with the finished step left on screen.
   // Must keep the same identity between renders.

@@ -1,12 +1,14 @@
 // Development only (roadmap 5.1): runs one test with the fake ResultStore.
 // The sound check comes first, because browsers block sound until a click.
-// Keys stand in for the dashboard (roadmap 5.11, 9.5): C is Continue, S is End test.
+// Keys stand in for the dashboard (roadmap 5.11, 9.5): C is Continue, S is End test, K is the test's first
+// skip, if it has one (ADR-055).
 // Holds and timed parts are logged to the console.
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useParams } from "react-router";
 import SoundCheck from "../client/sound-check/SoundCheck";
 import type { TestResult } from "../shared/test-module";
+import { testsById } from "../dashboard/sequence-tests";
 import { testModules } from "../tests/registry";
 import { createFakeResultStore, type SavedResult } from "./fake-result-store";
 
@@ -22,6 +24,7 @@ function DevTestPage() {
   const [saved, setSaved] = useState<SavedResult[]>([]);
   const [stopRequested, setStopRequested] = useState(false);
   const [holdsReleased, setHoldsReleased] = useState(0);
+  const [skipRequested, setSkipRequested] = useState<string | null>(null);
   const holdsReached = useRef(0);
 
   const handleHoldReached = useCallback((hold: number) => {
@@ -44,11 +47,20 @@ function DevTestPage() {
       if (event.key === "c") {
         setHoldsReleased(holdsReached.current);
       }
+
+      // Like request_skip: the skip, with the holds moved to just before where it lands.
+      const [skip] = Object.entries(testsById.get(testId ?? "")?.skips ?? {});
+      if (event.key === "k" && skip) {
+        const [key, { toHold }] = skip;
+        setSkipRequested(key);
+        holdsReached.current = toHold - 1;
+        setHoldsReleased(toHold - 1);
+      }
     }
 
     window.addEventListener("keydown", controlOnKey);
     return () => window.removeEventListener("keydown", controlOnKey);
-  }, [heard]);
+  }, [heard, testId]);
 
   async function handleComplete(result: TestResult) {
     await store.saveResult(result, { width: window.innerWidth, height: window.innerHeight });
@@ -84,6 +96,7 @@ function DevTestPage() {
       sequenceId="dev-sequence"
       stopRequested={stopRequested}
       holdsReleased={holdsReleased}
+      skipRequested={skipRequested}
       onHoldReached={handleHoldReached}
       onTimedPartStarted={logTimedPartStarted}
       onTimedPartEnded={logTimedPartEnded}

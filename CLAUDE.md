@@ -86,16 +86,16 @@ docs/            ROADMAP.md, DECISIONS.md
 **Tests as plug-ins**
 
 - Each test exports `id`, `name`, `version` and a React component taking
-  `{ sequenceId, stopRequested, holdsReleased, onHoldReached, onTimedPartStarted, onTimedPartEnded, onComplete, onLoadFailed }`.
+  `{ sequenceId, stopRequested, holdsReleased, skipRequested, onHoldReached, onTimedPartStarted, onTimedPartEnded, onComplete, onLoadFailed }`.
 - A test waits before step n until `holdsReleased` reaches n, and reports each hold and timed part;
-  holds are counts and part keys are passed along unread (ADR-048, ADR-049, ADR-050).
+  holds are counts, and part and skip keys are passed along unread (ADR-048, ADR-049, ADR-050, ADR-055).
 - `onComplete` returns `{ testId, testVersion, sequenceId, startedAt, completedAt, scores, rawData, sheets }`.
 - The shared layer must be able to stop a test and collect its partial result.
 - Shared code never knows how a test is scored. Test code never imports
   Supabase. All data goes through the `ResultStore` interface.
-- For the dashboard, each test also provides `scoreTable`, `practiceRow`,
-  `csvMeasures`, `csvRows`, `sheetLabels`, `stopReasons`, `timedParts` and `holds`,
-  and saves `rawData.browser` (ADR-047, ADR-049, ADR-052).
+- For the dashboard, each test also provides `scoreTable`, `emptyTable` (shown while it runs), `practiceRow`,
+  `csvMeasures`, `csvRows`, `sheetLabels`, `stopReasons`, `stopReasonHints`, `timedParts`, `holds`
+  and `skips`, and saves `rawData.browser` (ADR-047, ADR-049, ADR-052, ADR-055).
 
 **Scoring and timing**
 

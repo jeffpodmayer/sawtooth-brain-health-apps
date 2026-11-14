@@ -174,9 +174,16 @@ samples and the timed parts:
 
 - **No automatic failure.** A sample has no limit on errors or time, and it doesn't
   restart. The client keeps going until the sample is finished (ADR-032).
-- **Only the clinician can end a sample early,** from the dashboard. That ends the
-  whole test (see "Stopped by the clinician").
-- Practice clicks are not scored or saved. Only each sample's outcome is recorded.
+- **Only the clinician can end a sample early,** from the dashboard (see "Stopped by the clinician").
+- **Skip Part A (NACC):** if the client can't complete Sample A, the clinician clicks Skip Part A, any time
+  from Sample A until Part A finishes (ADR-055). Before Part A's clock starts, Part A is not given (code 996).
+  During the timed Part A, what was done is kept, as a stop with code 996 (shown as "(skipped)"), with its
+  sheet. Sample A is not passed (passed, if the skip came once it was finished), and the client goes to the
+  break screen and then Sample B as usual.
+- **If the client can't complete Sample B,** the clinician uses Discontinue with Unable to complete: Part B is
+  not given (code 996) and the test ends.
+- Each sample is scored (time, lines and errors) and its sheet is kept (ADR-056). Its outcome, passed or
+  not, still doesn't change how the test runs.
 
 ## Alphabet pre-test ⏳
 
@@ -199,20 +206,24 @@ such as B minus A (T11).
 | Field           | Meaning                                                                                          |
 | --------------- | ------------------------------------------------------------------------------------------------ |
 | `status`        | `completed`, `timedOut`, `stopped` or `notGiven`                                                 |
-| `code`          | `996` or `997` when not given for those reasons, otherwise empty                                 |
+| `code`          | `996` or `997` when not given for those reasons, `996` on a part skipped partway, else empty     |
 | `timeMs`        | Start ("Begin." ends) to the End-circle click. Time limit if timed out. Elapsed time if stopped. |
 | `timeSeconds`   | ⏳ `timeMs` in seconds, to the nearest tenth (e.g. 28.3)                                         |
 | `correctLines`  | Correct connections made, 0–24 (NACC score)                                                      |
 | `correctClicks` | Correct circle clicks including circle 1, 0–25 (T12)                                             |
 | `errors`        | Error clicks (commission errors). Ignored clicks don't count.                                    |
 
-Plus, per sample: `passed` (yes if finished, no if the clinician ended the test during
-it, including during its instructions). A sample is empty (null) if the test ended before
-reaching it. A `notGiven` part has only `status` and `code`.
+Plus, per sample (ADR-056): `passed` (yes if finished, no if a stop or a skip cut it short,
+including during its instructions), and `timeMs`, `timeSeconds`, `correctLines`,
+`correctClicks` and `errors`, counted with the same rules as a timed part. A sample has no time
+limit: its time runs from when its clicks are allowed to its last correct click, or to the stop
+or skip. Samples saved before 2026-11-14 have only `passed`. A sample is empty (null) if the test
+ended before reaching it. A `notGiven` part has only `status` and `code`.
 
 ## Recording (`rawData`)
 
-- **Click log** for each timed part: time (ms from "Begin."), position on the page,
+- **Click log** for each page, samples too (ADR-056): time (ms from "Begin." on a timed part, or from when
+  a sample's clicks were allowed), position on the page,
   which circle (if any), and the outcome: correct, error, or ignored (outside a
   circle, double-click). Clicks during the instructions are blocked and not logged.
 - **Stop point (`stop`):** where a clinician's stop found the test: the page, its stage
@@ -222,8 +233,9 @@ reaching it. A `notGiven` part has only `status` and `code`.
 - **Screen:** screen size, page scale, browser name and version.
 - **Focus:** any time the test tab was hidden or lost focus, with times.
 - **Screen too small:** any time the too-small message replaced a timed part, with times.
-- **Sheets (in the result's `sheets`, not `rawData`):** one SVG per timed part, as it
-  ended, with errors slashed (T13). Samples aren't saved.
+- **Sheets (in the result's `sheets`, not `rawData`):** one SVG per page, as it ended, with errors
+  slashed (T13): both samples as well as both timed parts, kept in case the clinic needs them (ADR-055).
+  A page cut short by a stop or a skip is kept as it stood. A page never started has no sheet.
 
 ## Stopped by the clinician
 
@@ -278,7 +290,8 @@ reaching it. A `notGiven` part has only `status` and `code`.
 7. If a client can't do a sample, you'd end the test from the dashboard and it stops
    there, with no Part A or B. Earlier you said the test ends after three failed tries.
    The NACC instructions say not to give Test A if the client can't complete the sample
-   and clearly doesn't understand the task, and to enter code 996. OK?
+   and clearly doesn't understand the task, and to enter code 996. OK? Answered 2026-11-14 from the
+   instructions: Sample B is still given after a failed Sample A, so the app has Skip Part A (ADR-055).
 8. Will you do the alphabet check on the video call before the test? If the client
    doesn't pass, you'd end the test after Part A with "Alphabet check not passed."
 9. Do you want codes 996 and 997 in the results and the CSV?

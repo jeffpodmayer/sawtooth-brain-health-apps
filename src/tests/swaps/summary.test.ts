@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import type { GivenGridScore, SwapsScores } from "./scoring/score-grid";
-import { csvMeasures, csvRows, practiceRow, scoreTable } from "./summary";
+import { csvMeasures, csvRows, emptyTable, practiceRow, scoreTable } from "./summary";
 
 const timedOut: GivenGridScore = { status: "timedOut", timeMs: 60000, attempted: 24, correct: 23, errors: 1, corrections: 1 };
 const practice = { wrongAnswers: 0 };
@@ -101,5 +101,23 @@ describe("SWAPS CSV rows", () => {
   it("every row has exactly the test's measures", () => {
     const rows = [...csvRows(scores(timedOut, recallDone)), ...csvRows(scores({ status: "notGiven" }, { status: "notGiven" }))];
     for (const row of rows) expect(Object.keys(row.values)).toEqual(csvMeasures);
+  });
+});
+
+// While the test runs (ADR-048): the finished table's columns and rows, all dashes, no sheet. Recall fills only
+// Correct and Time; each row names its timed part, so the dashboard can show the live counter.
+describe("SWAPS table while running", () => {
+  it("has every column and row, dashes where numbers will go, and the timed parts' keys", () => {
+    expect(emptyTable()).toEqual({
+      columns: ["Correct", "Tried", "Errors", "Corrections", "Time (s)"],
+      rows: [
+        { label: "Test (of 75)", cells: ["—", "—", "—", "—", "—"], note: null, sheet: null, timedPart: "test" },
+        { label: "Recall (of 7)", cells: ["—", "", "", "", "—"], note: null, sheet: null, timedPart: "recall" },
+      ],
+    });
+  });
+
+  it("has the finished table's columns", () => {
+    expect(emptyTable().columns).toEqual(scoreTable(scores(timedOut, recallDone)).columns);
   });
 });

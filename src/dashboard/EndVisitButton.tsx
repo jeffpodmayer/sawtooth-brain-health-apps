@@ -10,11 +10,10 @@ import { supabase } from "./supabase";
 type Props = {
   sequenceId: string;
   subtitle: string; // "TEST-002 · Nov 13, 2026"
-  testReasons: Record<string, string>; // the running test's own reasons, offered after the shared ones
   onEnded: () => void;
 };
 
-function EndVisitButton({ sequenceId, subtitle, testReasons, onEnded }: Props) {
+function EndVisitButton({ sequenceId, subtitle, onEnded }: Props) {
   const [open, setOpen] = useState(false);
 
   async function endVisit(reason: string): Promise<string | null> {
@@ -41,7 +40,9 @@ function EndVisitButton({ sequenceId, subtitle, testReasons, onEnded }: Props) {
         subtitle={subtitle}
         explanation="The running test stops, every test after it is marked not given, and the client's link stops working."
         confirmLabel="End session"
-        reasons={{ ...stopReasonLabels, ...testReasons }}
+        // Only the shared reasons: a test's own reasons and codes (Trail Making's 996 and 997) belong to
+        // Discontinue on that test's row, not to ending the whole visit.
+        reasons={stopReasonLabels}
         onConfirm={endVisit}
         onClosed={() => setOpen(false)}
       />

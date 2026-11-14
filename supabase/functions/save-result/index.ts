@@ -11,6 +11,9 @@ import type { Database, Json } from "../_shared/database.types.ts";
 import { rescore as rescoreSwaps } from "../../../src/tests/swaps/scoring/rescore.ts";
 import * as swaps from "../../../src/tests/swaps/test-info.ts";
 import { rescore as rescoreTrailMaking } from "../../../src/tests/trail-making/scoring/rescore.ts";
+import type { TrailMakingScores } from "../../../src/tests/trail-making/scoring/score-part.ts";
+import type { StopPoint } from "../../../src/tests/trail-making/scoring/score-test.ts";
+import { withStopCodes } from "../../../src/tests/trail-making/scoring/stop-codes.ts";
 import * as trailMaking from "../../../src/tests/trail-making/test-info.ts";
 
 // A link token is 32 random bytes as 64 hex characters (see the sequences migration).
@@ -20,13 +23,28 @@ const TOKEN_FORMAT = /^[0-9a-f]{64}$/;
 // - rescore works the scores out again. null means the raw log isn't one the test could have written.
 // - sheetNames are the only sheets the test hands over (each test's sheetLabels). Any other name is
 //   rejected, so the browser can't choose where a file goes. A finished test hands over all of them.
+// - requiredSheets, for a test where a step can be skipped, names the sheets a finished result must hand over.
+//   Without it, every sheet is required. Trail Making's skipped Part A has no sheet (ADR-055).
+// - addCodes, for a test with codes, adds them to a stopped result's scores from the clinician's reason,
+//   which the browser never knows (ADR-049). It runs after the browser-versus-server check. rawData has
+//   passed rescore by then, so its stop is one the test could have written.
 const tests = new Map<string, {
   rescore: (rawData: unknown, scores: unknown) => Json | null;
   sheetNames: string[];
+  requiredSheets?: (rawData: Record<string, unknown>) => string[];
+  addCodes?: (scores: Json, rawData: Record<string, unknown>, stopReason: string | null) => Json;
 }>([
   [trailMaking.testId, {
     rescore: (rawData) => rescoreTrailMaking(rawData),
     sheetNames: Object.keys(trailMaking.sheetLabels),
+    // A finished run always drew both samples and Part B; Part A only if it wasn't skipped before its clock.
+    requiredSheets: (rawData) => {
+      const skip = rawData.skip as { stoppedAtMs?: unknown } | null | undefined;
+      const partADrawn = !skip || typeof skip.stoppedAtMs === "number";
+      return ["sampleA", "sampleB", "partB", ...(partADrawn ? ["partA"] : [])];
+    },
+    addCodes: (scores, rawData, stopReason) =>
+      withStopCodes(scores as TrailMakingScores, rawData.stop as StopPoint | null, stopReason),
   }],
   [swaps.testId, {
     rescore: (rawData, scores) => rescoreSwaps(rawData, scores),
@@ -124,7 +142,7 @@ export default {
     async function findRow(testId: string) {
       return await ctx.supabaseAdmin
         .from("sequence_tests")
-        .select("id, practice_id, status, stop_requested_at, holds_released")
+        .select("id, practice_id, status, stop_requested_at, stop_reason, holds_released")
         .eq("sequence_id", sequence!.id)
         .eq("test_id", testId)
         .maybeSingle();
@@ -181,9 +199,10 @@ export default {
     }
 
     // Both tests record where a stop found them as rawData.stop, null when nothing stopped them.
-    // A test that ran to its end hands over every sheet.
+    // A test that ran to its end hands over every sheet, apart from a skipped step's.
     const stoppedEarly = rawData.stop !== null;
-    if (!stoppedEarly && !test.sheetNames.every((name) => name in sheets)) {
+    const requiredSheets = test.requiredSheets ? test.requiredSheets(rawData) : test.sheetNames;
+    if (!stoppedEarly && !requiredSheets.every((name) => name in sheets)) {
       return rejected("bad_result", "finished test missing a sheet");
     }
 
@@ -242,7 +261,11 @@ export default {
     // Its reason and clinician are on the row already. Each save also matches the stop state it
     // expects and the pending status, in case a stop or another save lands in between.
     // rawData arrived as JSON, so it can be stored as JSON.
-    async function saveAs(stopped: boolean) {
+    // A stopped result gets the test's codes from the clinician's reason, if the test has any.
+    async function saveAs(stopped: boolean, stopReason: string | null) {
+      const savedScores = stopped && test!.addCodes
+        ? test!.addCodes(scores!, rawData as Record<string, unknown>, stopReason)
+        : scores!;
       const update = ctx.supabaseAdmin
         .from("sequence_tests")
         .update({
@@ -250,7 +273,7 @@ export default {
           test_version: testVersion as string,
           started_at: new Date(startedAt!).toISOString(),
           completed_at: new Date(completedAt!).toISOString(),
-          scores,
+          scores: savedScores,
           browser_scores: scoresDiffer ? (browserScores as Json) : null,
           raw_data: rawData as Json,
           screen_width: width as number,
@@ -263,11 +286,17 @@ export default {
       return await matched.select("id").maybeSingle();
     }
 
-    let { data: saved, error: saveError } = await saveAs(row.stop_requested_at !== null);
+    let { data: saved, error: saveError } = await saveAs(row.stop_requested_at !== null, row.stop_reason);
 
-    // Nothing matched as completed: a stop may have landed since the row was read. Save it as stopped.
+    // Nothing matched as completed: a stop may have landed since the row was read. Save it as stopped,
+    // with the reason that stop brought (read again, since the first read came before it).
     if (!saveError && !saved && row.stop_requested_at === null) {
-      ({ data: saved, error: saveError } = await saveAs(true));
+      const { data: again, error: againError } = await findRow(testId);
+      if (againError) {
+        await removeSheets();
+        return failed("test recheck", againError.message);
+      }
+      ({ data: saved, error: saveError } = await saveAs(true, again?.stop_reason ?? null));
     }
 
     if (saveError) {

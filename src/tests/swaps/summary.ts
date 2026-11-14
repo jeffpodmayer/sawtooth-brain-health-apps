@@ -14,12 +14,32 @@ const testItems = gridItems.filter((item) => item.part === "test").length;
 // scores come from the database, where only save-result's own scoring writes them (ADR-040),
 // so they have this test's shape.
 
+const columns = ["Correct", "Tried", "Errors", "Corrections", "Time (s)"];
+
+// The table while the test runs (ADR-048): the same columns and rows, dashes where the numbers will go (recall
+// has only Correct and Time), no sheet yet. Each row names its timed part, for the dashboard's live counter.
+export function emptyTable(): ScoreTable {
+  return {
+    columns,
+    rows: [
+      { label: `Test (of ${testItems})`, cells: ["—", "—", "—", "—", "—"], note: null, sheet: null, timedPart: "test" },
+      {
+        label: `Recall (of ${recallSymbols})`,
+        cells: ["—", "", "", "", "—"],
+        note: null,
+        sheet: null,
+        timedPart: "recall",
+      },
+    ],
+  };
+}
+
 // Test and recall share one table. Recall fills only Correct; its blanks are a note (ADR-047). Their totals
 // differ (75 and 7), so each row's name carries its own; the time's unit sits in its heading.
 export function scoreTable(scores: unknown): ScoreTable {
   const { test, recall } = scores as SwapsScores;
   return {
-    columns: ["Correct", "Tried", "Errors", "Corrections", "Time (s)"],
+    columns,
     rows: [testRow(test), recallRow(recall)],
   };
 }
@@ -51,7 +71,8 @@ export function csvRows(scores: unknown): CsvRow[] {
           Corrections: test.corrections,
           "Time (s)": seconds(test.timeMs),
         };
-  const recallValues = recall.status === "notGiven" ? blank : { ...blank, Correct: recall.correct, Blank: recall.blank };
+  const recallValues =
+    recall.status === "notGiven" ? blank : { ...blank, Correct: recall.correct, Blank: recall.blank };
   return [
     { part: "Test", status: csvStatus[test.status], values: testValues },
     { part: "Recall", status: csvStatus[recall.status], values: recallValues },
