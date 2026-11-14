@@ -1222,3 +1222,40 @@ the test that's running, not on a page of their own.
   sample. How it's recorded is settled at 9.1.
 - The development test pages need a way past a hold without the dashboard.
 - Phase 9 is reshaped to carry Continue alongside Stop.
+
+## ADR-049: How stop requests, holds and stop reasons are stored
+
+- **Status:** Accepted · **Date:** 2026-11-13 · Builds on ADR-024, ADR-032 and ADR-048
+
+**Context:** A clinician's stop and Continue must be saved before the client's tab acts on them
+(roadmap 9.1). A `sequence_tests` row can only be `stopped` once its partial result is saved, so
+there was nowhere to keep a stop that hasn't been answered yet, or a hold.
+
+**Decision:**
+
+- `sequence_tests` gains `stop_requested_at`, `holds_reached` and `holds_released`. No new status.
+  `stop_reason` and `stopped_by` are filled when the clinician clicks.
+- Holds are counts, not names, so shared code never learns a test's parts. The client's tab raises
+  `holds_reached`; Continue sets `holds_released` equal to it. Holding means reached > released.
+  Repeating either changes nothing.
+- Clinicians act through one database function per action (ADR-044), which checks their practice.
+  The client's tab writes only through Edge Functions checked by link token.
+- The client's tab always answers a stop: a partial result (saved as `stopped`), or "not begun"
+  (saved as `not_given`, keeping the reason and clinician). With no answer, the row stays `pending`
+  with its request, and the dashboard says so. The server never guesses whether a test began.
+- A full result that arrives after a stop request is saved as `stopped`, with the clinician's reason.
+- End whole sequence, in one save: the visit becomes `discontinued`, the running test gets a stop
+  request, and the other pending tests become `not_given`. save-result accepts a result for a test
+  with a stop request even after its visit has closed.
+- Stop reasons: Gave up, Interrupted and Unable to complete for every test. A test can add its own
+  through its plug-in; Trail Making adds Alphabet check not passed.
+- Trail Making's codes come from the reason and where the stop found the test: 996 for Unable to
+  complete during a sample, its instructions or the hold after it; 997 for Alphabet check not passed.
+  save-result adds them through Trail Making's own scoring code, after the browser-versus-server
+  check, since the browser never knows the reason.
+
+**Consequences:**
+
+- A closed tab mid-test loses that test's partial result. Its row shows the unanswered stop.
+- The code rule awaits the clinicians, with ADR-032 (Trail Making SPEC questions 5–9).
+- Each new test-specific reason needs a migration, since the database checks the list.
