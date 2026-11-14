@@ -11,3 +11,7 @@ export const sheetLabels: Record<string, string> = { partA: "Part A", partB: "Pa
 // Stop reasons the dashboard offers for this test, on top of the shared ones (ADR-049). The database's
 // stop-reason check must list each key.
 export const stopReasons: Record<string, string> = { alphabet_check_not_passed: "Alphabet check not passed" };
+
+// The timed parts this test reports while running (ADR-048), labeled as in its score table, so the dashboard
+// shows the counter in that part's row.
+export const timedParts: Record<string, string> = { partA: "Part A", partB: "Part B" };

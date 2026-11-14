@@ -16,6 +16,7 @@ export const sequenceTests = [
     practice: practiceTrailMaking,
     sheetLabels: trailMaking.sheetLabels,
     stopReasons: trailMaking.stopReasons,
+    timedParts: trailMaking.timedParts,
   },
   {
     id: swaps.testId,
@@ -24,6 +25,7 @@ export const sequenceTests = [
     practice: practiceSwaps,
     sheetLabels: swaps.sheetLabels,
     stopReasons: swaps.stopReasons,
+    timedParts: swaps.timedParts,
   },
 ];
 

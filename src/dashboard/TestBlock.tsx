@@ -8,6 +8,7 @@ import type { Json } from "../../supabase/functions/_shared/database.types.ts";
 import Chevron from "./Chevron";
 import { formatDate } from "./formatDate";
 import { testsById } from "./sequence-tests";
+import { LiveDot, TimedCounter } from "./LiveIndicators";
 import type { NoteDialogState } from "./NoteDialog";
 import RunningTestControls from "./RunningTestControls";
 import SetupInfo from "./SetupInfo";
@@ -32,7 +33,8 @@ export type VisitTest = {
   holds_reached: number;
   holds_released: number;
   began_at: string | null; // the client's tab began this test (9.3)
-  timed_part_started_at: string | null; // a timed part is running (9.3)
+  timed_part: string | null; // the running timed part's key, e.g. "partA" (9.3)
+  timed_part_started_at: string | null; // when it started (9.3)
   sheets: Json | null;
   browser: Json | null; // raw_data's browser only
   clinicians: { display_name: string } | null; // whoever stopped the test
@@ -118,10 +120,14 @@ function TestBlock({ test, clientCode, visitCreatedAt, running, onChanged }: Pro
     .filter(Boolean)
     .join(" · ");
 
+  // The dot once the client's tab has begun the running test. The counter is in the part rows below.
+  const live = running && test.began_at !== null && !ending;
+
   const nameAndStatus = (
     <span className="flex flex-wrap items-baseline gap-x-3">
       <span className="font-semibold">{name}</span>
       <span className={`text-base font-semibold ${statusColor}`}>
+        {live && <LiveDot />}
         {ending && (
           <>
             Ending
@@ -180,6 +186,44 @@ function TestBlock({ test, clientCode, visitCreatedAt, running, onChanged }: Pro
 
       {/* Hidden rather than removed when closed, so notes aren't loaded again each time it opens. */}
       <div id={`test-body-${test.id}`} hidden={!open} className="pl-16 pr-6">
+        {/* While the test runs, its timed parts as rows; the running part's row shows the counter (ADR-048).
+            The saved result's score table replaces these once the test is saved. */}
+        {test.status === "pending" && test.began_at && plugin && (
+          <table className="mt-3 w-full table-fixed tabular-nums">
+            <colgroup>
+              <col style={{ width: `${columnPercent}%` }} />
+              <col style={{ width: `${columnPercent}%` }} />
+              <col />
+            </colgroup>
+            <thead>
+              <tr className="border-b border-line text-base text-ink-muted">
+                <td />
+                <th scope="col" className="py-3 text-center font-normal">
+                  Time
+                </th>
+                <td />
+              </tr>
+            </thead>
+            <tbody>
+              {Object.entries(plugin.timedParts).map(([key, label]) => (
+                <tr key={key} className="border-b border-line">
+                  <th scope="row" className="py-4 text-left font-normal">
+                    {label}
+                  </th>
+                  <td className="py-4 text-center font-semibold">
+                    {key === test.timed_part && test.timed_part_started_at ? (
+                      <TimedCounter startedAt={test.timed_part_started_at} stoppedAt={test.stop_requested_at} />
+                    ) : (
+                      <span className="font-normal text-ink-muted">—</span>
+                    )}
+                  </td>
+                  <td />
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
+
         {/* The samples or practice row (each test's practiceRow) is hidden for now (8.9); only scored rows show. */}
         {table && table.rows.length > 0 && (
           <div className="mt-3">

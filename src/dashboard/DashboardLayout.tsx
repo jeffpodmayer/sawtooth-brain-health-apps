@@ -34,7 +34,7 @@ function DashboardLayout() {
   // The dashboard's font and 18px text (client screens stay at 20px), and its buttons show a pointer on hover.
   return (
     <div className="font-dashboard text-lg [&_button:not(:disabled)]:cursor-pointer">
-      <header className="border-b border-line">
+      <header className="border-b border-line bg-surface shadow-xs">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-8 py-3">
           <p className="font-semibold">{me?.practiceName}</p>
           <AccountBar displayName={me?.displayName ?? null} />

@@ -25,6 +25,18 @@
   /* Hover tint for rows and buttons on white; a light teal-gray that stands apart from the page color. */
   --color-hover: #ebf3f2;
 
+  /* The running test's red dot: a soft glow that swells and fades every 2 seconds (roadmap 9.1). */
+  --animate-live-glow: live-glow 2s ease-in-out infinite;
+  @keyframes live-glow {
+    0%,
+    100% {
+      box-shadow: 0 0 0 0 rgb(180 35 24 / 0.55);
+    }
+    50% {
+      box-shadow: 0 0 0 6px rgb(180 35 24 / 0);
+    }
+  }
+
   /* Three dots fading in turn after "Ending" (roadmap 9.1). */
   --animate-loading-dot: loading-dot 1.4s ease-in-out infinite;
   @keyframes loading-dot {
