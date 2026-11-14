@@ -5,18 +5,12 @@
 import { useEffect, useRef, useState } from "react";
 import SequenceForm, { type CreatedSequence } from "./SequenceForm";
 import SequenceLink from "./SequenceLink";
-
-const buttonClasses = {
-  solid:
-    "flex h-12 items-center gap-2 rounded-lg bg-accent px-6 font-semibold text-white hover:bg-accent-strong focus-visible:outline-4 focus-visible:outline-offset-4 focus-visible:outline-accent",
-  outline:
-    "flex h-12 items-center gap-2 rounded-lg border border-accent bg-surface px-6 font-medium text-accent hover:bg-hover focus-visible:outline-4 focus-visible:outline-offset-4 focus-visible:outline-accent",
-};
+import { buttonClass, dialogBodyClass, dialogClass, dialogCloseClass, dialogHeaderClass } from "./styles";
 
 // clientCode, when given, fixes the window to that client (opened from a client's page).
-type Props = { onCreated: () => void; clientCode?: string; look: "solid" | "outline" };
+type Props = { onCreated: () => void; clientCode?: string };
 
-function GenerateSequence({ onCreated, clientCode, look }: Props) {
+function GenerateSequence({ onCreated, clientCode }: Props) {
   const dialogRef = useRef<HTMLDialogElement>(null);
   const [open, setOpen] = useState(false);
   const [created, setCreated] = useState<CreatedSequence | null>(null);
@@ -33,7 +27,7 @@ function GenerateSequence({ onCreated, clientCode, look }: Props) {
 
   const close = () => dialogRef.current?.close();
 
-  let subtitle = clientCode ? `New visit for ${clientCode}` : "A link the client opens at home.";
+  let subtitle = clientCode ? `New visit for ${clientCode}` : "";
   if (created) {
     const client = created.clientIsNew ? "New client" : "Existing client";
     subtitle = `${created.code} · ${client} · ${created.testNames.join(", ")}`;
@@ -47,7 +41,7 @@ function GenerateSequence({ onCreated, clientCode, look }: Props) {
           setCreated(null); // a link that finished saving after the window closed isn't shown again
           setOpen(true);
         }}
-        className={buttonClasses[look]}
+        className={buttonClass("primary")}
       >
         <svg aria-hidden="true" viewBox="0 0 24 24" className="size-5 fill-none stroke-current stroke-2">
           <path d="M12 5v14M5 12h14" />
@@ -59,40 +53,42 @@ function GenerateSequence({ onCreated, clientCode, look }: Props) {
         ref={dialogRef}
         onClose={handleClose}
         aria-labelledby="generate-heading"
-        className="m-auto w-[calc(100%-2rem)] max-w-xl rounded-2xl bg-surface p-8 text-ink backdrop:bg-ink/60"
+        className={`max-w-xl ${dialogClass}`}
       >
         {open && (
           <>
-            <div className="flex items-start justify-between gap-4">
+            <div className={dialogHeaderClass}>
               <div>
                 <h2 id="generate-heading" className="text-3xl font-semibold">
-                  {created ? "Link ready" : "Generate Test Sequence"}
+                  {created ? "Link ready" : "New Test Sequence"}
                 </h2>
-                <p className="mt-1 text-base text-ink-muted">{subtitle}</p>
+                {subtitle && <p className="mt-1 text-base text-ink-muted">{subtitle}</p>}
               </div>
               <button
                 type="button"
                 onClick={close}
                 aria-label="Close"
-                className="-mr-3 -mt-2 flex size-12 shrink-0 items-center justify-center rounded-lg hover:bg-hover focus-visible:outline-4 focus-visible:-outline-offset-4 focus-visible:outline-accent"
+                className={dialogCloseClass}
               >
                 <svg aria-hidden="true" viewBox="0 0 24 24" className="size-5 fill-none stroke-ink stroke-2">
                   <path d="M6 6l12 12M18 6 6 18" />
                 </svg>
               </button>
             </div>
-            {created === null ? (
-              <SequenceForm
-                fixedCode={clientCode}
-                onCreated={(sequence) => {
-                  setCreated(sequence);
-                  onCreated();
-                }}
-                onCancel={close}
-              />
-            ) : (
-              <SequenceLink created={created} onDone={close} />
-            )}
+            <div className={dialogBodyClass}>
+              {created === null ? (
+                <SequenceForm
+                  fixedCode={clientCode}
+                  onCreated={(sequence) => {
+                    setCreated(sequence);
+                    onCreated();
+                  }}
+                  onCancel={close}
+                />
+              ) : (
+                <SequenceLink created={created} onDone={close} />
+              )}
+            </div>
           </>
         )}
       </dialog>

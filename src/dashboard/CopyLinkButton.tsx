@@ -3,6 +3,7 @@
 
 import CopyIcon from "./CopyIcon";
 import { clientLink } from "./links";
+import { buttonClass } from "./styles";
 import { useCopy } from "./useCopy";
 
 function CopyLinkButton({ linkToken }: { linkToken: string }) {
@@ -13,7 +14,7 @@ function CopyLinkButton({ linkToken }: { linkToken: string }) {
       type="button"
       onClick={copy}
       aria-live="polite"
-      className="flex h-12 shrink-0 items-center gap-2 rounded-lg px-3 text-base text-accent hover:bg-surface focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-accent"
+      className={`shrink-0 ${buttonClass("secondary")}`}
     >
       <CopyIcon copied={status === "copied"} />
       {status === "copied" ? "Copied" : status === "failed" ? "Couldn't copy" : "Copy link"}

@@ -5,20 +5,23 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router";
 import ClientsMenu from "./ClientsMenu";
+import { formatDate } from "./formatDate";
 import GenerateSequence from "./GenerateSequence";
+import { fieldClass } from "./styles";
 import { supabase } from "./supabase";
 
-// sequences holds only the client's first visit. Whoever made it created the client, since a client
-// is always created together with its first visit (ADR-044).
-type Client = { id: string; code: string; sequences: { clinicians: { display_name: string } | null }[] };
+// sequences holds only the client's newest visit, for the Last visit column.
+type Client = {
+  id: string;
+  code: string;
+  sequences: { created_at: string; status: string }[];
+};
 
 type Load = { state: "loading" } | { state: "failed" } | { state: "loaded"; clients: Client[] };
 
-const searchFieldClass =
-  "block h-12 w-full rounded-lg border border-field-line bg-surface pl-12 pr-4 text-ink placeholder:text-ink-muted focus-visible:border-accent focus-visible:outline-2 focus-visible:outline-offset-0 focus-visible:outline-accent";
 // One whole row is the link, so a click anywhere on it opens the client.
 const rowLinkClass =
-  "grid grid-cols-[1fr_1fr_3rem] items-center px-6 py-3.5 hover:bg-hover focus-visible:outline-4 focus-visible:-outline-offset-4 focus-visible:outline-accent";
+  "grid grid-cols-[1fr_1fr_3rem] items-center px-6 py-3.5 hover:bg-hover focus-visible:outline-3 focus-visible:-outline-offset-4 focus-visible:outline-accent";
 
 function ClientsPage() {
   const [load, setLoad] = useState<Load>({ state: "loading" });
@@ -29,9 +32,9 @@ function ClientsPage() {
     let cancelled = false;
     supabase
       .from("clients")
-      .select("id, code, sequences(clinicians(display_name))")
+      .select("id, code, sequences(created_at, status)")
       .order("created_at", { ascending: false })
-      .order("created_at", { referencedTable: "sequences" })
+      .order("created_at", { referencedTable: "sequences", ascending: false })
       .limit(1, { referencedTable: "sequences" })
       .then(({ data, error }) => {
         if (cancelled) return;
@@ -75,13 +78,16 @@ function ClientsPage() {
               placeholder="Search client ID"
               autoComplete="off"
               spellCheck={false}
-              className={searchFieldClass}
+              className={`${fieldClass} pl-12`}
             />
           </div>
         )}
-        <GenerateSequence look="solid" onCreated={() => setReloads((count) => count + 1)} />
-        {/* Export CSV, with the same search, once there are clients (roadmap 10.1). */}
-        {load.state === "loaded" && clients.length > 0 && <ClientsMenu matches={(code) => code.includes(query)} />}
+        {/* New sequence and ⋯ sit closer together than the rest of the row. */}
+        <div className="flex items-center gap-2">
+          <GenerateSequence onCreated={() => setReloads((count) => count + 1)} />
+          {/* Export CSV, with the same search, once there are clients (roadmap 10.1). */}
+          {load.state === "loaded" && clients.length > 0 && <ClientsMenu matches={(code) => code.includes(query)} />}
+        </div>
       </div>
 
       {load.state === "loading" && <p className="mt-8">Loading…</p>}
@@ -100,29 +106,35 @@ function ClientsPage() {
             {/* Column titles for sighted users. Each row's link text says the same to a screen reader. */}
             <div aria-hidden="true" className="grid grid-cols-[1fr_1fr_3rem] border-b border-line px-6 py-3 text-base">
               <span className="font-semibold">Client ID</span>
-              <span className="text-ink-muted">Created by</span>
+              <span className="text-ink-muted">Last visit</span>
             </div>
             {shown.length === 0 && <p className="px-6 py-5">No client ID matches "{search.trim()}".</p>}
             {shown.length > 0 && (
               <ul>
-                {shown.map((client) => (
-                  <li key={client.id} className="border-b border-line last:border-b-0">
-                    <Link to={`/dashboard/clients/${client.id}`} className={rowLinkClass}>
-                      <span className="font-semibold">{client.code}</span>
-                      <span className="text-base">
-                        <span className="sr-only">Created by </span>
-                        {client.sequences[0]?.clinicians?.display_name ?? "—"}
-                      </span>
-                      <svg
-                        aria-hidden="true"
-                        viewBox="0 0 24 24"
-                        className="size-5 justify-self-end fill-none stroke-ink stroke-2"
-                      >
-                        <path d="m9 6 6 6-6 6" />
-                      </svg>
-                    </Link>
-                  </li>
-                ))}
+                {shown.map((client) => {
+                  const last = client.sequences[0];
+                  return (
+                    <li key={client.id} className="border-b border-line last:border-b-0">
+                      <Link to={`/dashboard/clients/${client.id}`} className={rowLinkClass}>
+                        <span className="font-semibold">{client.code}</span>
+                        <span className="flex items-center gap-3 text-base">
+                          <span className="sr-only">Last visit </span>
+                          {last ? formatDate(last.created_at) : "—"}
+                          {last?.status === "open" && (
+                            <span className="rounded-full bg-success-bg px-2.5 py-0.5 text-success-ink">Open</span>
+                          )}
+                        </span>
+                        <svg
+                          aria-hidden="true"
+                          viewBox="0 0 24 24"
+                          className="size-5 justify-self-end fill-none stroke-ink stroke-2"
+                        >
+                          <path d="m9 6 6 6-6 6" />
+                        </svg>
+                      </Link>
+                    </li>
+                  );
+                })}
               </ul>
             )}
           </div>

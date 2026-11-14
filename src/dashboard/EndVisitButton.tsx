@@ -4,6 +4,7 @@
 import { useState } from "react";
 import { stopReasonLabels } from "./statusLabels";
 import StopDialog from "./StopDialog";
+import { buttonClass } from "./styles";
 import { supabase } from "./supabase";
 
 type Props = {
@@ -30,7 +31,7 @@ function EndVisitButton({ sequenceId, subtitle, testReasons, onEnded }: Props) {
         type="button"
         aria-haspopup="dialog"
         onClick={() => setOpen(true)}
-        className="flex h-12 items-center rounded-lg border border-danger px-4 font-medium text-danger hover:bg-danger-tint focus-visible:outline-4 focus-visible:outline-offset-4 focus-visible:outline-accent"
+        className={buttonClass("dangerOutline")}
       >
         End session
       </button>

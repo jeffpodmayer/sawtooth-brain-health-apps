@@ -1,6 +1,7 @@
 // The signed-in clinician's name and a Sign out link, at the top right of every dashboard page (8.9).
 // No menu: signing out is one click.
 
+import { textButtonClass } from "./styles";
 import { supabase } from "./supabase";
 
 function AccountBar({ displayName }: { displayName: string | null }) {
@@ -16,7 +17,7 @@ function AccountBar({ displayName }: { displayName: string | null }) {
       <button
         type="button"
         onClick={() => supabase.auth.signOut()}
-        className="-ml-2 h-12 rounded-lg px-2 text-accent underline-offset-4 hover:text-accent-strong hover:underline focus-visible:outline-4 focus-visible:-outline-offset-4 focus-visible:outline-accent"
+        className={`h-9 px-3 text-base ${textButtonClass}`}
       >
         Sign out
       </button>

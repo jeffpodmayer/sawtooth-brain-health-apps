@@ -15,6 +15,7 @@ import SetupInfo from "./SetupInfo";
 import SheetButtons from "./SheetButtons";
 import { sheetScoreLines } from "./sheet-scores";
 import { stopReasonLabels, testStatusLabels } from "./statusLabels";
+import { textButtonClass } from "./styles";
 import TestNotes from "./TestNotes";
 
 export type VisitTest = {
@@ -166,7 +167,7 @@ function TestBlock({ test, clientCode, visitCreatedAt, running, onChanged }: Pro
                 aria-expanded={open}
                 aria-controls={`test-body-${test.id}`}
                 onClick={() => setOpen(!open)}
-                className="flex flex-wrap items-center gap-x-3 rounded-lg text-left focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-accent"
+                className="flex flex-wrap items-center gap-x-3 rounded-lg text-left focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-accent"
               >
                 <Chevron open={open} small />
                 {nameAndStatus}
@@ -321,7 +322,7 @@ function TestBlock({ test, clientCode, visitCreatedAt, running, onChanged }: Pro
               The scores above are the server's, worked out again from the saved log. The browser's are kept below.
             </p>
             <details className="mt-2">
-              <summary className="inline-flex h-12 cursor-pointer items-center font-semibold text-accent underline underline-offset-4 hover:text-accent-strong focus-visible:outline-4 focus-visible:outline-offset-4 focus-visible:outline-accent">
+              <summary className="inline-flex h-12 cursor-pointer items-center font-semibold text-accent underline underline-offset-4 hover:text-accent-strong focus-visible:outline-3 focus-visible:outline-offset-4 focus-visible:outline-accent">
                 Show the browser's scores
               </summary>
               <pre className="mt-2 whitespace-pre-wrap break-words text-base">
@@ -347,7 +348,7 @@ function TestBlock({ test, clientCode, visitCreatedAt, running, onChanged }: Pro
             type="button"
             aria-haspopup="dialog"
             onClick={() => setNoteDialog({ mode: "add", draft: "" })}
-            className="-ml-2 mt-2 flex h-9 items-center gap-2 rounded-lg px-2 text-base font-semibold text-accent hover:bg-hover focus-visible:outline-4 focus-visible:-outline-offset-4 focus-visible:outline-accent"
+            className={`-ml-2 mt-2 flex h-9 items-center gap-2 px-2 text-base ${textButtonClass}`}
           >
             <svg aria-hidden="true" viewBox="0 0 24 24" className="size-4 fill-none stroke-current stroke-2">
               <path d="M12 5v14M5 12h14" />

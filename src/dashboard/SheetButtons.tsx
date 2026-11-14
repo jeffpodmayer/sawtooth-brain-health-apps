@@ -7,18 +7,16 @@
 import { useEffect, useId, useRef, useState } from "react";
 import { saveFile } from "./save-file";
 import { sheetPdf } from "./sheet-pdf";
+import { dialogBodyClass, dialogClass, dialogCloseClass, dialogHeaderClass, iconButtonClass } from "./styles";
 import { supabase } from "./supabase";
 
 const SIGNED_URL_SECONDS = 10 * 60;
-const iconButtonClass =
-  "flex size-10 items-center justify-center rounded-lg text-accent hover:bg-hover focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-accent disabled:opacity-70";
+const sheetIconClass = `size-10 text-accent disabled:opacity-70 ${iconButtonClass}`;
 // A small tip above each icon, shown on hover or keyboard focus, in the same white card style as the setup
 // info. Its right edge lines up with the button's, so it isn't cut off at the right side of the visits card.
 // Screen readers skip it: the button's own label already says the same, with the sheet's name.
 const tipClass =
   "pointer-events-none invisible absolute bottom-full right-0 z-10 mb-1 whitespace-nowrap rounded-lg border border-line bg-surface px-3 py-1.5 text-base text-ink shadow-md group-focus-within:visible group-hover:visible";
-const closeButtonClass =
-  "-mr-3 -mt-2 flex size-12 shrink-0 items-center justify-center rounded-lg hover:bg-hover focus-visible:outline-4 focus-visible:-outline-offset-4 focus-visible:outline-accent";
 
 // title names the sheet, e.g. "TEST-001 · Trail Making · Part A". heading tops the PDF, e.g. the title and the
 // test's date, with scoreLines under it. fileName is what the PDF is saved as.
@@ -66,7 +64,7 @@ function SheetButtons({ path, title, heading, scoreLines, fileName }: Props) {
     <div className="flex flex-col items-end">
       <div className="flex gap-2">
         <div className="group relative">
-          <button type="button" onClick={view} disabled={busy} aria-label={`View ${title}`} className={iconButtonClass}>
+          <button type="button" onClick={view} disabled={busy} aria-label={`View ${title}`} className={sheetIconClass}>
             <svg aria-hidden="true" viewBox="0 0 24 24" className="size-5 fill-none stroke-current stroke-2">
               <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12Z" />
               <circle cx="12" cy="12" r="3" />
@@ -82,7 +80,7 @@ function SheetButtons({ path, title, heading, scoreLines, fileName }: Props) {
             onClick={download}
             disabled={busy}
             aria-label={`Download ${title}`}
-            className={iconButtonClass}
+            className={sheetIconClass}
           >
             <svg aria-hidden="true" viewBox="0 0 24 24" className="size-5 fill-none stroke-current stroke-2">
               <path d="M12 4v11m-5-5 5 5 5-5M5 20h14" />
@@ -103,31 +101,33 @@ function SheetButtons({ path, title, heading, scoreLines, fileName }: Props) {
         ref={dialogRef}
         onClose={() => setViewUrl(null)}
         aria-labelledby={titleId}
-        className="m-auto w-[calc(100%-2rem)] max-w-4xl rounded-xl bg-surface p-6 text-ink backdrop:bg-ink/60"
+        className={`max-w-4xl ${dialogClass}`}
       >
         {viewUrl && (
           <>
-            <div className="flex items-center justify-between gap-4">
-              <h2 id={titleId} className="text-xl font-semibold">
+            <div className={dialogHeaderClass}>
+              <h2 id={titleId} className="text-3xl font-semibold">
                 {title}
               </h2>
-              {/* The same ✕ as the note dialogs. */}
+              {/* The same ✕ as every window. */}
               <button
                 type="button"
                 onClick={() => dialogRef.current?.close()}
                 aria-label="Close"
-                className={closeButtonClass}
+                className={dialogCloseClass}
               >
                 <svg aria-hidden="true" viewBox="0 0 24 24" className="size-5 fill-none stroke-ink stroke-2">
                   <path d="M6 6l12 12M18 6 6 18" />
                 </svg>
               </button>
             </div>
-            <img
-              src={viewUrl}
-              alt={title}
-              className="mx-auto mt-4 max-h-[calc(100vh-10rem)] w-auto border border-line bg-white"
-            />
+            <div className={dialogBodyClass}>
+              <img
+                src={viewUrl}
+                alt={title}
+                className="mx-auto mt-6 max-h-[calc(100vh-12rem)] w-auto border border-line bg-white"
+              />
+            </div>
           </>
         )}
       </dialog>

@@ -30,7 +30,7 @@ function SetupInfo({ testName, browser, screen }: Props) {
         onFocus={() => setOpen(true)}
         onBlur={() => setOpen(false)}
         onClick={() => setOpen(true)}
-        className="flex size-9 items-center justify-center rounded-lg text-ink-muted hover:bg-surface hover:text-ink focus-visible:outline-4 focus-visible:-outline-offset-4 focus-visible:outline-accent"
+        className="flex size-9 items-center justify-center rounded-lg text-ink-muted hover:bg-surface hover:text-ink focus-visible:outline-3 focus-visible:-outline-offset-4 focus-visible:outline-accent"
       >
         <svg aria-hidden="true" viewBox="0 0 24 24" className="size-5 fill-none stroke-current stroke-2">
           <rect x="3" y="4" width="18" height="12" rx="2" />

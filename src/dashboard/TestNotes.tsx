@@ -7,6 +7,7 @@
 import { useEffect, useState, type SubmitEvent } from "react";
 import { formatDateTime } from "./formatDate";
 import NoteDialog, { type Note, type NoteDialogState } from "./NoteDialog";
+import { iconButtonClass } from "./styles";
 import { supabase } from "./supabase";
 import { useMe } from "./useMe";
 import { useSession } from "./useSession";
@@ -15,10 +16,6 @@ type Load = { state: "loading" } | { state: "failed" } | { state: "loaded"; note
 
 const noteColumns = "id, body, created_by, created_at, updated_at, clinicians(display_name)";
 const checkConnection = "Check your internet connection and try again.";
-
-// A 48px click area around a small icon.
-const iconButtonClass =
-  "flex size-10 items-center justify-center rounded-lg hover:bg-hover focus-visible:outline-4 focus-visible:-outline-offset-4 focus-visible:outline-accent";
 
 // Which side each note sits on, like a text conversation: the first note is on the left, and the side
 // switches each time a different clinician wrote the next note. A clinician's notes in a row stay together.
@@ -53,7 +50,7 @@ function NoteCard({ note, side, showName, mine, onEdit }: NoteCardProps) {
       >
         {note.body}
       </p>
-      <div className="flex items-center gap-1">
+      <div className="mt-1 flex items-center gap-1">
         <p className="px-1 text-base text-ink-muted">{when}</p>
         {mine && (
           <button
@@ -61,7 +58,7 @@ function NoteCard({ note, side, showName, mine, onEdit }: NoteCardProps) {
             aria-haspopup="dialog"
             onClick={onEdit}
             aria-label={`Edit note written ${written}`}
-            className={`${iconButtonClass} text-accent`}
+            className={`size-9 text-accent ${iconButtonClass}`}
           >
             <svg aria-hidden="true" viewBox="0 0 24 24" className="size-5 fill-none stroke-current stroke-2">
               <path d="M4 20h4L19 9l-4-4L4 16v4Z" />

@@ -4,6 +4,14 @@
 
 import { useEffect, useId, useRef, type ChangeEvent, type SubmitEvent } from "react";
 import { formatDateTime } from "./formatDate";
+import {
+  buttonClass,
+  dialogBodyClass,
+  dialogClass,
+  dialogCloseClass,
+  dialogHeaderClass,
+  textAreaClass,
+} from "./styles";
 
 export type Note = {
   id: string;
@@ -35,15 +43,6 @@ type Props = {
   onClosed: () => void;
 };
 
-const fieldClass =
-  "mt-2 block w-full rounded-lg border border-field-line bg-white p-4 text-ink placeholder:text-ink-muted focus-visible:border-accent focus-visible:outline-2 focus-visible:outline-offset-0 focus-visible:outline-accent";
-const primaryButtonClass =
-  "h-12 rounded-lg bg-accent px-6 font-semibold text-white hover:bg-accent-strong focus-visible:outline-4 focus-visible:outline-offset-4 focus-visible:outline-accent disabled:opacity-70";
-const secondaryButtonClass =
-  "h-12 rounded-lg border-2 border-line bg-surface px-6 font-semibold text-ink hover:bg-hover focus-visible:outline-4 focus-visible:outline-offset-4 focus-visible:outline-accent";
-const dangerButtonClass =
-  "h-12 rounded-lg bg-danger px-6 font-semibold text-white hover:bg-danger-strong focus-visible:outline-4 focus-visible:outline-offset-4 focus-visible:outline-accent disabled:opacity-70";
-
 function TrashIcon() {
   return (
     <svg aria-hidden="true" viewBox="0 0 24 24" className="size-5 fill-none stroke-current stroke-2">
@@ -70,15 +69,10 @@ function NoteDialog(props: Props) {
   const close = () => dialogRef.current?.close();
 
   return (
-    <dialog
-      ref={dialogRef}
-      onClose={props.onClosed}
-      aria-labelledby={titleId}
-      className="m-auto w-[calc(100%-2rem)] max-w-xl rounded-2xl bg-surface p-8 text-ink backdrop:bg-ink/60"
-    >
+    <dialog ref={dialogRef} onClose={props.onClosed} aria-labelledby={titleId} className={`max-w-xl ${dialogClass}`}>
       {state && state.mode !== "delete" && (
         <form onSubmit={props.onSave}>
-          <div className="flex items-start justify-between gap-4">
+          <div className={dialogHeaderClass}>
             <div>
               <h2 id={titleId} className="text-3xl font-semibold">
                 {state.mode === "add" ? "Add note" : "Edit note"}
@@ -91,64 +85,65 @@ function NoteDialog(props: Props) {
                 </p>
               )}
             </div>
-            <button
-              type="button"
-              onClick={close}
-              aria-label="Close"
-              className="-mr-3 -mt-2 flex size-12 shrink-0 items-center justify-center rounded-lg hover:bg-hover focus-visible:outline-4 focus-visible:-outline-offset-4 focus-visible:outline-accent"
-            >
+            <button type="button" onClick={close} aria-label="Close" className={dialogCloseClass}>
               <svg aria-hidden="true" viewBox="0 0 24 24" className="size-5 fill-none stroke-ink stroke-2">
                 <path d="M6 6l12 12M18 6 6 18" />
               </svg>
             </button>
           </div>
 
-          <label htmlFor={fieldId} className="mt-6 block font-semibold">
-            Note
-          </label>
-          <textarea
-            id={fieldId}
-            aria-describedby={hintId}
-            autoFocus
-            rows={5}
-            value={state.draft}
-            onChange={(event: ChangeEvent<HTMLTextAreaElement>) => props.onDraftChange(event.target.value)}
-            placeholder="What happened during this test?"
-            className={fieldClass}
-          />
-          <p id={hintId} className="mt-2 flex gap-2 text-base text-ink-muted">
-            <svg aria-hidden="true" viewBox="0 0 24 24" className="mt-0.5 size-4 shrink-0 fill-none stroke-current stroke-2">
-              <rect x="5" y="11" width="14" height="10" rx="2" />
-              <path d="M8 11V8a4 4 0 0 1 8 0v3" />
-            </svg>
-            Only clinicians see notes. Don't include the client's name or other identifying details.
-          </p>
-          {error && (
-            <p role="alert" className="mt-3">
-              {error}
-            </p>
-          )}
-
-          <div className="mt-6 flex flex-wrap items-center justify-between gap-4">
-            {state.mode === "add" ? (
-              <p className="text-base text-ink-muted">{savingAs && `Saving as ${savingAs}`}</p>
-            ) : (
-              <button
-                type="button"
-                onClick={props.onAskDelete}
-                aria-label="Delete note"
-                className="flex size-12 items-center justify-center rounded-lg text-danger hover:bg-danger-tint focus-visible:outline-4 focus-visible:-outline-offset-4 focus-visible:outline-accent"
+          <div className={dialogBodyClass}>
+            <label htmlFor={fieldId} className="mt-6 block font-semibold">
+              Note
+            </label>
+            <textarea
+              id={fieldId}
+              aria-describedby={hintId}
+              autoFocus
+              rows={5}
+              value={state.draft}
+              onChange={(event: ChangeEvent<HTMLTextAreaElement>) => props.onDraftChange(event.target.value)}
+              placeholder="What happened during this test?"
+              className={`mt-2 ${textAreaClass}`}
+            />
+            <p id={hintId} className="mt-2 flex gap-2 text-base text-ink-muted">
+              <svg
+                aria-hidden="true"
+                viewBox="0 0 24 24"
+                className="mt-0.5 size-4 shrink-0 fill-none stroke-current stroke-2"
               >
-                <TrashIcon />
-              </button>
+                <rect x="5" y="11" width="14" height="10" rx="2" />
+                <path d="M8 11V8a4 4 0 0 1 8 0v3" />
+              </svg>
+              Only clinicians see notes. Don't include the client's name or other identifying details.
+            </p>
+            {error && (
+              <p role="alert" className="mt-3">
+                {error}
+              </p>
             )}
-            <div className="flex gap-3">
-              <button type="button" onClick={close} className={secondaryButtonClass}>
-                Cancel
-              </button>
-              <button type="submit" disabled={busy} className={primaryButtonClass}>
-                {busy ? "Saving…" : state.mode === "add" ? "Save note" : "Save changes"}
-              </button>
+
+            <div className="mt-6 flex flex-wrap items-center justify-between gap-4">
+              {state.mode === "add" ? (
+                <p className="text-base text-ink-muted">{savingAs && `Saving as ${savingAs}`}</p>
+              ) : (
+                <button
+                  type="button"
+                  onClick={props.onAskDelete}
+                  aria-label="Delete note"
+                  className="flex size-12 items-center justify-center rounded-lg text-danger hover:bg-danger-tint focus-visible:outline-3 focus-visible:-outline-offset-4 focus-visible:outline-accent"
+                >
+                  <TrashIcon />
+                </button>
+              )}
+              <div className="flex gap-3">
+                <button type="button" onClick={close} className={buttonClass("secondary")}>
+                  Cancel
+                </button>
+                <button type="submit" disabled={busy} className={buttonClass("primary")}>
+                  {busy ? "Saving…" : state.mode === "add" ? "Save note" : "Save changes"}
+                </button>
+              </div>
             </div>
           </div>
         </form>
@@ -156,29 +151,35 @@ function NoteDialog(props: Props) {
 
       {state?.mode === "delete" && (
         <>
-          <h2 id={titleId} className="text-3xl font-semibold">
-            Delete this note?
-          </h2>
-          <p className="mt-2 text-base text-ink-muted">{subtitle}. Other clinicians will no longer see it.</p>
-          <div className="mt-4 rounded-lg bg-page p-4">
-            <p className="whitespace-pre-wrap break-words">{state.note.body}</p>
-            <p className="mt-2 text-base text-ink-muted">
-              {state.note.clinicians?.display_name ?? "—"} · {formatDateTime(state.note.created_at)}
-            </p>
+          <div className={dialogHeaderClass}>
+            <div>
+              <h2 id={titleId} className="text-3xl font-semibold">
+                Delete this note?
+              </h2>
+              <p className="mt-1 text-base text-ink-muted">{subtitle}. Other clinicians will no longer see it.</p>
+            </div>
           </div>
-          {error && (
-            <p role="alert" className="mt-3">
-              {error}
-            </p>
-          )}
-          <div className="mt-6 flex justify-end gap-3">
-            {/* The cursor starts on Keep note, so pressing Enter by mistake doesn't delete. */}
-            <button type="button" onClick={props.onKeep} autoFocus className={secondaryButtonClass}>
-              Keep note
-            </button>
-            <button type="button" onClick={props.onConfirmDelete} disabled={busy} className={dangerButtonClass}>
-              {busy ? "Deleting…" : "Delete note"}
-            </button>
+          <div className={dialogBodyClass}>
+            <div className="mt-6 rounded-lg border border-line bg-surface p-4">
+              <p className="whitespace-pre-wrap break-words">{state.note.body}</p>
+              <p className="mt-2 text-base text-ink-muted">
+                {state.note.clinicians?.display_name ?? "—"} · {formatDateTime(state.note.created_at)}
+              </p>
+            </div>
+            {error && (
+              <p role="alert" className="mt-3">
+                {error}
+              </p>
+            )}
+            <div className="mt-6 flex justify-end gap-3">
+              {/* The cursor starts on Keep note, so pressing Enter by mistake doesn't delete. */}
+              <button type="button" onClick={props.onKeep} autoFocus className={buttonClass("secondary")}>
+                Keep note
+              </button>
+              <button type="button" onClick={props.onConfirmDelete} disabled={busy} className={buttonClass("danger")}>
+                {busy ? "Deleting…" : "Delete note"}
+              </button>
+            </div>
           </div>
         </>
       )}

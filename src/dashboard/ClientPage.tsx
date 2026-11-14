@@ -31,7 +31,7 @@ type Load =
   | { state: "loaded"; clientId: string; client: Client | null };
 
 const breadcrumbLinkClass =
-  "rounded-lg font-semibold text-accent underline-offset-8 hover:text-accent-strong hover:underline focus-visible:outline-4 focus-visible:outline-offset-4 focus-visible:outline-accent";
+  "rounded-lg font-semibold text-accent underline-offset-8 hover:text-accent-strong hover:underline focus-visible:outline-3 focus-visible:outline-offset-4 focus-visible:outline-accent";
 
 // Of raw_data (the full click or answer log), only the browser is read (ADR-047); the log itself isn't.
 // A visit's clinicians is who created it.
@@ -151,7 +151,6 @@ function ClientPage() {
         </nav>
         {client && (
           <GenerateSequence
-            look="outline"
             clientCode={client.code}
             onCreated={() => setReloads((count) => count + 1)}
           />
@@ -189,7 +188,7 @@ function ClientPage() {
                             aria-expanded={open}
                             aria-controls={`visit-${visit.id}`}
                             onClick={() => toggleVisit(visit.id)}
-                            className="flex w-full items-center gap-4 px-6 py-4 text-left focus-visible:outline-4 focus-visible:-outline-offset-4 focus-visible:outline-accent"
+                            className="flex w-full items-center gap-4 px-6 py-4 text-left focus-visible:outline-3 focus-visible:-outline-offset-4 focus-visible:outline-accent"
                           >
                             <Chevron open={open} />
                             <span className="flex-1">

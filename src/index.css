@@ -21,7 +21,8 @@
   --color-line: #e5e2db;
   /* The band behind each test's name in a visit, marking where one test ends and the next begins. */
   --color-band: #eef3f2;
-  --color-field-line: #8a919a;
+  /* Input borders: about 4.5:1 on white, so an empty field is easy to see. */
+  --color-field-line: #6e7781;
   /* Hover tint for rows and buttons on white; a light teal-gray that stands apart from the page color. */
   --color-hover: #ebf3f2;
   /* The running test's dot while it waits for Continue (roadmap 9.1). */

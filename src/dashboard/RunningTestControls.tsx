@@ -5,6 +5,7 @@
 import { useState } from "react";
 import { stopReasonLabels } from "./statusLabels";
 import StopDialog from "./StopDialog";
+import { buttonClass } from "./styles";
 import { supabase } from "./supabase";
 
 type Props = {
@@ -54,7 +55,7 @@ function RunningTestControls({ sequenceTestId, testName, subtitle, holding, next
           disabled={continuing}
           // Heard as "Continue to Part A"; seen as "▶ Part A".
           aria-label={nextStep ? `Continue to ${nextStep}` : undefined}
-          className="flex h-9 items-center gap-2 rounded-lg bg-accent px-4 text-base font-medium text-white hover:bg-accent-strong focus-visible:outline-4 focus-visible:outline-offset-4 focus-visible:outline-accent disabled:opacity-70"
+          className={buttonClass("primary", "small")}
         >
           {continuing ? (
             "Continuing…"
@@ -72,7 +73,7 @@ function RunningTestControls({ sequenceTestId, testName, subtitle, holding, next
         type="button"
         aria-haspopup="dialog"
         onClick={() => setStopOpen(true)}
-        className="flex h-9 items-center rounded-lg border border-danger bg-surface px-4 text-base font-medium text-danger hover:bg-danger-tint focus-visible:outline-4 focus-visible:outline-offset-4 focus-visible:outline-accent"
+        className={buttonClass("dangerOutline", "small")}
       >
         End test
       </button>
