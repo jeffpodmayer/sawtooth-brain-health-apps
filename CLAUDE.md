@@ -91,8 +91,8 @@ docs/            ROADMAP.md, DECISIONS.md
 - The shared layer must be able to stop a test and collect its partial result.
 - Shared code never knows how a test is scored. Test code never imports
   Supabase. All data goes through the `ResultStore` interface.
-- For the dashboard, each test also provides `scoreTable`, `practiceRow` and
-  `sheetLabels`, and saves `rawData.browser` (ADR-047).
+- For the dashboard, each test also provides `scoreTable`, `practiceRow`,
+  `sheetLabels` and `stopReasons`, and saves `rawData.browser` (ADR-047, ADR-049).
 
 **Scoring and timing**
 

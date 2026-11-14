@@ -8,6 +8,7 @@ export const testStatusLabels: Record<string, string> = {
   not_given: "Not given",
 };
 
+// The stop reasons every test offers (ADR-049). A test adds its own in its test-info.ts (stopReasons).
 export const stopReasonLabels: Record<string, string> = {
   gave_up: "Gave up",
   interrupted: "Interrupted",

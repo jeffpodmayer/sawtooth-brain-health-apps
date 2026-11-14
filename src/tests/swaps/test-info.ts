@@ -7,3 +7,6 @@ export const testVersion = "0.1.0";
 
 // The sheets this test saves (SPEC: Recording), labeled and in the order the dashboard shows them (roadmap 8.7).
 export const sheetLabels: Record<string, string> = { sheet: "Answer sheet" };
+
+// Stop reasons the dashboard offers for this test, on top of the shared ones (ADR-049). None for now.
+export const stopReasons: Record<string, string> = {};
