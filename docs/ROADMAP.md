@@ -3,7 +3,7 @@
 The build, broken into small steps. Each step is about one session and teaches
 one thing. Tick a box only when its "Check" passes.
 
-**Current step:** 9.2
+**Current step:** 9.3
 
 How to use this file:
 
@@ -427,9 +427,11 @@ clicks Continue, and the controls sit on the client page, on the running test's 
   - Note: a stop with no client tab to answer stays "Ending… waiting for the client's screen" (ADR-049). TEST-RPC in development has such rows
   - Note: `seed.sql`'s first visit (Trail Making completed, SWAPS stopped, visit completed) matches End test on the last test, so it stays as it is
 
-- [ ] **9.2 The client page updates live**
+- [x] **9.2 The client page updates live**
   - Learn: Supabase real-time for signed-in clinicians, through RLS
   - Check: when a client reaches a hold or finishes a test, the client page shows it within a second or two without a reload; the running test shows the dot and, during a timed part, the counter; another practice's changes never arrive
+  - Note: built with Postgres Changes (migration `add_realtime_for_visits`): the client page listens to this client's visits and their tests, re-reads on any change, and re-reads when the connection comes back. A script confirmed the other practice's clinician and a browser that isn't signed in receive no events
+  - Note: also added: status pills (red In progress, yellow Waiting for you) and Continue labeled with the next step from each test's `holds` (ADR-050)
   - Note: consider a `seed.sql` visit that's begun, holding and in a timed part, so the live states show after a reset without SQL by hand
 
 - [ ] **9.3 Stop and Continue reach the client's tab**
