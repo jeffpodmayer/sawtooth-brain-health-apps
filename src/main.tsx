@@ -18,6 +18,7 @@ const DevBreakPage = import.meta.env.DEV ? lazy(() => import("./dev/DevBreakPage
 const DevTrailPages = import.meta.env.DEV ? lazy(() => import("./dev/DevTrailPages")) : null;
 const DevSwapsForm = import.meta.env.DEV ? lazy(() => import("./dev/DevSwapsForm")) : null;
 const DevSwapsRecall = import.meta.env.DEV ? lazy(() => import("./dev/DevSwapsRecall")) : null;
+const DevProgressPage = import.meta.env.DEV ? lazy(() => import("./dev/DevProgressPage")) : null;
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
@@ -89,6 +90,16 @@ createRoot(document.getElementById("root")!).render(
             element={
               <Suspense>
                 <DevSwapsRecall />
+              </Suspense>
+            }
+          />
+        )}
+        {DevProgressPage && (
+          <Route
+            path="/dev/progress/:token"
+            element={
+              <Suspense>
+                <DevProgressPage />
               </Suspense>
             }
           />

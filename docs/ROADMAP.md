@@ -3,7 +3,7 @@
 The build, broken into small steps. Each step is about one session and teaches
 one thing. Tick a box only when its "Check" passes.
 
-**Current step:** 9.3
+**Current step:** 9.4
 
 How to use this file:
 
@@ -434,10 +434,13 @@ clicks Continue, and the controls sit on the client page, on the running test's 
   - Note: also added: status pills (red In progress, yellow Waiting for you) and Continue labeled with the next step from each test's `holds` (ADR-050)
   - Note: consider a `seed.sql` visit that's begun, holding and in a timed part, so the live states show after a reset without SQL by hand
 
-- [ ] **9.3 Stop and Continue reach the client's tab**
+- [x] **9.3 Stop and Continue reach the client's tab**
   - Learn: Supabase real-time channels; letting a client listen without letting it read tables (approach decided at the start of this step)
   - Check: the client's tab reports test began, timed part started and ended, and each hold (through an Edge Function, checked by link token); a stop or Continue reaches the tab within a second or two; the client can't hear any other sequence's messages
-  - Note: consider alerting the dashboard when a client's screen is too small, in case the client can't explain the problem on the call. ADR-048 allows only which test is running and whether it's holding, so this would need another decision (raised at 5.4)
+  - Note: built as ADR-051: migration `add_visit_pings` sends an empty "check now" on the visit's own Broadcast channel (named from a hash of the link token) when a stop is requested, Continue is clicked or the visit closes; the tab then asks the Edge Function `check-status`, which 9.4 polls too. The Edge Function `report-progress` records began, holds and timed parts. `src/client/listen-for-checks.ts` uses `@supabase/realtime-js` alone, the one ESLint exception (ADR-051 narrows ADR-043)
+  - Note: tried with the development page `/dev/progress/<token>?test=<test-id>` beside the dashboard: each report showed on the dashboard, and Continue and End test reached the page within a second or two. A listener on another visit's channel heard nothing
+  - Note: `reportProgress` answers saved or not saved. 9.5 decides how a hold report is retried, since Continue can't appear until the hold is recorded
+  - Note: production still needs migration `add_visit_pings` and Edge Functions `check-status` and `report-progress` at the Phase 9 release
 
 - [ ] **9.4 Status-check fallback**
   - Learn: polling an Edge Function every few seconds; stopping the polling cleanly
@@ -448,6 +451,7 @@ clicks Continue, and the controls sit on the client page, on the running test's 
   - Check: each test holds after its samples or practice until Continue, with the finished sample left on screen and nothing timed; a stop saves the partial result and sheet with its reason; "end current test" goes to the break screen; "end whole sequence" goes to the end screen and closes the link
   - Note: the hold prop's shape, and the timed-part prop, are settled here (ADR-048). Holds and their labels follow ADR-050, including a hold at each test's start. The development test pages need a way past a hold without the dashboard
   - Note: remove `breakLocked` (`SequenceRunner`, `BreakScreen`) and the break screen's button: the next test's first hold starts it (ADR-050)
+  - Note: consider alerting the dashboard when a client's screen is too small, in case the client can't explain the problem on the call. ADR-048 allows only which test is running and whether it's holding, so this would need another decision (raised at 5.4)
   - Note: check that audio resumes after a long hold without a client click, in every browser, Safari especially (ADR-050)
   - Note: save-result refuses a result with a stop point (`stopped_not_supported_yet`). Extend it to save a stopped test's partial result with its reason and clinician (ADR-040)
   - Note: from the Phases 5–7 code review, while save-result and the close trigger are open here: (a) two saves finishing the last two tests at once can leave the sequence `open`, since neither sees the other's change (lock the sequence row in the trigger); (b) two tabs saving the same test can overwrite the saved test's sheets, since the pending check runs before the upload; (c) save-result doesn't require a finished test's sheets (Trail Making's partA and partB, SWAPS's sheet), only rejects unknown names
