@@ -1299,3 +1299,32 @@ each timed part, and that the Continue button should say which step comes next.
 - Audio resumes after long silences without a new click. Check this in every browser, Safari
   especially (roadmap 9.5 and 10.4).
 - `breakLocked` goes away: the break screen simply has no button.
+
+## ADR-051: How the client's tab hears Stop and Continue
+
+- **Status:** Accepted · **Date:** 2026-11-13 · Builds on ADR-002, ADR-048 and ADR-049
+
+**Context:** A clinician's stop or Continue must reach the client's tab within a second or two
+(roadmap 9.3). Supabase real-time normally decides who hears what by checking a login against RLS,
+but clients never log in and never read tables (ADR-002).
+
+**Decision:**
+
+- When a stop is requested, Continue is clicked, or the visit closes, a database trigger sends
+  an empty "check now" message over real-time Broadcast. The message carries no data.
+- Each visit has its own channel, named from a one-way hash (SHA-256) of its link token with a
+  fixed prefix. The client's tab works out the name from the token it already has. The name can't
+  be guessed and can't be turned back into the token. No column is added.
+- On a message, the tab asks an Edge Function, checked by link token, for the current state
+  (stop requested, Continue count). The status check (roadmap 9.4) calls the same function, so the
+  answer always comes from the server, never from the message.
+- The channel is public in Supabase's terms (no login). Anyone who learned its name could send a
+  fake "check now", which only makes the tab ask the server early.
+- The client's tab still never logs in. Anonymous sign-in was considered and rejected: it would
+  change that rule and add logins to manage.
+
+**Consequences:**
+
+- Realtime's "Allow public access" setting must stay on in both Supabase projects.
+- A visit's channel name is as private as its link token. Never log or display it.
+- Real-time is only a shortcut. Without it, Stop and Continue arrive at the next status check.
