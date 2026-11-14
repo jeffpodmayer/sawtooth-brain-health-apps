@@ -430,11 +430,11 @@ clicks Continue, and the controls sit on the client page, on the running test's 
 
 - [ ] **9.2 The client page updates live**
   - Learn: Supabase real-time for signed-in clinicians, through RLS
-  - Check: when a client reaches a hold or finishes a test, the client page shows it within a second or two without a reload; another practice's changes never arrive
+  - Check: when a client reaches a hold or finishes a test, the client page shows it within a second or two without a reload; the running test shows the dot and, during a timed part, the counter; another practice's changes never arrive
 
 - [ ] **9.3 Stop and Continue reach the client's tab**
   - Learn: Supabase real-time channels; letting a client listen without letting it read tables (approach decided at the start of this step)
-  - Check: the client's tab reports a hold (through an Edge Function, checked by link token); a stop or Continue reaches the tab within a second or two; the client can't hear any other sequence's messages
+  - Check: the client's tab reports test began, timed part started and ended, and each hold (through an Edge Function, checked by link token); a stop or Continue reaches the tab within a second or two; the client can't hear any other sequence's messages
   - Note: consider alerting the dashboard when a client's screen is too small, in case the client can't explain the problem on the call. ADR-048 allows only which test is running and whether it's holding, so this would need another decision (raised at 5.4)
 
 - [ ] **9.4 Status-check fallback**
@@ -444,7 +444,7 @@ clicks Continue, and the controls sit on the client page, on the running test's 
 - [ ] **9.5 What the client sees: holds and stops**
   - Learn: connecting the hold and the stop to each test (5.11, 6.10); adding a prop to the plug-in contract
   - Check: each test holds after its samples or practice until Continue, with the finished sample left on screen and nothing timed; a stop saves the partial result and sheet with its reason; "end current test" goes to the break screen; "end whole sequence" goes to the end screen and closes the link
-  - Note: the hold prop's shape is settled here (ADR-048). The development test pages need a way past a hold without the dashboard
+  - Note: the hold prop's shape, and the timed-part prop, are settled here (ADR-048). The development test pages need a way past a hold without the dashboard
   - Note: the break screen stays a client click. `breakLocked` (`SequenceRunner`, `BreakScreen`) offered a clinician-locked break; ADR-048 puts the clinician's control inside tests instead, so remove it unless the clinicians ask for it (decided at 7.4, dropped at 9.1)
   - Note: save-result refuses a result with a stop point (`stopped_not_supported_yet`). Extend it to save a stopped test's partial result with its reason and clinician (ADR-040)
   - Note: from the Phases 5–7 code review, while save-result and the close trigger are open here: (a) two saves finishing the last two tests at once can leave the sequence `open`, since neither sees the other's change (lock the sequence row in the trigger); (b) two tabs saving the same test can overwrite the saved test's sheets, since the pending check runs before the upload; (c) save-result doesn't require a finished test's sheets (Trail Making's partA and partB, SWAPS's sheet), only rejects unknown names

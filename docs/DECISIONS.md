@@ -1211,8 +1211,11 @@ the test that's running, not on a page of their own.
   couldn't do the sample.
 - Tests get one more prop for the hold. Its shape is settled when the tests use it (roadmap 9.5).
   Tests still never import Supabase; the shared layer passes the hold through.
-- ADR-009's "no live progress view" now allows exactly this: which test is running and whether
-  it's holding. Nothing else about the client's progress is shown.
+- ADR-009's "no live progress view" now allows exactly this: whether the client's tab has begun the
+  running test (a red glowing dot with "In progress"; steady when the computer asks for reduced motion),
+  a counter while a timed part runs, and whether the test is holding. Nothing else is shown.
+- Tests report when a timed part starts and ends, as "running" or "not", never which part. The server
+  records the times with its own clock. The counter is for display only and is never used for scoring.
 
 **Consequences:**
 
@@ -1238,6 +1241,8 @@ there was nowhere to keep a stop that hasn't been answered yet, or a hold.
 - Holds are counts, not names, so shared code never learns a test's parts. The client's tab raises
   `holds_reached`; Continue sets `holds_released` equal to it. Holding means reached > released.
   Repeating either changes nothing.
+- `sequence_tests` also gains `began_at` (the client's tab began the test) and `timed_part_started_at`
+  (a timed part is running; cleared when it ends). Both use the server's clock. Neither is part of the result.
 - Clinicians act through one database function per action (ADR-044), which checks their practice.
   The client's tab writes only through Edge Functions checked by link token.
 - The client's tab always answers a stop: a partial result (saved as `stopped`), or "not begun"
