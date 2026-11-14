@@ -127,7 +127,7 @@ function TestBlock({ test, clientCode, visitCreatedAt, running, onChanged }: Pro
     <span className="flex flex-wrap items-baseline gap-x-3">
       <span className="font-semibold">{name}</span>
       <span className={`text-base font-semibold ${statusColor}`}>
-        {live && <LiveDot />}
+        {live && <LiveDot waiting={holding} />}
         {ending && (
           <>
             Ending

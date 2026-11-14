@@ -237,7 +237,7 @@ reaching it. A `notGiven` part has only `status` and `code`.
   that part is `notGiven`.
 - Parts not yet reached are `notGiven`.
 - The test records no code for a stop, because it only learns that it was stopped, not
-  why. How a stop becomes 996 or 997 is settled at roadmap 9.1.
+  why. The server adds 996 or 997 from the stop reason and where the stop found the test (ADR-049, roadmap 9.5).
 - The stop reason (Gave up, Interrupted, Alphabet check not passed) is saved.
 - The sheet is saved as it stood. The partial result goes through the shared stop hook.
 

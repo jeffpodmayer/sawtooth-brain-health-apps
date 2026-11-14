@@ -24,16 +24,18 @@
   --color-field-line: #8a919a;
   /* Hover tint for rows and buttons on white; a light teal-gray that stands apart from the page color. */
   --color-hover: #ebf3f2;
+  /* The running test's dot while it waits for Continue (roadmap 9.1). */
+  --color-hold-dot: #e0a100;
 
-  /* The running test's red dot: a soft glow that swells and fades every 2 seconds (roadmap 9.1). */
+  /* The running test's dot: a soft glow in its own color that swells and fades every 2 seconds (roadmap 9.1). */
   --animate-live-glow: live-glow 2s ease-in-out infinite;
   @keyframes live-glow {
     0%,
     100% {
-      box-shadow: 0 0 0 0 rgb(180 35 24 / 0.55);
+      box-shadow: 0 0 0 0 color-mix(in srgb, currentColor 55%, transparent);
     }
     50% {
-      box-shadow: 0 0 0 6px rgb(180 35 24 / 0);
+      box-shadow: 0 0 0 6px color-mix(in srgb, currentColor 0%, transparent);
     }
   }
 

@@ -1212,7 +1212,8 @@ the test that's running, not on a page of their own.
 - Tests get one more prop for the hold. Its shape is settled when the tests use it (roadmap 9.5).
   Tests still never import Supabase; the shared layer passes the hold through.
 - ADR-009's "no live progress view" now allows exactly this: whether the client's tab has begun the
-  running test (a red glowing dot with "In progress"; steady when the computer asks for reduced motion),
+  running test (a red glowing dot with "In progress", yellow with "Waiting for you"; steady when the computer
+  asks for reduced motion),
   a counter while a timed part runs, and whether the test is holding. Nothing else is shown.
 - Tests report when a timed part starts and ends, with the part's key (e.g. `partA`). Shared code passes
   the key along without reading it; each test lists its timed parts' labels for the dashboard (`timedParts`).

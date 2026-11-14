@@ -1,15 +1,18 @@
-// The running test's live signs on the client page (roadmap 9.1, ADR-048): a red glowing dot once the client's tab
+// The running test's live signs on the client page (roadmap 9.1, ADR-048): a glowing dot once the client's tab
 // has begun the test, and a counter while a timed part runs. Both are for display only.
 
 import { useEffect, useState } from "react";
 
-// A red dot with a soft glow that swells and fades every 2 seconds. Steady when the computer asks for reduced
-// motion. Screen readers skip it; the words next to it ("In progress") carry the meaning.
-export function LiveDot() {
+// A dot with a soft glow that swells and fades every 2 seconds: red while the test runs, yellow while it waits
+// for Continue. The glow takes the dot's own color. Steady when the computer asks for reduced motion.
+// Screen readers skip it; the words next to it ("In progress", "Waiting for you") carry the meaning.
+export function LiveDot({ waiting }: { waiting: boolean }) {
   return (
     <span
       aria-hidden="true"
-      className="mr-2 inline-block size-2.5 rounded-full bg-danger animate-live-glow motion-reduce:animate-none"
+      className={`mr-2 inline-block size-2.5 rounded-full bg-current animate-live-glow motion-reduce:animate-none ${
+        waiting ? "text-hold-dot" : "text-danger"
+      }`}
     />
   );
 }

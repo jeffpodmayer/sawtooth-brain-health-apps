@@ -3,7 +3,7 @@
 The build, broken into small steps. Each step is about one session and teaches
 one thing. Tick a box only when its "Check" passes.
 
-**Current step:** 9.1
+**Current step:** 9.2
 
 How to use this file:
 
@@ -419,18 +419,18 @@ see their own practice.
 Reshaped at the start of 9.1 (ADR-048): a test holds after each sample or practice until the clinician
 clicks Continue, and the controls sit on the client page, on the running test's row.
 
-- [ ] **9.1 Stop and Continue controls on the dashboard**
+- [x] **9.1 Stop and Continue controls on the dashboard**
   - Learn: recording an action with who did it and why; one database function per action (ADR-044)
   - Check: the running test's row (the first `pending` test in an open visit) shows End current test, and Continue while it's holding (hold set by hand in development); the open visit's row shows End whole sequence, next to Copy link; both ends require a reason (Gave up / Interrupted); each action saves with the clinician's ID
-  - Note: a stop must be saved before the client's partial result arrives, so the status check (9.4) has something to read. `sequence_tests` doesn't allow that yet; add a stop-request state by migration (Phase 2 code review)
-  - Note: a test only learns that it was stopped, not why, so Trail Making can't yet record a part as `notGiven` with code 996 or 997. A stop during a sample needs 996 when the client couldn't do it (ADR-032). Settle how once the clinicians confirm the alphabet check (Phase 3 code review). Ending at the hold after a sample is the natural source of 996 (ADR-048)
-  - Note: a sequence closes itself as `completed` once no test is pending (ADR-042). "End whole sequence" must set the sequence to `discontinued` before marking its remaining tests not given (found at 7.8)
-  - Note: `seed.sql` creates the first visit (Trail Making completed, SWAPS stopped) as `completed` (fixed at 8.9; development's row was updated by hand). Check that this still fits the stop rule decided here
-  - Note: the client page re-reads its visits after New sequence and then opens only the newest visit with results, closing any the clinician had opened. Keep open visits and tests open across a re-read, since stop controls will re-read while a test runs (Phase 8 code review)
+  - Note: built as ADR-048 and ADR-049: migrations `add_stop_requests_and_holds`, `add_clinician_stop_and_continue` and `add_timed_part`; End test and Continue on the running test's row, End session on the open visit's row, a reason picker for both; a red In progress dot (yellow while waiting for Continue) and a counter in the running part's row. Holds, the dot and the counter were tried with values set by hand in development
+  - Note: the reasons are Gave up, Interrupted and Unable to complete, plus each test's own (`stopReasons`; Trail Making adds Alphabet check not passed)
+  - Note: a stop with no client tab to answer stays "Ending… waiting for the client's screen" (ADR-049). TEST-RPC in development has such rows
+  - Note: `seed.sql`'s first visit (Trail Making completed, SWAPS stopped, visit completed) matches End test on the last test, so it stays as it is
 
 - [ ] **9.2 The client page updates live**
   - Learn: Supabase real-time for signed-in clinicians, through RLS
   - Check: when a client reaches a hold or finishes a test, the client page shows it within a second or two without a reload; the running test shows the dot and, during a timed part, the counter; another practice's changes never arrive
+  - Note: consider a `seed.sql` visit that's begun, holding and in a timed part, so the live states show after a reset without SQL by hand
 
 - [ ] **9.3 Stop and Continue reach the client's tab**
   - Learn: Supabase real-time channels; letting a client listen without letting it read tables (approach decided at the start of this step)
@@ -448,6 +448,7 @@ clicks Continue, and the controls sit on the client page, on the running test's 
   - Note: the break screen stays a client click. `breakLocked` (`SequenceRunner`, `BreakScreen`) offered a clinician-locked break; ADR-048 puts the clinician's control inside tests instead, so remove it unless the clinicians ask for it (decided at 7.4, dropped at 9.1)
   - Note: save-result refuses a result with a stop point (`stopped_not_supported_yet`). Extend it to save a stopped test's partial result with its reason and clinician (ADR-040)
   - Note: from the Phases 5–7 code review, while save-result and the close trigger are open here: (a) two saves finishing the last two tests at once can leave the sequence `open`, since neither sees the other's change (lock the sequence row in the trigger); (b) two tabs saving the same test can overwrite the saved test's sheets, since the pending check runs before the upload; (c) save-result doesn't require a finished test's sheets (Trail Making's partA and partB, SWAPS's sheet), only rejects unknown names
+  - Note: add Trail Making's codes in save-result, after the browser-versus-server check (ADR-049): 996 on the next timed part for Unable to complete during a sample, its instructions or the hold after it; 997 on Part B for Alphabet check not passed. A pure function in Trail Making's `scoring/`, tests first. Awaits the clinicians with ADR-032
   - Note: a failed save offers Try again with the same result, and a 409 counts as saved (decided at 7.7). But a 400 or 404 fails on every retry, so the client stays on Try again. "End whole sequence" closes the link, and save-result only accepts an open sequence, so the stopped test's partial result must be saved before the sequence closes, or save-result must accept it (found at 7.7)
 
 - [ ] **9.6 Test both paths in every browser**
