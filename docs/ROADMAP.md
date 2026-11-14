@@ -3,7 +3,7 @@
 The build, broken into small steps. Each step is about one session and teaches
 one thing. Tick a box only when its "Check" passes.
 
-**Current step:** Phase 8 release (then 9.1)
+**Current step:** 9.1
 
 How to use this file:
 
@@ -361,7 +361,7 @@ see their own practice.
 - [x] **8.1 Clinician sign-in**
   - Learn: Supabase Auth in React; protecting routes (sign-in method decided at the start of this step)
   - Check: `/dashboard` redirects to sign-in when signed out; sign-out works; a client link never shows the dashboard
-  - Note: the production build warns that the script is over 500 KB (587 KB, 205 KB compressed, at the Phases 5–7 release). Load `/dashboard` and the client screens as separate pieces (React Router lazy routes), so a client never downloads dashboard code
+  - Note: the production build warns that the script is over 500 KB (587 KB, 205 KB compressed, at the Phases 5–7 release). Load `/dashboard` and the client screens as separate pieces (React Router lazy routes), so a client never downloads dashboard code. Done at 8.9 for the dashboard. At the Phase 8 release the client screens went back into the first download, since a failed second download left the client on a blank page (code review). The build still warns (590 KB)
 
 **8.2 Clinician accounts for all three:** moved to 10.4 (decided 2026-11-11, since development resets delete every login).
 
@@ -423,8 +423,9 @@ see their own practice.
   - Note: a test only learns that it was stopped, not why, so Trail Making can't yet record a part as `notGiven` with code 996 or 997. A stop during a sample needs 996 when the client couldn't do it (ADR-032). Settle how once the clinicians confirm the alphabet check (Phase 3 code review)
   - Note: save-result refuses a result with a stop point (`stopped_not_supported_yet`). Extend it here to save a stopped test's partial result with its reason and clinician (ADR-040)
   - Note: a sequence closes itself as `completed` once no test is pending (ADR-042). "End whole sequence" must set the sequence to `discontinued` before marking its remaining tests not given (found at 7.8)
-  - Note: in `seed.sql`, the first visit (Trail Making completed, SWAPS stopped) is still `open`, because the seed inserts finished rows and the closing trigger only runs on update (ADR-042). Set its status to match the rule decided here (found at the Phases 5–7 release)
+  - Note: `seed.sql` creates the first visit (Trail Making completed, SWAPS stopped) as `completed` (fixed at 8.9; development's row was updated by hand). Check that this still fits the stop rule decided here
   - Note: from the Phases 5–7 code review, while save-result and the close trigger are open here: (a) two saves finishing the last two tests at once can leave the sequence `open`, since neither sees the other's change (lock the sequence row in the trigger); (b) two tabs saving the same test can overwrite the saved test's sheets, since the pending check runs before the upload; (c) save-result doesn't require a finished test's sheets (Trail Making's partA and partB, SWAPS's sheet), only rejects unknown names
+  - Note: the client page re-reads its visits after New sequence and then opens only the newest visit with results, closing any the clinician had opened. Keep open visits and tests open across a re-read, since stop controls will re-read while a test runs (Phase 8 code review)
 
 - [ ] **9.2 Real-time stop to the client's tab**
   - Learn: Supabase real-time channels; letting a client listen without letting it read tables (approach decided at the start of this step)
@@ -512,6 +513,7 @@ Nothing real goes into production until every box here is ticked.
   - Learn: Supabase's security advisor; reviewing keys and auth settings
   - Check: the advisor shows no warnings; RLS is on for every table; no secret key in `src/` or the built app; production Edge Function secrets are set; sign-in settings are final
   - Note: set up a real email service for password resets, since Supabase's built-in email is limited to a few an hour; decide on a second sign-in step after 12.1 (ADR-043)
+  - Note: from the Phase 8 code review: (a) the client page assumes every saved `scores` has its test's current shape, so one older result would blank the whole page. Before any test's score shape changes, check the shape or catch the error for each test; (b) the Clients list reads at most 1,000 clients (`max_rows`), so search would miss any beyond that
 
 - [ ] **12.6 Set up the real practice in production**
   - Learn: adding real (non-seed) setup data safely
