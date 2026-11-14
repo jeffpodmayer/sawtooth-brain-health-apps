@@ -51,7 +51,7 @@ function ClientPage() {
   const { clientId = "" } = useParams();
   const validId = isUuid(clientId);
   const [load, setLoad] = useState<Load>({ state: "loading" });
-  const [reloads, setReloads] = useState(0); // goes up after a new sequence, so the visits are read again
+  const [reloads, setReloads] = useState(0); // goes up after a click or a live change, so the visits are read again
   // Which visits are open. Several can be open at once.
   const [openVisits, setOpenVisits] = useState<Set<string>>(new Set());
   const openedFor = useRef<string | null>(null); // the client whose visits were last opened by default
@@ -97,6 +97,33 @@ function ClientPage() {
   const current = load.state !== "loading" && load.clientId === clientId ? load : null;
   const notFound = !validId || (current?.state === "loaded" && current.client === null);
   const client = current?.state === "loaded" ? current.client : null;
+
+  // This client's visit ids, as one string, so the subscription below restarts only when the list changes.
+  const visitIds = client?.sequences.map((visit) => visit.id).join(",") ?? "";
+
+  // Live updates (roadmap 9.2): any change to this client's visits or their tests re-reads the page. The sent
+  // row is never used; RLS decides what's sent. A reconnect (e.g. after the laptop sleeps) also re-reads, in
+  // case changes were missed while offline.
+  useEffect(() => {
+    if (!validId) return;
+    const reread = () => setReloads((count) => count + 1);
+    let channel = supabase
+      .channel(`client-${clientId}`)
+      .on("postgres_changes", { event: "*", schema: "public", table: "sequences", filter: `client_id=eq.${clientId}` }, reread);
+    if (visitIds) {
+      channel = channel.on(
+        "postgres_changes",
+        { event: "UPDATE", schema: "public", table: "sequence_tests", filter: `sequence_id=in.(${visitIds})` },
+        reread,
+      );
+    }
+    channel.subscribe((status) => {
+      if (status === "SUBSCRIBED") reread();
+    });
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [clientId, validId, visitIds]);
   const visits = client?.sequences ?? [];
 
   return (

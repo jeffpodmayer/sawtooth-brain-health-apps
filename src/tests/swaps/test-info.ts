@@ -14,3 +14,7 @@ export const stopReasons: Record<string, string> = {};
 // The timed parts this test reports while running (ADR-048), labeled as in its score table, so the dashboard
 // shows the counter in that part's row.
 export const timedParts: Record<string, string> = { test: "Test", recall: "Recall" };
+
+// The steps this test holds before, in order, waiting for the clinician's Continue (ADR-050). The dashboard's
+// button shows the next one, e.g. "▶ Test". The hold before Recall awaits the clinicians.
+export const holds: string[] = ["Introduction", "Test", "Recall"];

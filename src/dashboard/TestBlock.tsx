@@ -41,7 +41,7 @@ export type VisitTest = {
 };
 
 const statusColors: Record<string, string> = { completed: "text-success-ink", stopped: "text-warning-ink" };
-const warningColor = "text-warning-ink"; // "Waiting for you" and "Ending…" too
+// "Ending…" is amber like Stopped. "In progress" and "Waiting for you" are ink; their dot carries the color.
 // Score table widths: the row names and each score column get this share of the width (about 150px on a
 // laptop); the sheet buttons get what's left, at least 16% with SWAPS's five columns.
 const columnPercent = 14;
@@ -108,11 +108,18 @@ function TestBlock({ test, clientCode, visitCreatedAt, running, onChanged }: Pro
   let liveLabel = testStatusLabels[test.status] ?? test.status;
   if (running && holding) liveLabel = "Waiting for you";
   else if (running && test.began_at) liveLabel = "In progress";
-  const statusColor = ending || (running && holding) ? warningColor : (statusColors[test.status] ?? "text-ink-muted");
+  const statusColor = ending
+    ? "text-warning-ink"
+    : running && test.began_at
+      ? "text-ink"
+      : (statusColors[test.status] ?? "text-ink-muted");
 
-  // While ending, "Ending" with its dots comes first, before these.
+  // The dot once the client's tab has begun the running test. The counter is in the part rows below.
+  const live = running && test.began_at !== null && !ending;
+
+  // While ending, "Ending" with its dots comes first, before these; while live, the pill does.
   const status = [
-    !ending && liveLabel,
+    !ending && !live && liveLabel,
     test.stop_reason && (stopReasonLabels[test.stop_reason] ?? plugin?.stopReasons[test.stop_reason] ?? test.stop_reason),
     test.stop_reason && test.clinicians && `by ${test.clinicians.display_name}`,
     otherDay,
@@ -120,14 +127,21 @@ function TestBlock({ test, clientCode, visitCreatedAt, running, onChanged }: Pro
     .filter(Boolean)
     .join(" · ");
 
-  // The dot once the client's tab has begun the running test. The counter is in the part rows below.
-  const live = running && test.began_at !== null && !ending;
-
   const nameAndStatus = (
     <span className="flex flex-wrap items-baseline gap-x-3">
-      <span className="font-semibold">{name}</span>
-      <span className={`text-base font-semibold ${statusColor}`}>
-        {live && <LiveDot waiting={holding} />}
+      {/* The name is larger and bolder than its status (20px semibold over 16px regular), so it reads as the heading. */}
+      <span className="text-xl font-semibold">{name}</span>
+      <span className={`text-base ${statusColor}`}>
+        {/* An outlined pill in its dot's color, with ink text: each over a see-through tint of its color: red for In progress, amber and yellow for Waiting for you. */}
+        {live && (
+          <span
+            className={`inline-flex items-center rounded-full border px-3 py-0.5 ${holding ? "border-hold-line bg-hold-dot/15" : "border-danger bg-danger/10"}`}
+          >
+            <LiveDot waiting={holding} />
+            {liveLabel}
+          </span>
+        )}
+        {live && status && " · "}
         {ending && (
           <>
             Ending
@@ -178,6 +192,7 @@ function TestBlock({ test, clientCode, visitCreatedAt, running, onChanged }: Pro
             testName={name}
             subtitle={`${clientCode} · ${formatDate(visitCreatedAt)}`}
             holding={holding}
+            nextStep={plugin?.holds[test.holds_released] ?? null}
             testReasons={plugin?.stopReasons ?? {}}
             onChanged={onChanged}
           />

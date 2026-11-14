@@ -26,16 +26,20 @@
   --color-hover: #ebf3f2;
   /* The running test's dot while it waits for Continue (roadmap 9.1). */
   --color-hold-dot: #e0a100;
+  /* The outline around "Waiting for you": a deeper amber than the dot, so it shows on the pale band (roadmap 9.1). */
+  --color-hold-line: #b07d00;
 
-  /* The running test's dot: a soft glow in its own color that swells and fades every 2 seconds (roadmap 9.1). */
-  --animate-live-glow: live-glow 2s ease-in-out infinite;
+  /* The running test's dot: a copy of it grows and fades every 2 seconds, like a glow (roadmap 9.1). It uses
+     size and opacity only, so it works in every browser and in any dot color. */
+  --animate-live-glow: live-glow 2s ease-out infinite;
   @keyframes live-glow {
-    0%,
-    100% {
-      box-shadow: 0 0 0 0 color-mix(in srgb, currentColor 55%, transparent);
+    0% {
+      transform: scale(1);
+      opacity: 0.6;
     }
-    50% {
-      box-shadow: 0 0 0 6px color-mix(in srgb, currentColor 0%, transparent);
+    100% {
+      transform: scale(2.6);
+      opacity: 0;
     }
   }
 

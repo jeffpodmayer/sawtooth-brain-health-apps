@@ -1,5 +1,6 @@
-// Continue and End test, on the running test's row (roadmap 9.1, ADR-048, ADR-049). Continue shows only while
-// the test is holding. End test asks for a reason first (StopDialog); the client's tab then answers the stop.
+// Continue and End test, on the running test's row (roadmap 9.1, ADR-048 to ADR-050). Continue shows only while
+// the test is holding, labeled with the step it starts ("▶ Part A"). End test asks for a reason first
+// (StopDialog); the client's tab then answers the stop.
 
 import { useState } from "react";
 import { stopReasonLabels } from "./statusLabels";
@@ -11,11 +12,12 @@ type Props = {
   testName: string; // "Trail Making"
   subtitle: string; // "TEST-002 · Nov 13, 2026"
   holding: boolean;
+  nextStep: string | null; // the step Continue starts, from the test's holds list (ADR-050)
   testReasons: Record<string, string>; // this test's own reasons, offered after the shared ones
   onChanged: () => void; // re-reads the visits
 };
 
-function RunningTestControls({ sequenceTestId, testName, subtitle, holding, testReasons, onChanged }: Props) {
+function RunningTestControls({ sequenceTestId, testName, subtitle, holding, nextStep, testReasons, onChanged }: Props) {
   const [stopOpen, setStopOpen] = useState(false);
   const [continuing, setContinuing] = useState(false);
   const [continueError, setContinueError] = useState(false);
@@ -50,9 +52,20 @@ function RunningTestControls({ sequenceTestId, testName, subtitle, holding, test
           type="button"
           onClick={handleContinue}
           disabled={continuing}
-          className="flex h-9 items-center rounded-lg bg-accent px-4 text-base font-medium text-white hover:bg-accent-strong focus-visible:outline-4 focus-visible:outline-offset-4 focus-visible:outline-accent disabled:opacity-70"
+          // Heard as "Continue to Part A"; seen as "▶ Part A".
+          aria-label={nextStep ? `Continue to ${nextStep}` : undefined}
+          className="flex h-9 items-center gap-2 rounded-lg bg-accent px-4 text-base font-medium text-white hover:bg-accent-strong focus-visible:outline-4 focus-visible:outline-offset-4 focus-visible:outline-accent disabled:opacity-70"
         >
-          {continuing ? "Continuing…" : "Continue"}
+          {continuing ? (
+            "Continuing…"
+          ) : (
+            <>
+              <svg aria-hidden="true" viewBox="0 0 24 24" className="size-4 fill-current">
+                <path d="M7 4.5v15l12-7.5z" />
+              </svg>
+              {nextStep ?? "Continue"}
+            </>
+          )}
         </button>
       )}
       <button

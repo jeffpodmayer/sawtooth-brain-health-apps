@@ -17,6 +17,7 @@ export const sequenceTests = [
     sheetLabels: trailMaking.sheetLabels,
     stopReasons: trailMaking.stopReasons,
     timedParts: trailMaking.timedParts,
+    holds: trailMaking.holds,
   },
   {
     id: swaps.testId,
@@ -26,6 +27,7 @@ export const sequenceTests = [
     sheetLabels: swaps.sheetLabels,
     stopReasons: swaps.stopReasons,
     timedParts: swaps.timedParts,
+    holds: swaps.holds,
   },
 ];
 

@@ -3,17 +3,18 @@
 
 import { useEffect, useState } from "react";
 
-// A dot with a soft glow that swells and fades every 2 seconds: red while the test runs, yellow while it waits
-// for Continue. The glow takes the dot's own color. Steady when the computer asks for reduced motion.
+// A dot with a glow: a copy of it behind grows and fades every 2 seconds. Red while the test runs, yellow while
+// it waits for Continue. The glow is hidden when the computer asks for reduced motion, leaving a steady dot.
 // Screen readers skip it; the words next to it ("In progress", "Waiting for you") carry the meaning.
 export function LiveDot({ waiting }: { waiting: boolean }) {
   return (
     <span
       aria-hidden="true"
-      className={`mr-2 inline-block size-2.5 rounded-full bg-current animate-live-glow motion-reduce:animate-none ${
-        waiting ? "text-hold-dot" : "text-danger"
-      }`}
-    />
+      className={`relative mr-2 inline-block size-2.5 align-middle ${waiting ? "text-hold-dot" : "text-danger"}`}
+    >
+      <span className="absolute inset-0 rounded-full bg-current animate-live-glow motion-reduce:hidden" />
+      <span className="relative block size-2.5 rounded-full bg-current" />
+    </span>
   );
 }
 
