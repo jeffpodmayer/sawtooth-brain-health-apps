@@ -41,7 +41,14 @@ function GenerateSequence({ onCreated, clientCode, look }: Props) {
 
   return (
     <>
-      <button type="button" onClick={() => setOpen(true)} className={buttonClasses[look]}>
+      <button
+        type="button"
+        onClick={() => {
+          setCreated(null); // a link that finished saving after the window closed isn't shown again
+          setOpen(true);
+        }}
+        className={buttonClasses[look]}
+      >
         <svg aria-hidden="true" viewBox="0 0 24 24" className="size-5 fill-none stroke-current stroke-2">
           <path d="M12 5v14M5 12h14" />
         </svg>
