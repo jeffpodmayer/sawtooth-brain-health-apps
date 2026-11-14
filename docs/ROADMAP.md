@@ -3,7 +3,7 @@
 The build, broken into small steps. Each step is about one session and teaches
 one thing. Tick a box only when its "Check" passes.
 
-**Current step:** 9.5
+**Current step:** Phase 9 release (code review, then production)
 
 How to use this file:
 
@@ -448,7 +448,7 @@ clicks Continue, and the controls sit on the client page, on the running test's 
   - Note: `src/client/watch-test.ts` asks `check-status` at the start, on each "check now" ping, and 3 seconds after each answer, always (real-time can fail without saying so). One check at a time; stopping cancels the timer and the listener and drops a late answer; a refused answer stops it too. Unit tests with fake timers
   - Note: tried on the development page with `*realtime*` blocked in Chrome's DevTools: Continue and End test arrived within 3 seconds. The other browsers are checked at 10.4
 
-- [ ] **9.5 What the client sees: holds and stops**
+- [x] **9.5 What the client sees: holds and stops**
   - Learn: connecting the hold and the stop to each test (5.11, 6.10); adding a prop to the plug-in contract
   - Check: each test holds after its samples or practice until Continue, with the finished sample left on screen and nothing timed; a stop saves the partial result and sheet with its reason; "end current test" goes to the break screen; "end whole sequence" goes to the end screen and closes the link
   - Note: the hold prop's shape, and the timed-part prop, are settled here (ADR-048). Holds and their labels follow ADR-050, including a hold at each test's start. The development test pages need a way past a hold without the dashboard
@@ -465,6 +465,7 @@ clicks Continue, and the controls sit on the client page, on the running test's 
   - Note: built. save-result saves a stopped result as `stopped`, a full result after a stop request as `stopped`, and "not begun" as `not_given`; after End whole sequence it still takes the running test's answer. Its reply says whether the visit is still open, which sends the client to the next test or the end screen. Code review: (a) migration `lock_sequence_when_closing` locks the visit's row in the close trigger; (b) each save try uploads its sheets to its own folder, `<practice_id>/<sequence_test_id>/<try>/`, and removes them if its save doesn't land; (c) a finished test must hand over every sheet
   - Note: after Jeff's live run: a hold right after a timed part shows the break screen instead of the finished part (Trail Making before Sample B, SWAPS before Recall). Holds after a sample or practice keep the finished page on screen (ADR-048)
   - Note: from the live run, on the client page: a test's header no longer names who stopped it ("Stopped · Gave up"); `stopped_by` is still saved. Score cells don't wrap, so "Stopped at 20.6 s" stays on one line
+  - Note: checked in Jeff's live run beside the dashboard: holds and Continue; End current test saved the partial result and sheet with its reason, then the break screen; End whole sequence went to the end screen and closed the link; audio came back after a long hold without a click (Chrome; the other browsers at 10.4)
   - Note: development pages: on `/dev/test/<id>` and `/dev/sequence`, C is Continue and S is End test; E on `/dev/sequence` is End whole sequence
   - Note: the migration and save-result are on development. Production needs `lock_sequence_when_closing` and the new save-result at the Phase 9 release
   - Note: not done here: Trail Making's 996/997 codes (await the clinicians), the too-small-screen alert (needs a decision). No automated tests for `SequenceRunner` (no component-testing library); checked by hand
