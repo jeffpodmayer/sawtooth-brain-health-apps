@@ -3,7 +3,7 @@
 The build, broken into small steps. Each step is about one session and teaches
 one thing. Tick a box only when its "Check" passes.
 
-**Current step:** 8.9
+**Current step:** Phase 8 release (then 9.1)
 
 How to use this file:
 
@@ -405,16 +405,14 @@ see their own practice.
 - [x] **8.8 Notes on each test**
   - Learn: saving with the signed-in clinician's ID
   - Check: a note saves and shows who wrote it and when; clients never see notes
-  - Note: notes show in a test's details, newest first. Clinicians add notes and edit or delete their own, and Delete asks first (ADR-025). Only completed or stopped tests have notes for now; notes on tests that weren't given can come with 9.1 (decided at 8.8)
+  - Note: notes show in a test's details, oldest first, like a text conversation (changed at 8.9). Clinicians add notes and edit or delete their own, and Delete asks first (ADR-025). Only completed or stopped tests have notes for now; notes on tests that weren't given can come with 9.1 (decided at 8.8)
   - Note: migration `restrict_sequence_test_notes_grants` narrows what the browser can write: adding sets only the practice, test, text and author, and editing changes only the text (ADR-027). It goes to production with `create_sequence` at the Phase 8 release
 
-- [ ] **8.9 Dashboard accessibility pass**
-  - Learn: checking with keyboard only and a screen reader; contrast checks
-  - Check: every dashboard page works by keyboard; text meets WCAG 2.2 AA contrast
-  - Note: polish the dashboard's look, especially the Generate Test Sequence window and the clients list. They were built plain for the MVP (decided at 8.4b)
-  - Note: add a client-code search to the Clients list. The Results list had one until it was removed at 8.7
-  - Note: rework the client page's layout, including how a test's details open (8.7). The layout can change freely; what each test provides and how sheets are shown can't (ADR-046)
-  - Note: after saving, cancelling or deleting a note, keyboard focus isn't moved anywhere. Put it somewhere sensible (left at 8.8)
+- [x] **8.9 Dashboard redesign**
+  - Check: Clients list and client page match Jeff's designs; notes, sheets, Copy link and New sequence work
+  - Note: redesigned from Jeff's mock-ups (ADR-047). The formal accessibility pass was dropped; the dashboard keeps the basics
+  - Note: the client page reads each visit's link token (Copy link) and `raw_data->browser`, both through RLS
+  - Note: show the redesign to the clinicians at 10.4
 
 ## Phase 9 — Stop button with real-time
 

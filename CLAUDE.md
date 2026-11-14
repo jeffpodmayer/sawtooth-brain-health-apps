@@ -22,7 +22,7 @@ depends on it.
 ## Stack
 
 - TypeScript + React + Vite, React Router, Tailwind CSS, SVG for test drawings
-- Fontsource (Atkinson Hyperlegible), screenfull, Howler.js, Papa Parse
+- Fontsource (Atkinson Hyperlegible; Atkinson Hyperlegible Next for the dashboard), screenfull, Howler.js, Papa Parse
 - Supabase: auth (clinicians only), Postgres, Storage, real-time, Edge Functions (Deno)
 - Vitest for tests
 - ESLint for linting
@@ -91,6 +91,8 @@ docs/            ROADMAP.md, DECISIONS.md
 - The shared layer must be able to stop a test and collect its partial result.
 - Shared code never knows how a test is scored. Test code never imports
   Supabase. All data goes through the `ResultStore` interface.
+- For the dashboard, each test also provides `scoreTable`, `practiceRow` and
+  `sheetLabels`, and saves `rawData.browser` (ADR-047).
 
 **Scoring and timing**
 
@@ -128,8 +130,11 @@ docs/            ROADMAP.md, DECISIONS.md
 
 **Accessibility**
 
-- WCAG 2.2 AA around the tests. Users are mostly older adults.
-- Atkinson Hyperlegible, body text 18–22px, buttons 48px+ tall.
+- WCAG 2.2 AA on client screens and around the tests. Users are mostly older adults.
+- The dashboard (clinicians only) keeps the basics without a formal audit: contrast,
+  real buttons and labels, keyboard use, visible focus (ADR-047).
+- Client screens: Atkinson Hyperlegible, body text 18–22px, buttons 48px+ tall.
+  Dashboard: Atkinson Hyperlegible Next, 18px body, 16px small text (ADR-047).
 - No accommodations inside a timed test that would change what it measures.
 - No timer, help phone number, or end/skip button on client screens.
 

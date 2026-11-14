@@ -10,7 +10,7 @@ rule in CLAUDE.md.
 
 ## ADR-001: One app, tests as plug-ins
 
-- **Status:** Accepted · **Date:** by 2026-11-05 (naming 2026-11-06) · Component props extended by ADR-028 and ADR-039 · Result extended by ADR-033 · Score summary added by ADR-045 · Full scores and sheet labels added by ADR-046
+- **Status:** Accepted · **Date:** by 2026-11-05 (naming 2026-11-06) · Component props extended by ADR-028 and ADR-039 · Result extended by ADR-033 · Score summary added by ADR-045 · Full scores and sheet labels added by ADR-046 · Replaced by score rows and a practice row in ADR-047
 
 **Context:** The practice will add more tests over time. Each test has its own
 rules, but they all share links, audio, timing, saving and the dashboard.
@@ -266,7 +266,7 @@ having to rebuild later.
 
 ## ADR-012: Accessibility and client screens
 
-- **Status:** Accepted · **Date:** 2026-11-05
+- **Status:** Accepted · **Date:** 2026-11-05 · Narrowed for the dashboard by ADR-047
 
 **Context:** Most clients are older adults, some with vision or motor difficulties.
 But changing a timed test to help someone can change what it measures.
@@ -329,7 +329,7 @@ Jeff wants to avoid merging after every step.
 
 ## ADR-015: Theme names and button text color
 
-- **Status:** Accepted · **Date:** 2026-11-07
+- **Status:** Accepted · **Date:** 2026-11-07 · Dashboard font and sizes changed by ADR-047
 
 **Context:** ADR-012 lists the colors but not what to call them in code, or
 what color text goes on an accent button.
@@ -1081,7 +1081,7 @@ can't run a transaction either.
 
 ## ADR-045: Each test summarizes its own scores for the dashboard
 
-- **Status:** Accepted · **Date:** 2026-11-12 · Adds to the test plug-in in ADR-001 · Extended by ADR-046
+- **Status:** Accepted · **Date:** 2026-11-12 · Adds to the test plug-in in ADR-001 · Extended by ADR-046 · Replaced by ADR-047
 
 **Context:** The per-client view (roadmap 8.6) shows each test's scores. Shared code must never
 know how a test is scored (ADR-001), and each test's `scores` has its own shape.
@@ -1105,7 +1105,7 @@ know how a test is scored (ADR-001), and each test's `scores` has its own shape.
 
 ## ADR-046: Results show on the client page, with each test's full detail and sheets
 
-- **Status:** Accepted · **Date:** 2026-11-12 · Removes the results list (roadmap 8.5) · Adds to the test plug-in in ADR-001 and ADR-045
+- **Status:** Accepted · **Date:** 2026-11-12 · Removes the results list (roadmap 8.5) · Adds to the test plug-in in ADR-001 and ADR-045 · Detail pieces and layout replaced by ADR-047
 
 **Context:** Roadmap 8.5 built a results list across all clients, and 8.7 planned a page for each result.
 Clinicians look at results one client at a time, so the list and a separate page added a step
@@ -1132,3 +1132,56 @@ without adding anything.
 - Search by client code and the date filter went with the results list. A client-code search is
   planned for the Clients list (8.9).
 - The CSV export (10.1) was planned to match the results list, so where it lives is decided at 10.1.
+
+## ADR-047: The dashboard redesign
+
+- **Status:** Accepted · **Date:** 2026-11-13 · Replaces the score summary in ADR-045 and the detail pieces in ADR-046 · Narrows ADR-012 and ADR-015 for the dashboard
+
+**Context:** At roadmap 8.9, Jeff redesigned the dashboard from his own mock-ups. The client page shows each
+test's parts as a table, each row with its own sheet, so each test now hands the dashboard a table instead of text lines.
+Only clinicians use the dashboard.
+
+**Decision:**
+
+- Each test's `summary.ts` provides `scoreTable(scores)`: the test's column names and one row per part.
+  Each row has a label, its values for the first columns (the first shown bold), an optional grey note
+  across the columns it doesn't fill (such as "1 blank" or "Not given"), and the row's sheet name. It also
+  provides `practiceRow(scores)`: the samples or practice, which aren't scored. It is kept but not shown on
+  the dashboard for now. These replace `summarizeScores` (ADR-045) and `detailScores` (ADR-046).
+  `sheetLabels` stays. The `ScoreTable`, `ScoreRow` and `PracticeRow` types are in
+  `src/shared/test-module.ts`.
+- Every test saves `rawData.browser` as `{ name, version }`. The dashboard reads only that from `raw_data`,
+  never the log.
+- The client page has a "Clients / <client ID>" breadcrumb, then the visits, newest first. The newest visit
+  with results starts open. Visits show no status.
+- Each test shows:
+  - its name and status, with the stop reason, who stopped it, and its own date if it differs from the
+    visit's
+  - a computer icon that shows the browser and screen size on hover
+  - its score table, with View and Download for each sheet. Each click gets a fresh 10-minute signed link,
+    and sheets show only as images (ADR-041).
+  - the corrected-scores warning, with the browser's scores inside it
+  - its notes, shown like a text conversation: oldest first, the first note on the left, switching sides
+    when a different clinician wrote the next one; and Add note
+- Test version and start and finish times are stored but not shown.
+- Notes are added, edited and deleted in dialogs. Deleting is reached from Edit and asks first.
+- Open visits have Copy link. New sequence is on the Clients page and on each client page, where the client
+  ID is fixed. The top bar shows the practice name, the clinician's name and Sign out.
+- The dashboard says "Client ID", not "client code". The database column stays `code`.
+- The dashboard has no formal accessibility pass (screen reader testing or audit). It keeps the basics:
+  contrast (4.5:1 for text, 3:1 for borders), real buttons and labels, keyboard use, visible focus, and
+  click targets of at least 24px (most are 48px). Client screens stay at WCAG 2.2 AA (ADR-012).
+- The dashboard uses Atkinson Hyperlegible Next (variable font), loaded only with the dashboard's code,
+  with semibold in place of bold. Body text is 18px, small text 16px and headings 36px. Client screens
+  keep the original Atkinson Hyperlegible at 20px (ADR-015).
+- New theme colors: `surface`, `line`, `field-line`, `hover`, `band`, `accent-strong`, `warning-ink`,
+  `danger`, `danger-strong` and `danger-tint`.
+
+**Consequences:**
+
+- A new test needs `scoreTable` and `practiceRow` with unit tests, and `sheetLabels`. It must also save
+  `rawData.browser`.
+- If a test's score shape changes, its table must handle older results too (as in ADR-045).
+- Test version and times are visible only in the database, or in the CSV export (10.1).
+- The device and operating system aren't recorded. Add them to both tests if the clinicians want them.
+- The clinicians haven't seen the redesign yet.
