@@ -50,14 +50,16 @@ values
   ('20000000-0000-4000-8000-000000000002', '9fd7e9ef-8180-4ee6-b96a-b54143062035', 'TEST-002'),
   ('20000000-0000-4000-8000-000000000003', '4d5c949a-12ca-4902-b1fb-d73d7637f7e7', 'TEST-001');
 
--- One open visit for Sawtooth's TEST-001, created by Test Clinician One.
--- The database fills in link_token and status (open) by itself.
-insert into public.sequences (id, practice_id, client_id, created_by)
+-- A finished visit for Sawtooth's TEST-001, created by Test Clinician One. Its tests are inserted already
+-- finished, so the trigger that closes a visit (roadmap 7.8) never runs; the visit is marked completed here.
+-- The database fills in link_token by itself.
+insert into public.sequences (id, practice_id, client_id, created_by, status)
 values (
   '30000000-0000-4000-8000-000000000001',
   '9fd7e9ef-8180-4ee6-b96a-b54143062035',
   '20000000-0000-4000-8000-000000000001',
-  '10000000-0000-4000-8000-000000000001'
+  '10000000-0000-4000-8000-000000000001',
+  'completed'
 );
 
 -- A finished Trail Making result. Scores follow its SPEC; the numbers are made up.
