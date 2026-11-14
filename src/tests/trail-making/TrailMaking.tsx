@@ -1,11 +1,12 @@
 // Runs all four pages in order, then hands the result to the shared layer. Each page's instructions
 // play first, with their arrows (SPEC: Voice and arrows). Correct clicks draw lines; wrong clicks
-// get the full error response (SPEC: Errors). A finished page stays on screen at the hold before the
-// next one until the clinician's Continue (ADR-050).
+// get the full error response (SPEC: Errors). At the hold before the next page, a finished sample stays
+// on screen until the clinician's Continue (ADR-050); after Part A, the break screen shows instead.
 // Shows a message instead if the screen is too small.
 
 import { useEffect, useReducer, useRef, useState } from "react";
 import { withAudioLog } from "../../shared/audio-log";
+import BreakScreen from "../../shared/BreakScreen";
 import { createAudioPlayer, readyInTime } from "../../shared/audio-player";
 import { browserFrom } from "../../shared/browser-info";
 import { elapsedClock, realClock } from "../../shared/clock";
@@ -359,6 +360,13 @@ function TrailMaking({
         <p>Please tell your clinician.</p>
       </main>
     );
+  }
+
+  // A hold right after a timed part (before Sample B) shows the break screen, not the finished part.
+  const afterTimedPart = phase === "waiting" && (pages[pageIndex - 1] === "partA" || pages[pageIndex - 1] === "partB");
+
+  if (afterTimedPart) {
+    return <BreakScreen />;
   }
 
   if (phase === "waiting" && heldPage !== null) {

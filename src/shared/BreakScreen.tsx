@@ -1,7 +1,7 @@
-// Shown before each test while it waits at its first hold (roadmap 7.4, 9.5). The client and clinician
-// can talk; the clinician's Continue on the dashboard starts the test (ADR-050). No button: after the
-// first click, the client never needs to act except to take the test, and only a clinician ends a
-// test or a sequence (ADR-009).
+// Shown before each test while it waits at its first hold (roadmap 7.4, 9.5), and inside a test at a hold
+// right after a timed part. The client and clinician can talk; the clinician's Continue on the dashboard
+// goes on (ADR-050). No button: after the first click, the client never needs to act except to take the
+// test, and only a clinician ends a test or a sequence (ADR-009).
 
 import ClientScreen from "./ClientScreen";
 

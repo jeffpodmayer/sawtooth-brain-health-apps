@@ -1,9 +1,11 @@
 // Runs SWAPS: the introduction and demo, practice, the test, then recall (SPEC: Flow).
-// Each of the three waits at a hold until the clinician's Continue (ADR-050), with the
-// finished practice or grid left on screen.
+// Each of the three waits at a hold until the clinician's Continue (ADR-050). The finished practice
+// stays on screen at the hold before the test; the hold before recall, right after the timed test,
+// shows the break screen.
 
 import { useEffect, useRef, useState } from "react";
 import { withAudioLog } from "../../shared/audio-log";
+import BreakScreen from "../../shared/BreakScreen";
 import { createAudioPlayer, readyInTime } from "../../shared/audio-player";
 import { browserFrom } from "../../shared/browser-info";
 import { elapsedClock, realClock } from "../../shared/clock";
@@ -404,6 +406,10 @@ function Swaps({
     if (view.inputOn && canSelect(part, view.answers, item) && isOnScreen(item, topRow)) {
       setView({ ...view, selected: item });
     }
+  }
+
+  if (activeStage === "holding" && stage === "recall") {
+    return <BreakScreen />;
   }
 
   return (
