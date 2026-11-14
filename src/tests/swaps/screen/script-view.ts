@@ -25,15 +25,23 @@ function itemNumber(target: string): number {
   return kind === "recall" ? (recallOrder as readonly string[]).indexOf(name) + 1 : Number(name);
 }
 
+// key:correct is the right number in the key for the selected box; item:current is the selected box itself.
 function arrowTarget(view: ScriptView, target: string): string {
-  return target === "key:correct" && view.selected !== null ? `key:${gridItems[view.selected - 1].symbol}` : target;
+  if (view.selected === null) return target;
+  if (target === "key:correct") return `key:${gridItems[view.selected - 1].symbol}`;
+  if (target === "item:current") return `item:${view.selected}`;
+
+  return target;
 }
 
 export function applyScriptAction(view: ScriptView, line: ActionLine): ScriptView {
   const { action, target, value } = line as ViewAction;
 
   if (action === "arrow") return { ...view, arrowOn: arrowTarget(view, target) };
-  if (action === "highlight") return target === "recall:all" ? { ...view, allHighlighted: true } : { ...view, highlighted: itemNumber(target) };
+  // key:all and recall:all light up the whole key row or every recall symbol; one box ends that.
+  if (action === "highlight") {
+    return target.endsWith(":all") ? { ...view, allHighlighted: true } : { ...view, highlighted: itemNumber(target), allHighlighted: false };
+  }
   if (action === "fill") return { ...view, answers: new Map(view.answers).set(itemNumber(target), value) };
   if (action === "select") return { ...view, selected: target === "current" ? view.selected : itemNumber(target) };
   if (action === "enableInput") return { ...view, arrowOn: null, highlighted: null, allHighlighted: false, inputOn: true };

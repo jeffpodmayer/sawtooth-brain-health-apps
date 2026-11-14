@@ -37,12 +37,17 @@ function RecallPage({ answers, selected, allHighlighted = false, onSymbolPress }
 
   return (
     <svg viewBox={`0 ${visibleArea.y} ${pageSize.width} ${visibleArea.height}`} className="block min-h-0 w-full flex-1 fill-ink select-none">
+      {/* The tint sits under the symbols, so they stay crisp; the outline goes on top. */}
+      {outlined.map((place) => (
+        <rect key={place} {...selectionSquare(place)} rx={8} className="fill-accent/20" />
+      ))}
+
       {recallOrder.map((symbol, index) => (
-        <SymbolShape key={symbol} symbol={symbol} {...recallPosition(index + 1)} size={recallSymbolSize} number={answers.get(index + 1) ?? null} />
+        <SymbolShape key={symbol} symbol={symbol} {...recallPosition(index + 1)} size={recallSymbolSize} number={answers.get(index + 1) ?? null} solid={outlined.includes(index + 1)} />
       ))}
 
       {outlined.map((place) => (
-        <rect key={place} {...selectionSquare(place)} rx={8} strokeWidth={4} className="fill-none stroke-accent" />
+        <rect key={place} {...selectionSquare(place)} rx={8} strokeWidth={2.5} className="fill-none stroke-accent" />
       ))}
 
       {places.map((place) => (

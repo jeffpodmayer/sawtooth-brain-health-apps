@@ -27,9 +27,21 @@ const noAnswers: Answers = new Map();
 type SwapsPageProps = {
   answers?: Answers;
   selected?: number | null;
+  keyHighlighted?: boolean;
   topRow?: number;
   arrowOn?: string | null;
   onItemPress?: (item: number) => void;
+};
+
+// A box around the whole key row, with the same margin as the selected box around an item.
+const keyRowMargin = (selectionSize - keySymbolSize) / 2;
+const firstKey = keyPosition(0);
+const lastKey = keyPosition(keyPrintedOrder.length - 1);
+const keyRowBox = {
+  x: firstKey.x - keySymbolSize / 2 - keyRowMargin,
+  y: firstKey.y - keySymbolSize / 2 - keyRowMargin,
+  width: lastKey.x - firstKey.x + keySymbolSize + 2 * keyRowMargin,
+  height: keySymbolSize + 2 * keyRowMargin,
 };
 
 // A square around an item, the same size for the outline and the area that can be pressed.
@@ -39,7 +51,7 @@ function selectionSquare(item: number) {
   return { x: x - selectionSize / 2, y: y - selectionSize / 2, width: selectionSize, height: selectionSize };
 }
 
-function SwapsPage({ answers = noAnswers, selected = null, topRow = 1, arrowOn = null, onItemPress }: SwapsPageProps) {
+function SwapsPage({ answers = noAnswers, selected = null, keyHighlighted = false, topRow = 1, arrowOn = null, onItemPress }: SwapsPageProps) {
   const arrow = arrowOn === null ? null : arrowTo(arrowOn);
 
   function handlePointerDown(event: PointerEvent<SVGRectElement>, item: number) {
@@ -57,9 +69,14 @@ function SwapsPage({ answers = noAnswers, selected = null, topRow = 1, arrowOn =
         <rect x={0} y={gridWindow.y} width={pageSize.width} height={gridWindow.height} />
       </clipPath>
 
+      {/* The key row's highlight: tint under the symbols, outline on top, as for a selected box. */}
+      {keyHighlighted && <rect {...keyRowBox} rx={8} className="fill-accent/20" />}
+
       {keyPrintedOrder.map((symbol, index) => (
-        <SymbolShape key={symbol} symbol={symbol} {...keyPosition(index)} size={keySymbolSize} number={keyNumbers[symbol]} />
+        <SymbolShape key={symbol} symbol={symbol} {...keyPosition(index)} size={keySymbolSize} number={keyNumbers[symbol]} solid={keyHighlighted} />
       ))}
+
+      {keyHighlighted && <rect {...keyRowBox} rx={8} strokeWidth={2.5} className="fill-none stroke-accent" />}
 
       <g clipPath="url(#swaps-grid-window)">
         <g style={{ transform: `translateY(${-scrollOffset(topRow)}px)`, transition: `transform ${scrollMs}ms ease-in-out` }}>
@@ -72,6 +89,9 @@ function SwapsPage({ answers = noAnswers, selected = null, topRow = 1, arrowOn =
             </g>
           ))}
 
+          {/* The selected box's tint sits under the symbols, so they stay crisp; its outline goes on top. */}
+          {selected !== null && <rect {...selectionSquare(selected)} rx={8} className="fill-accent/20" />}
+
           {gridItems.map(({ item, symbol, part }) => (
             <SymbolShape
               key={item}
@@ -79,11 +99,11 @@ function SwapsPage({ answers = noAnswers, selected = null, topRow = 1, arrowOn =
               {...itemPosition(item)}
               size={gridSymbolSize}
               number={answers.get(item) ?? null}
-              solid={part === "practice"}
+              solid={part === "practice" || item === selected}
             />
           ))}
 
-          {selected !== null && <rect {...selectionSquare(selected)} rx={8} strokeWidth={4} className="fill-none stroke-accent" />}
+          {selected !== null && <rect {...selectionSquare(selected)} rx={8} strokeWidth={2.5} className="fill-none stroke-accent" />}
 
           {gridItems.map(({ item }) => (
             <rect key={item} {...selectionSquare(item)} fill="transparent" onPointerDown={(event) => handlePointerDown(event, item)} />

@@ -95,35 +95,29 @@ numbers filling in. The exact lines, with IDs, live in `script.json`.
 
 | #   | Source wording                                                 | App wording                                                                 | Why                                                           |
 | --- | -------------------------------------------------------------- | --------------------------------------------------------------------------- | ------------------------------------------------------------- |
-| SW1 | _(none: the instructions don't cover wrong practice answers)_  | "This number [arrow on the right number in the key] goes with this symbol." | Practice feedback (S7), built from the demo's own words.      |
+| SW1 | _(none: the instructions don't cover wrong practice answers)_  | "**[arrow on the right number in the key]** This number **[arrow on the box]** goes with this symbol." | Practice feedback (S7), built from the demo's own words.      |
 | SW2 | "Write in the numbers that go with each symbol…" (recall form) | "Fill in the numbers that go with each symbol…"                             | Clients click, not write. "Fill in" is the test's own phrase. |
 
 ### Introduction and demo
 
-> Here we have different symbols paired with numbers. Each symbol has its own number.
+> **[highlight the whole key row]** Here we have different symbols paired with numbers. Each symbol has its own number.
 > Your job is to fill in the correct number that goes with each symbol.
 
-> Here is a symbol **[arrow on grid item 1]**. This number \*\*[arrow on the 7 inside the
->
-> > heart in the key]** goes with this symbol, so I would put it here like this.
-> > **[7 fills in inside item 1]\*\*
+Each arrow appears as the words it goes with begin: the number in the key for "This number", the box for "this symbol".
 
-> Here is the next symbol **[arrow on item 2]**. This number \*\*[arrow on the 1 inside
->
-> > the triangle in the key]** goes with this symbol, so I would put it here like this.
-> > **[1 fills in inside item 2]\*\*
+> **[arrow on item 1]** Here is a symbol. **[arrow on the 7 inside the heart in the key]** This number **[arrow on item 1]** goes with this symbol, so I would put it here like this. **[7 fills in inside item 1]**
 
-> This symbol **[arrow on item 3]** goes with this number \*\*[arrow on the 6 inside the
->
-> > flag in the key]**, so I would put it here like this. **[6 fills in inside item 3]\*\*
+> **[arrow on item 2]** Here is the next symbol. **[arrow on the 1 inside the triangle in the key]** This number **[arrow on item 2]** goes with this symbol, so I would put it here like this. **[1 fills in inside item 2]**
 
-Each demo item's box is highlighted while it's being talked about.
+> **[arrow on item 3]** This symbol **[arrow on the 6 inside the flag in the key]** goes with this number, **[arrow on item 3]** so I would put it here like this. **[6 fills in inside item 3]**
+
+The key row stays highlighted until item 1's box is. Each demo item's box is highlighted while it's being
+talked about. After items 1 and 2 fill in, the demo waits 2 seconds before moving on, so the number is seen
+on its own.
 
 ### Practice
 
-> Now you do the rest of these, in the gray box. Stop here \*\*[arrow on the end of the
->
-> > gray box]\*\*.
+> Now you do the rest of these, in the gray box. **[arrow on the end of the gray box]** Stop here.
 
 Then the selector moves to item 4 and the number pad turns on.
 
@@ -136,7 +130,7 @@ Then the selector moves to item 4 and the number pad turns on.
 ⏳ The examiner's pointing at row 1, then row 2, is left out (decided 2026-11-08), because
 the selector moves to the next row by itself.
 
-> When I say begin, start here **[arrow on item 7]** and work as quickly as you can,
+> **[arrow on item 7]** When I say begin, start here and work as quickly as you can,
 > without making mistakes, until I tell you to stop. Ready? Begin!
 
 "Ready?" and "Begin!" are separate clips with a short pause between them. The timer
@@ -151,7 +145,8 @@ The recall timer starts when this clip ends.
 
 ## Answering rules (practice and test)
 
-- **Selector:** one answer box is selected at a time, outlined in the accent color.
+- **Selector:** one answer box is selected at a time, tinted and outlined in the accent color, with
+  its symbol white inside.
   At the start of practice it's item 4; at the start of the test, item 7.
 - **Answering:** clicking a number fills the selected box, and the selector moves to the
   next box.
@@ -166,8 +161,8 @@ The recall timer starts when this clip ends.
 
 ## Practice feedback ⏳
 
-- On a wrong practice answer, the wrong number is cleared, the voice says SW1 with an
-  arrow on the right number in the key, and the box is selected again.
+- On a wrong practice answer, the wrong number is cleared and the voice says SW1, with an
+  arrow on the right number in the key, then on the box, and the box is selected again.
 - This repeats until the answer is right. There's no limit on tries; if the client
   can't finish practice, the clinician ends the test from the dashboard (S7).
 - Practice answers are not scored. Only the number of wrong practice answers is recorded.

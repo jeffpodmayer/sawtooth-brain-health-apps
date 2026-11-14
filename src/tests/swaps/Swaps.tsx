@@ -133,7 +133,10 @@ function Swaps({
       });
     }
 
+    // A pause holds the next line; every other action changes what's on screen.
     function applyAction(line: ActionLine) {
+      if (line.action === "pause") return pause((line as ActionLine & { ms: number }).ms);
+
       setView((current) => applyScriptAction(current, line));
     }
 
@@ -415,7 +418,7 @@ function Swaps({
   return (
     <div ref={pageRef} className="flex h-screen flex-col pb-6">
       {recallView === null ? (
-        <SwapsPage answers={view.answers} selected={view.highlighted ?? view.selected} topRow={topRow} arrowOn={view.arrowOn} onItemPress={handleItemPress} />
+        <SwapsPage answers={view.answers} selected={view.highlighted ?? view.selected} keyHighlighted={view.allHighlighted} topRow={topRow} arrowOn={view.arrowOn} onItemPress={handleItemPress} />
       ) : (
         <RecallPage answers={recallView.answers} selected={recallView.selected} allHighlighted={recallView.allHighlighted} onSymbolPress={handleSymbolPress} />
       )}

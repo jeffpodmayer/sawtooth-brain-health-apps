@@ -6,7 +6,7 @@
     "Spoken lines are played in order; each line is one audio clip named by its id.",
     "Joining a section's spoken lines with single spaces gives the source wording, minus the adaptations listed below.",
     "An arrow replaces the previous arrow. A highlight stays until the next highlight or until input is enabled.",
-    "Targets: item:N is grid item N (1-81, left to right, top to bottom); key:<symbol> is the number inside that symbol in the key; recall:<symbol> is a recall symbol.",
+    "Targets: item:N is grid item N (1-81, left to right, top to bottom); key:<symbol> is the number inside that symbol in the key; recall:<symbol> is a recall symbol; key:correct and item:current follow the selected box (the right number in the key, and the box itself); key:all is the whole key row; recall:all is all the recall symbols.",
     "The recall form's final colon is spoken as a full stop (punctuation only)."
   ],
   "adaptations": [
@@ -27,6 +27,7 @@
   ],
   "sections": {
     "intro": [
+      { "id": "in-00", "type": "action", "action": "highlight", "target": "key:all" },
       {
         "id": "in-01",
         "type": "spoken",
@@ -50,19 +51,25 @@
         "action": "highlight",
         "target": "item:1"
       },
+      {
+        "id": "de-01a",
+        "type": "action",
+        "action": "arrow",
+        "target": "item:1"
+      },
       { "id": "de-02", "type": "spoken", "text": "Here is a symbol." },
       {
         "id": "de-03",
         "type": "action",
         "action": "arrow",
-        "target": "item:1"
+        "target": "key:heart"
       },
       { "id": "de-04", "type": "spoken", "text": "This number" },
       {
         "id": "de-05",
         "type": "action",
         "action": "arrow",
-        "target": "key:heart"
+        "target": "item:1"
       },
       {
         "id": "de-06",
@@ -76,10 +83,17 @@
         "target": "item:1",
         "value": 7
       },
+      { "id": "de-07a", "type": "action", "action": "pause", "ms": 2000 },
       {
         "id": "de-08",
         "type": "action",
         "action": "highlight",
+        "target": "item:2"
+      },
+      {
+        "id": "de-08a",
+        "type": "action",
+        "action": "arrow",
         "target": "item:2"
       },
       { "id": "de-09", "type": "spoken", "text": "Here is the next symbol." },
@@ -87,14 +101,14 @@
         "id": "de-10",
         "type": "action",
         "action": "arrow",
-        "target": "item:2"
+        "target": "key:triangle"
       },
       { "id": "de-11", "type": "spoken", "text": "This number" },
       {
         "id": "de-12",
         "type": "action",
         "action": "arrow",
-        "target": "key:triangle"
+        "target": "item:2"
       },
       {
         "id": "de-13",
@@ -108,10 +122,17 @@
         "target": "item:2",
         "value": 1
       },
+      { "id": "de-14a", "type": "action", "action": "pause", "ms": 2000 },
       {
         "id": "de-15",
         "type": "action",
         "action": "highlight",
+        "target": "item:3"
+      },
+      {
+        "id": "de-15a",
+        "type": "action",
+        "action": "arrow",
         "target": "item:3"
       },
       { "id": "de-16", "type": "spoken", "text": "This symbol" },
@@ -119,14 +140,14 @@
         "id": "de-17",
         "type": "action",
         "action": "arrow",
-        "target": "item:3"
+        "target": "key:flag"
       },
       { "id": "de-18", "type": "spoken", "text": "goes with this number," },
       {
         "id": "de-19",
         "type": "action",
         "action": "arrow",
-        "target": "key:flag"
+        "target": "item:3"
       },
       {
         "id": "de-20",
@@ -147,13 +168,13 @@
         "type": "spoken",
         "text": "Now you do the rest of these, in the gray box."
       },
-      { "id": "pr-02", "type": "spoken", "text": "Stop here." },
       {
         "id": "pr-03",
         "type": "action",
         "action": "arrow",
         "target": "item:6"
       },
+      { "id": "pr-02", "type": "spoken", "text": "Stop here." },
       {
         "id": "pr-04",
         "type": "action",
@@ -170,6 +191,12 @@
         "target": "current"
       },
       {
+        "id": "pf-01a",
+        "type": "action",
+        "action": "arrow",
+        "target": "key:correct"
+      },
+      {
         "id": "pf-02",
         "type": "spoken",
         "text": "This number",
@@ -179,7 +206,7 @@
         "id": "pf-03",
         "type": "action",
         "action": "arrow",
-        "target": "key:correct"
+        "target": "item:current"
       },
       {
         "id": "pf-04",
@@ -213,15 +240,15 @@
         "text": "When you finish this line go on to the next one."
       },
       {
-        "id": "te-07",
-        "type": "spoken",
-        "text": "When I say begin, start here"
-      },
-      {
         "id": "te-08",
         "type": "action",
         "action": "arrow",
         "target": "item:7"
+      },
+      {
+        "id": "te-07",
+        "type": "spoken",
+        "text": "When I say begin, start here"
       },
       {
         "id": "te-09",

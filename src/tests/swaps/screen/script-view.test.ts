@@ -15,6 +15,8 @@ const enableInput = { id: "g", type: "action", action: "enableInput" } as Action
 const highlightRecall = { id: "h", type: "action", action: "highlight", target: "recall:all" } as ActionLine;
 const selectSquare = { id: "i", type: "action", action: "select", target: "recall:square" } as ActionLine;
 const selectCross = { id: "j", type: "action", action: "select", target: "recall:cross" } as ActionLine;
+const arrowOnCurrent = { id: "k", type: "action", action: "arrow", target: "item:current" } as ActionLine;
+const highlightKey = { id: "l", type: "action", action: "highlight", target: "key:all" } as ActionLine;
 
 it("replaces the last arrow with a new one", () => {
   const view = applyScriptAction(applyScriptAction(startView, arrowOnHeart), arrowOnItem2);
@@ -22,10 +24,30 @@ it("replaces the last arrow with a new one", () => {
   expect(view.arrowOn).toBe("item:2");
 });
 
+it("points an item:current arrow at the selected box", () => {
+  const view = applyScriptAction({ ...startView, selected: 5 }, arrowOnCurrent);
+
+  expect(view.arrowOn).toBe("item:5");
+});
+
 it("replaces the last highlight with a new one", () => {
   const view = applyScriptAction(applyScriptAction(startView, highlight1), highlight2);
 
   expect(view.highlighted).toBe(2);
+});
+
+it("highlights the whole key row", () => {
+  expect(applyScriptAction(startView, highlightKey).allHighlighted).toBe(true);
+});
+
+it("ends the key row's highlight when one box is highlighted", () => {
+  const view = [highlightKey, highlight1].reduce(applyScriptAction, startView);
+
+  expect(view).toMatchObject({ allHighlighted: false, highlighted: 1 });
+});
+
+it("starts the introduction with the key row highlighted", () => {
+  expect(sections.intro[0]).toMatchObject({ action: "highlight", target: "key:all" });
 });
 
 it("fills in a number without changing the view it started from", () => {
@@ -40,8 +62,15 @@ it("ends the script's demo with its three numbers filled in", () => {
   const end = actions.reduce(applyScriptAction, startView);
 
   expect(end.answers).toEqual(new Map([[1, 7], [2, 1], [3, 6]]));
-  expect(end.arrowOn).toBe("key:flag");
+  expect(end.arrowOn).toBe("item:3");
   expect(end.highlighted).toBe(3);
+});
+
+it("pauses after each of the demo's first two numbers fills in", () => {
+  const demo = sections.demo;
+  const afterFills = demo.flatMap((line, index) => (line.type === "action" && line.action === "fill" ? [demo[index + 1]] : []));
+
+  expect(afterFills.slice(0, 2)).toMatchObject([{ action: "pause" }, { action: "pause" }]);
 });
 
 it("selects a box", () => {
@@ -74,11 +103,11 @@ it("ends the script's recall section with the first symbol selected and the pad 
   expect(end).toMatchObject({ selected: 1, allHighlighted: false, highlighted: null, inputOn: true });
 });
 
-it("makes the lines after practice's last arrow wait", () => {
+it("doesn't wait in practice, since speech follows its arrow", () => {
   const [now, later] = splitAfterFinalArrow(sections.practice);
 
-  expect(now.map((line) => line.id)).toEqual(["pr-01", "pr-02", "pr-03"]);
-  expect(later.map((line) => line.id)).toEqual(["pr-04", "pr-05"]);
+  expect(now).toHaveLength(sections.practice.length);
+  expect(later).toEqual([]);
 });
 
 it("doesn't wait when speech follows the last arrow", () => {
@@ -91,10 +120,12 @@ it("doesn't wait when speech follows the last arrow", () => {
 it("runs the script's practice feedback on the selected box", () => {
   const wrongAt5 = { ...startView, selected: 5, answers: new Map([[4, 2], [5, 1]]) };
   const actions = sections.practiceFeedback.filter((line): line is ActionLine => line.type === "action");
-  const arrowOn = actions.slice(0, 2).reduce(applyScriptAction, wrongAt5).arrowOn;
+  const onKey = actions.slice(0, 2).reduce(applyScriptAction, wrongAt5).arrowOn;
+  const onBox = actions.slice(0, 3).reduce(applyScriptAction, wrongAt5).arrowOn;
   const end = actions.reduce(applyScriptAction, wrongAt5);
 
-  expect(arrowOn).toBe("key:heart");
+  expect(onKey).toBe("key:heart");
+  expect(onBox).toBe("item:5");
   expect(end).toMatchObject({ selected: 5, arrowOn: null, inputOn: true });
   expect(end.answers).toEqual(new Map([[4, 2]]));
 });

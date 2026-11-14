@@ -22,7 +22,7 @@ exports[`script.json matches the approved copy 1`] = `
     "Spoken lines are played in order; each line is one audio clip named by its id.",
     "Joining a section's spoken lines with single spaces gives the source wording, minus the adaptations listed below.",
     "An arrow replaces the previous arrow. A highlight stays until the next highlight or until input is enabled.",
-    "Targets: item:N is grid item N (1-81, left to right, top to bottom); key:<symbol> is the number inside that symbol in the key; recall:<symbol> is a recall symbol.",
+    "Targets: item:N is grid item N (1-81, left to right, top to bottom); key:<symbol> is the number inside that symbol in the key; recall:<symbol> is a recall symbol; key:correct and item:current follow the selected box (the right number in the key, and the box itself); key:all is the whole key row; recall:all is all the recall symbols.",
     "The recall form's final colon is spoken as a full stop (punctuation only).",
   ],
   "scriptVersion": "0.1.0",
@@ -35,6 +35,12 @@ exports[`script.json matches the approved copy 1`] = `
         "type": "action",
       },
       {
+        "action": "arrow",
+        "id": "de-01a",
+        "target": "item:1",
+        "type": "action",
+      },
+      {
         "id": "de-02",
         "text": "Here is a symbol.",
         "type": "spoken",
@@ -42,7 +48,7 @@ exports[`script.json matches the approved copy 1`] = `
       {
         "action": "arrow",
         "id": "de-03",
-        "target": "item:1",
+        "target": "key:heart",
         "type": "action",
       },
       {
@@ -53,7 +59,7 @@ exports[`script.json matches the approved copy 1`] = `
       {
         "action": "arrow",
         "id": "de-05",
-        "target": "key:heart",
+        "target": "item:1",
         "type": "action",
       },
       {
@@ -69,8 +75,20 @@ exports[`script.json matches the approved copy 1`] = `
         "value": 7,
       },
       {
+        "action": "pause",
+        "id": "de-07a",
+        "ms": 2000,
+        "type": "action",
+      },
+      {
         "action": "highlight",
         "id": "de-08",
+        "target": "item:2",
+        "type": "action",
+      },
+      {
+        "action": "arrow",
+        "id": "de-08a",
         "target": "item:2",
         "type": "action",
       },
@@ -82,7 +100,7 @@ exports[`script.json matches the approved copy 1`] = `
       {
         "action": "arrow",
         "id": "de-10",
-        "target": "item:2",
+        "target": "key:triangle",
         "type": "action",
       },
       {
@@ -93,7 +111,7 @@ exports[`script.json matches the approved copy 1`] = `
       {
         "action": "arrow",
         "id": "de-12",
-        "target": "key:triangle",
+        "target": "item:2",
         "type": "action",
       },
       {
@@ -109,8 +127,20 @@ exports[`script.json matches the approved copy 1`] = `
         "value": 1,
       },
       {
+        "action": "pause",
+        "id": "de-14a",
+        "ms": 2000,
+        "type": "action",
+      },
+      {
         "action": "highlight",
         "id": "de-15",
+        "target": "item:3",
+        "type": "action",
+      },
+      {
+        "action": "arrow",
+        "id": "de-15a",
         "target": "item:3",
         "type": "action",
       },
@@ -122,7 +152,7 @@ exports[`script.json matches the approved copy 1`] = `
       {
         "action": "arrow",
         "id": "de-17",
-        "target": "item:3",
+        "target": "key:flag",
         "type": "action",
       },
       {
@@ -133,7 +163,7 @@ exports[`script.json matches the approved copy 1`] = `
       {
         "action": "arrow",
         "id": "de-19",
-        "target": "key:flag",
+        "target": "item:3",
         "type": "action",
       },
       {
@@ -150,6 +180,12 @@ exports[`script.json matches the approved copy 1`] = `
       },
     ],
     "intro": [
+      {
+        "action": "highlight",
+        "id": "in-00",
+        "target": "key:all",
+        "type": "action",
+      },
       {
         "id": "in-01",
         "text": "Here we have different symbols paired with numbers.",
@@ -173,15 +209,15 @@ exports[`script.json matches the approved copy 1`] = `
         "type": "spoken",
       },
       {
-        "id": "pr-02",
-        "text": "Stop here.",
-        "type": "spoken",
-      },
-      {
         "action": "arrow",
         "id": "pr-03",
         "target": "item:6",
         "type": "action",
+      },
+      {
+        "id": "pr-02",
+        "text": "Stop here.",
+        "type": "spoken",
       },
       {
         "action": "select",
@@ -203,6 +239,12 @@ exports[`script.json matches the approved copy 1`] = `
         "type": "action",
       },
       {
+        "action": "arrow",
+        "id": "pf-01a",
+        "target": "key:correct",
+        "type": "action",
+      },
+      {
         "adaptation": "SW1",
         "id": "pf-02",
         "text": "This number",
@@ -211,7 +253,7 @@ exports[`script.json matches the approved copy 1`] = `
       {
         "action": "arrow",
         "id": "pf-03",
-        "target": "key:correct",
+        "target": "item:current",
         "type": "action",
       },
       {
@@ -291,15 +333,15 @@ exports[`script.json matches the approved copy 1`] = `
         "type": "spoken",
       },
       {
-        "id": "te-07",
-        "text": "When I say begin, start here",
-        "type": "spoken",
-      },
-      {
         "action": "arrow",
         "id": "te-08",
         "target": "item:7",
         "type": "action",
+      },
+      {
+        "id": "te-07",
+        "text": "When I say begin, start here",
+        "type": "spoken",
       },
       {
         "id": "te-09",
