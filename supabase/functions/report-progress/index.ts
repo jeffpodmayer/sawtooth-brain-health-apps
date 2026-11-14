@@ -56,15 +56,16 @@ export default {
     // supabaseAdmin uses the secret key and skips row-level security,
     // so every query here names exactly the columns it needs.
 
-    // The visit, only while it's open.
+    // The visit. While it's open, any report. After End whole sequence, only a timed part's end, so the
+    // dashboard's counter stops while the stopped test's result is on its way (ADR-049).
     const { data: sequence, error: sequenceError } = await ctx.supabaseAdmin
       .from("sequences")
-      .select("id")
+      .select("id, status")
       .eq("link_token", token)
-      .eq("status", "open")
       .maybeSingle();
     if (sequenceError) return failed("sequence lookup", sequenceError.message);
     if (!sequence) return refused();
+    if (sequence.status !== "open" && event !== "timedPartEnded") return refused();
 
     // The running test: the first one still pending. Reports for any other test are refused.
     const { data: running, error: runningError } = await ctx.supabaseAdmin

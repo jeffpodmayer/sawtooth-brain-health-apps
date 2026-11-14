@@ -124,7 +124,7 @@ export default {
     async function findRow(testId: string) {
       return await ctx.supabaseAdmin
         .from("sequence_tests")
-        .select("id, practice_id, status, stop_requested_at")
+        .select("id, practice_id, status, stop_requested_at, holds_released")
         .eq("sequence_id", sequence!.id)
         .eq("test_id", testId)
         .maybeSingle();
@@ -143,6 +143,8 @@ export default {
       if (!row) return rejected("bad_result", "not begun: test not in this sequence");
       if (row.status !== "pending") return alreadySaved(sequence.status === "open");
       if (row.stop_requested_at === null) return rejected("bad_result", "not begun: no stop request");
+      // Once Continue released the first hold the test began, and its answer is a result.
+      if (row.holds_released > 0) return rejected("bad_result", "not begun: test began");
 
       const { data: saved, error: saveError } = await ctx.supabaseAdmin
         .from("sequence_tests")
@@ -207,10 +209,6 @@ export default {
       return rejected("bad_result", "stopped test with no stop request");
     }
 
-    // With a stop request the test is saved as stopped, even if it ran to its end first (ADR-049).
-    // Its reason and clinician are on the row already.
-    const status = row.stop_requested_at === null ? "completed" : "stopped";
-
     // Sheets go up before the row is saved, so a saved result always has its files. Each try gets its
     // own folder, <practice_id>/<sequence_test_id>/<try>/, so two tabs saving the same test can't
     // overwrite each other's files: only the save that lands points to its files.
@@ -240,26 +238,38 @@ export default {
       sheetPaths[name] = path;
     }
 
-    // The status check stays, in case two saves arrive at once.
+    // With a stop request the test is saved as stopped, even if it ran to its end first (ADR-049).
+    // Its reason and clinician are on the row already. Each save also matches the stop state it
+    // expects and the pending status, in case a stop or another save lands in between.
     // rawData arrived as JSON, so it can be stored as JSON.
-    const { data: saved, error: saveError } = await ctx.supabaseAdmin
-      .from("sequence_tests")
-      .update({
-        status,
-        test_version: testVersion,
-        started_at: new Date(startedAt).toISOString(),
-        completed_at: new Date(completedAt).toISOString(),
-        scores,
-        browser_scores: scoresDiffer ? (browserScores as Json) : null,
-        raw_data: rawData as Json,
-        screen_width: width,
-        screen_height: height,
-        sheets: sheetPaths,
-      })
-      .eq("id", row.id)
-      .eq("status", "pending")
-      .select("id")
-      .maybeSingle();
+    async function saveAs(stopped: boolean) {
+      const update = ctx.supabaseAdmin
+        .from("sequence_tests")
+        .update({
+          status: stopped ? "stopped" : "completed",
+          test_version: testVersion as string,
+          started_at: new Date(startedAt!).toISOString(),
+          completed_at: new Date(completedAt!).toISOString(),
+          scores,
+          browser_scores: scoresDiffer ? (browserScores as Json) : null,
+          raw_data: rawData as Json,
+          screen_width: width as number,
+          screen_height: height as number,
+          sheets: sheetPaths,
+        })
+        .eq("id", row!.id)
+        .eq("status", "pending");
+      const matched = stopped ? update.not("stop_requested_at", "is", null) : update.is("stop_requested_at", null);
+      return await matched.select("id").maybeSingle();
+    }
+
+    let { data: saved, error: saveError } = await saveAs(row.stop_requested_at !== null);
+
+    // Nothing matched as completed: a stop may have landed since the row was read. Save it as stopped.
+    if (!saveError && !saved && row.stop_requested_at === null) {
+      ({ data: saved, error: saveError } = await saveAs(true));
+    }
+
     if (saveError) {
       await removeSheets();
       return failed("save", saveError.message);

@@ -419,6 +419,22 @@ see their own practice.
 Reshaped at the start of 9.1 (ADR-048): a test holds after each sample or practice until the clinician
 clicks Continue, and the controls sit on the client page, on the running test's row.
 
+Phase 9 code review (at the release, 2026-11-13):
+
+- Fixed: a stop landing during a save no longer makes the save fail (save-result matches the stop state and
+  saves as stopped); "not begun" is refused once the first hold was released; after End session, a timed
+  part's end still reaches report-progress, so the counter stops; a failing report is given up once the
+  next test's reports wait behind it; migration `lock_tests_when_ending_sequence` makes End session lock
+  the tests before the visit, the same order as a save, so the two can't deadlock
+- Known gap, shipped knowingly: after a reload mid-test, ADR-036 restarts the test, but the server still
+  counts the holds released before, so the restarted test skips them (a timed part can start without
+  Continue). Fix before 10.4, likely by resetting the test's holds when the tab arrives again (changes
+  ADR-049's "a hold can't be undone", so an ADR)
+- Left for later: check-status is polled every 3 s even while real-time works (decided at 9.4), and each
+  test opens its own real-time connection; the dashboard's client page re-reads more often than it needs
+  to; the token check and refusal are copied across the Edge Functions, and the fetch call across
+  `src/client/`; the first hold is handled by both `SequenceRunner` and each test
+
 - [x] **9.1 Stop and Continue controls on the dashboard**
   - Learn: recording an action with who did it and why; one database function per action (ADR-044)
   - Check: the running test's row (the first `pending` test in an open visit) shows End current test, and Continue while it's holding (hold set by hand in development); the open visit's row shows End whole sequence, next to Copy link; both ends require a reason (Gave up / Interrupted); each action saves with the clinician's ID

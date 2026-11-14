@@ -74,3 +74,26 @@ it("sends a report added later, once the queue is empty", async () => {
 
   expect(sent).toEqual([began, hold1]);
 });
+
+it("gives up a failing report once a report for another test waits behind it", async () => {
+  const { send, sent } = fakeSend(["failed", "failed"]);
+  const queue = createProgressQueue(send, 2000);
+
+  queue.add("trail-making", { event: "timedPartEnded", part: "partB" });
+  await vi.advanceTimersByTimeAsync(2000);
+  queue.add("swaps", began);
+  await vi.runAllTimersAsync();
+
+  expect(sent).toEqual([{ event: "timedPartEnded", part: "partB" }, { event: "timedPartEnded", part: "partB" }, began]);
+});
+
+it("keeps retrying a failing report while only its own test's reports wait behind it", async () => {
+  const { send, sent } = fakeSend(["failed", "failed"]);
+  const queue = createProgressQueue(send, 2000);
+
+  queue.add("swaps", began);
+  queue.add("swaps", hold1);
+  await vi.runAllTimersAsync();
+
+  expect(sent).toEqual([began, began, began, hold1]);
+});
