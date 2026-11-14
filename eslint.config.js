@@ -44,4 +44,23 @@ export default defineConfig([
       }],
     },
   },
+  {
+    // The one exception: the client's tab listens on its visit's channel with the real-time library alone,
+    // never the Supabase client (ADR-051). Same rule as above, with only that package let through.
+    files: ['src/client/listen-for-checks.ts'],
+    rules: {
+      'no-restricted-imports': ['error', {
+        patterns: [
+          {
+            group: ['@supabase/*', '!@supabase/realtime-js'],
+            message: 'Only dashboard code talks to Supabase (ADR-043). This file may use the real-time library alone (ADR-051).',
+          },
+          {
+            group: ['**/dashboard', '**/dashboard/**'],
+            message: 'Client screens, shared code and tests must not import dashboard code.',
+          },
+        ],
+      }],
+    },
+  },
 ])

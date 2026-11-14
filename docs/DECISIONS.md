@@ -1022,7 +1022,7 @@ to run. Closing it with the save means a retried last save finds the sequence al
 
 ## ADR-043: Clinicians sign in with email and password
 
-- **Status:** Accepted · **Date:** 2026-11-11 · Answers the sign-in question in ADR-022
+- **Status:** Accepted · **Date:** 2026-11-11 · Answers the sign-in question in ADR-022 · Client screens' channel added by ADR-051
 
 **Context:** ADR-022 left the clinicians' sign-in method to roadmap 8.1. There are three
 clinicians, and their accounts are created by hand (8.2). Public sign-up was still on, so
@@ -1302,7 +1302,7 @@ each timed part, and that the Continue button should say which step comes next.
 
 ## ADR-051: How the client's tab hears Stop and Continue
 
-- **Status:** Accepted · **Date:** 2026-11-13 · Builds on ADR-002, ADR-048 and ADR-049
+- **Status:** Accepted · **Date:** 2026-11-13 · Builds on ADR-002, ADR-048 and ADR-049 · Narrows ADR-043
 
 **Context:** A clinician's stop or Continue must reach the client's tab within a second or two
 (roadmap 9.3). Supabase real-time normally decides who hears what by checking a login against RLS,
@@ -1322,6 +1322,9 @@ but clients never log in and never read tables (ADR-002).
   fake "check now", which only makes the tab ask the server early.
 - The client's tab still never logs in. Anonymous sign-in was considered and rejected: it would
   change that rule and add logins to manage.
+- The tab opens only a real-time connection (Supabase's real-time library on its own), never the
+  Supabase client, so it still can't query tables. This narrows ADR-043: client screens use the
+  Edge Functions and this one channel.
 
 **Consequences:**
 
