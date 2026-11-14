@@ -170,6 +170,7 @@ export type Database = {
       }
       sequence_tests: {
         Row: {
+          began_at: string | null
           browser_scores: Json | null
           completed_at: string | null
           created_at: string
@@ -191,8 +192,10 @@ export type Database = {
           stopped_by: string | null
           test_id: string
           test_version: string | null
+          timed_part_started_at: string | null
         }
         Insert: {
+          began_at?: string | null
           browser_scores?: Json | null
           completed_at?: string | null
           created_at?: string
@@ -214,8 +217,10 @@ export type Database = {
           stopped_by?: string | null
           test_id: string
           test_version?: string | null
+          timed_part_started_at?: string | null
         }
         Update: {
+          began_at?: string | null
           browser_scores?: Json | null
           completed_at?: string | null
           created_at?: string
@@ -237,6 +242,7 @@ export type Database = {
           stopped_by?: string | null
           test_id?: string
           test_version?: string | null
+          timed_part_started_at?: string | null
         }
         Relationships: [
           {
@@ -326,6 +332,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      continue_test: { Args: { sequence_test_id: string }; Returns: undefined }
       create_sequence: {
         Args: { client_code: string; test_ids: string[] }
         Returns: {
@@ -333,6 +340,14 @@ export type Database = {
           client_is_new: boolean
           link_token: string
         }[]
+      }
+      end_sequence: {
+        Args: { reason: string; sequence_id: string }
+        Returns: undefined
+      }
+      request_test_stop: {
+        Args: { reason: string; sequence_test_id: string }
+        Returns: undefined
       }
     }
     Enums: {
