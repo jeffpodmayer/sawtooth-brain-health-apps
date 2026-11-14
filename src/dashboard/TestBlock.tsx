@@ -66,6 +66,19 @@ function fileDate(isoText: string): string {
   return new Date(isoText).toLocaleDateString("en-CA");
 }
 
+// Three dots that fade in turn, after "Ending". Still when the computer asks for reduced motion.
+function LoadingDots() {
+  return (
+    <span aria-hidden="true">
+      {[0, 200, 400].map((delay) => (
+        <span key={delay} className="animate-loading-dot motion-reduce:animate-none" style={{ animationDelay: `${delay}ms` }}>
+          .
+        </span>
+      ))}
+    </span>
+  );
+}
+
 type Props = {
   test: VisitTest;
   clientCode: string;
@@ -91,13 +104,13 @@ function TestBlock({ test, clientCode, visitCreatedAt, running, onChanged }: Pro
   // A stop waiting for the client's tab shows on any pending test, including after End session (ADR-049).
   const ending = test.status === "pending" && test.stop_requested_at !== null;
   let liveLabel = testStatusLabels[test.status] ?? test.status;
-  if (ending) liveLabel = "Ending… waiting for the client's screen";
-  else if (running && holding) liveLabel = "Waiting for you";
+  if (running && holding) liveLabel = "Waiting for you";
   else if (running && test.began_at) liveLabel = "In progress";
   const statusColor = ending || (running && holding) ? warningColor : (statusColors[test.status] ?? "text-ink-muted");
 
+  // While ending, "Ending" with its dots comes first, before these.
   const status = [
-    liveLabel,
+    !ending && liveLabel,
     test.stop_reason && (stopReasonLabels[test.stop_reason] ?? plugin?.stopReasons[test.stop_reason] ?? test.stop_reason),
     test.stop_reason && test.clinicians && `by ${test.clinicians.display_name}`,
     otherDay,
@@ -108,7 +121,15 @@ function TestBlock({ test, clientCode, visitCreatedAt, running, onChanged }: Pro
   const nameAndStatus = (
     <span className="flex flex-wrap items-baseline gap-x-3">
       <span className="font-semibold">{name}</span>
-      <span className={`text-base font-semibold ${statusColor}`}>{status}</span>
+      <span className={`text-base font-semibold ${statusColor}`}>
+        {ending && (
+          <>
+            Ending
+            <LoadingDots /> waiting for the client's screen{status && " · "}
+          </>
+        )}
+        {status}
+      </span>
     </span>
   );
 

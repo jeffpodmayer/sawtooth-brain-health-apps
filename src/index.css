@@ -24,6 +24,19 @@
   --color-field-line: #8a919a;
   /* Hover tint for rows and buttons on white; a light teal-gray that stands apart from the page color. */
   --color-hover: #ebf3f2;
+
+  /* Three dots fading in turn after "Ending" (roadmap 9.1). */
+  --animate-loading-dot: loading-dot 1.4s ease-in-out infinite;
+  @keyframes loading-dot {
+    0%,
+    80%,
+    100% {
+      opacity: 0.2;
+    }
+    40% {
+      opacity: 1;
+    }
+  }
 }
 
 @layer base {

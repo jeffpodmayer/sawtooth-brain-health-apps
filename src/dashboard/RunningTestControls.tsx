@@ -50,7 +50,7 @@ function RunningTestControls({ sequenceTestId, testName, subtitle, holding, test
           type="button"
           onClick={handleContinue}
           disabled={continuing}
-          className="flex h-12 items-center rounded-lg bg-accent px-6 font-medium text-white hover:bg-accent-strong focus-visible:outline-4 focus-visible:outline-offset-4 focus-visible:outline-accent disabled:opacity-70"
+          className="flex h-9 items-center rounded-lg bg-accent px-4 text-base font-medium text-white hover:bg-accent-strong focus-visible:outline-4 focus-visible:outline-offset-4 focus-visible:outline-accent disabled:opacity-70"
         >
           {continuing ? "Continuing…" : "Continue"}
         </button>
@@ -59,7 +59,7 @@ function RunningTestControls({ sequenceTestId, testName, subtitle, holding, test
         type="button"
         aria-haspopup="dialog"
         onClick={() => setStopOpen(true)}
-        className="flex h-12 items-center rounded-lg border border-danger bg-surface px-4 font-medium text-danger hover:bg-danger-tint focus-visible:outline-4 focus-visible:outline-offset-4 focus-visible:outline-accent"
+        className="flex h-9 items-center rounded-lg border border-danger bg-surface px-4 text-base font-medium text-danger hover:bg-danger-tint focus-visible:outline-4 focus-visible:outline-offset-4 focus-visible:outline-accent"
       >
         End test
       </button>
