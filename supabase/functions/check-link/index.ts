@@ -1,6 +1,7 @@
 // check-link: the first thing a client's browser calls (roadmap 7.1).
 // Given a link token, it returns the practice name and the tests still to run.
 // Clients never query tables (ADR-002); this function does it for them.
+// It also resets the running test's holds, since a reopened link starts that test again (ADR-053).
 
 import "@supabase/functions-js/edge-runtime.d.ts";
 import { withSupabase } from "@supabase/server";
@@ -44,11 +45,30 @@ export default {
     // A reopened link carries on from the first one.
     const { data: tests, error: testsError } = await ctx.supabaseAdmin
       .from("sequence_tests")
-      .select("test_id")
+      .select("id, test_id")
       .eq("sequence_id", sequence.id)
       .eq("status", "pending")
       .order("position");
     if (testsError) return failed("tests lookup", testsError.message);
+
+    // The running test starts again from its beginning (ADR-036), so its live state goes back to the
+    // start: no holds, not begun, no timed part (ADR-053). Not after a stop request: the tab must answer
+    // that stop as things stand (ADR-049). A test that never began is unchanged.
+    if (tests.length > 0) {
+      const { error: resetError } = await ctx.supabaseAdmin
+        .from("sequence_tests")
+        .update({
+          holds_reached: 0,
+          holds_released: 0,
+          began_at: null,
+          timed_part: null,
+          timed_part_started_at: null,
+        })
+        .eq("id", tests[0].id)
+        .eq("status", "pending")
+        .is("stop_requested_at", null);
+      if (resetError) return failed("running test reset", resetError.message);
+    }
 
     return Response.json({
       sequenceId: sequence.id,

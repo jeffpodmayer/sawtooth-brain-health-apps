@@ -1231,7 +1231,7 @@ the test that's running, not on a page of their own.
 
 ## ADR-049: How stop requests, holds and stop reasons are stored
 
-- **Status:** Accepted · **Date:** 2026-11-13 · Builds on ADR-024, ADR-032 and ADR-048
+- **Status:** Accepted · **Date:** 2026-11-13 · Builds on ADR-024, ADR-032 and ADR-048 · Hold reset on a reopened link added by ADR-053
 
 **Context:** A clinician's stop and Continue must be saved before the client's tab acts on them
 (roadmap 9.1). A `sequence_tests` row can only be `stopped` once its partial result is saved, so
@@ -1373,3 +1373,30 @@ files leave the app and live on the clinician's computer afterwards.
   each browser at 10.4.
 - Downloaded files live on the clinician's computer, outside RLS. Keeping them safe is the practice's job;
   mention it to the clinicians at 10.4.
+
+## ADR-053: A reopened link resets the running test's holds
+
+- **Status:** Accepted · **Date:** 2026-11-14 · Changes ADR-049 (a hold can be undone by this reset) · Builds on ADR-036
+
+**Context:** After a reload mid-test, ADR-036 starts the test again from its beginning, but the server
+still counted the holds released before. The restarted test skipped them, so a timed part could start
+without Continue (Phase 9 code review).
+
+**Decision:**
+
+- Each time the link is opened, check-link puts the running test (the first pending one) back to its
+  start: both hold counts to 0, `began_at`, `timed_part` and `timed_part_started_at` cleared. It
+  happens before the welcome screen, so the tab never sees the old counts.
+- Not while a stop is requested: the tab answers that stop as things stand (ADR-049).
+- The lock on finished rows allows this one drop (migration `allow_hold_reset`): both counts to 0
+  together, with no stop requested. Any other drop is still refused.
+
+**Consequences:**
+
+- The dashboard shows the restart: the dot goes off until the client is past the sound check, then
+  Continue reads the test's first step again.
+- A stop after the reload but before the first Continue is saved as `not_given`, with the clinician's
+  reason. What the client did before the reload was never saved (ADR-036).
+- Opening the link in a second tab resets the first tab's test too; it drops back to the wait or break
+  screen until Continue. Two tabs on one link aren't supported.
+- Nothing records that a restart happened. Add a count by migration if the clinicians want to see it.

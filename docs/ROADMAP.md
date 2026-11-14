@@ -428,10 +428,10 @@ Phase 9 code review (at the release, 2026-11-13):
   part's end still reaches report-progress, so the counter stops; a failing report is given up once the
   next test's reports wait behind it; migration `lock_tests_when_ending_sequence` makes End session lock
   the tests before the visit, the same order as a save, so the two can't deadlock
-- Known gap, shipped knowingly: after a reload mid-test, ADR-036 restarts the test, but the server still
-  counts the holds released before, so the restarted test skips them (a timed part can start without
-  Continue). Fix before 10.4, likely by resetting the test's holds when the tab arrives again (changes
-  ADR-049's "a hold can't be undone", so an ADR)
+- Known gap, shipped knowingly, fixed 2026-11-14: after a reload mid-test, ADR-036 restarts the test, but the
+  server still counted the holds released before, so the restarted test skipped them. check-link now resets
+  the running test's holds when the link is opened again (ADR-053, migration `allow_hold_reset`); goes to
+  production at the Phase 10 release
 - Left for later: check-status is polled every 3 s even while real-time works (decided at 9.4), and each
   test opens its own real-time connection; the dashboard's client page re-reads more often than it needs
   to; the token check and refusal are copied across the Edge Functions, and the fetch call across
