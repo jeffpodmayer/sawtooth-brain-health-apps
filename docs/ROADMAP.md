@@ -3,7 +3,7 @@
 The build, broken into small steps. Each step is about one session and teaches
 one thing. Tick a box only when its "Check" passes.
 
-**Current step:** Phase 9 release (code review, then production)
+**Current step:** 10.1
 
 How to use this file:
 
@@ -418,6 +418,8 @@ see their own practice.
 
 Reshaped at the start of 9.1 (ADR-048): a test holds after each sample or practice until the clinician
 clicks Continue, and the controls sit on the client page, on the running test's row.
+
+Released 2026-11-13: migrations through `lock_tests_when_ending_sequence` and the Edge Functions check-link, check-status, report-progress and save-result are on production, and `main` matches `dev`.
 
 Phase 9 code review (at the release, 2026-11-13):
 
