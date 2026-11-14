@@ -199,7 +199,7 @@ identifying data as possible.
 
 ## ADR-009: Only clinicians end a test
 
-- **Status:** Accepted · **Date:** 2026-11-06 · Live state and control placement changed by ADR-048
+- **Status:** Accepted · **Date:** 2026-11-06 · Live state and control placement changed by ADR-048 · Break screen's Continue removed by ADR-050
 
 **Context:** A client who gives up mid-test should be stopped by the clinician
 watching, not by a button that could be clicked by accident or used to skip.
@@ -899,7 +899,7 @@ save results, upload sheets and check status will follow the same pattern.
 
 ## ADR-038: Leaving full screen doesn't interrupt a test
 
-- **Status:** Accepted, clinicians not yet asked · **Date:** 2026-11-09 · Narrows full screen in ADR-005
+- **Status:** Accepted, clinicians not yet asked · **Date:** 2026-11-09 · Narrows full screen in ADR-005 · Return to full screen narrowed by ADR-050
 
 **Context:** ADR-005 says tests run full screen. A client can always leave full screen, for
 example with Esc, and only another click can bring it back. A message asking for that click
@@ -1188,7 +1188,7 @@ Only clinicians use the dashboard.
 
 ## ADR-048: The clinician starts each timed part, and controls sit on the test's row
 
-- **Status:** Accepted · **Date:** 2026-11-13 · Changes ADR-009 (adds a small live state) and ADR-028 (a new test prop)
+- **Status:** Accepted · **Date:** 2026-11-13 · Changes ADR-009 (adds a small live state) and ADR-028 (a new test prop) · Where tests hold changed by ADR-050
 
 **Context:** At the start of roadmap 9.1, Jeff changed the design: a test should wait after each
 sample or practice until the clinician clicks Continue, so the clinician can check in with the
@@ -1268,3 +1268,34 @@ there was nowhere to keep a stop that hasn't been answered yet, or a hold.
 - A closed tab mid-test loses that test's partial result. Its row shows the unanswered stop.
 - The code rule awaits the clinicians, with ADR-032 (Trail Making SPEC questions 5–9).
 - Each new test-specific reason needs a migration, since the database checks the list.
+
+## ADR-050: The clinician moves the client through every step
+
+- **Status:** Accepted · **Date:** 2026-11-13 · Changes ADR-048 (where tests hold) and ADR-009 (the break screen's Continue) · Narrows ADR-038
+
+**Context:** After 9.1, Jeff decided the clinician should control every step, not only the start of
+each timed part, and that the Continue button should say which step comes next.
+
+**Decision:**
+
+- Each test holds before each of its steps, and lists those holds in order with the label the
+  dashboard shows on Continue (`holds`). Trail Making: Sample A, Part A, Sample B, Part B.
+  SWAPS: Introduction, Test, Recall. The button reads "▶ " and the next hold's label. The database
+  still only counts holds (ADR-049), so the label is the test's list at `holds_released`.
+- The break screen has no button. It keeps its wording ("Please wait for your clinician to tell
+  you to continue.") while the next test waits at its first hold. The first test after the sound
+  check waits the same way.
+- The client's first click (welcome or sound check) stays. Browsers allow sound and full screen
+  only after a click by the person at that computer, and no message from the dashboard counts.
+- If the client leaves full screen, the test carries on windowed (ADR-038). Only the client can
+  return to full screen; the clinician can ask them to press F11 (Windows) or Ctrl+Cmd+F (Mac),
+  or click for them through the video platform's remote control.
+- SWAPS's hold before Recall makes the pause before recall clinician-paced. Recall is an
+  incidental-memory check, so this awaits the clinicians.
+
+**Consequences:**
+
+- After the first click, a client never needs to act except to take the test.
+- Audio resumes after long silences without a new click. Check this in every browser, Safari
+  especially (roadmap 9.5 and 10.4).
+- `breakLocked` goes away: the break screen simply has no button.
