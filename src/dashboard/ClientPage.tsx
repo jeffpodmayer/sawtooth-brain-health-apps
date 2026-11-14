@@ -1,13 +1,15 @@
 // One client's visits, newest first (roadmap 8.6, redesigned at 8.9). Each visit opens to show its tests.
 // Reads go through RLS, so another practice's client looks the same as one that doesn't exist.
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link, useParams } from "react-router";
 import Chevron from "./Chevron";
 import CopyLinkButton from "./CopyLinkButton";
+import EndVisitButton from "./EndVisitButton";
 import { formatDate } from "./formatDate";
 import GenerateSequence from "./GenerateSequence";
 import { isUuid } from "./isUuid";
+import { testsById } from "./sequence-tests";
 import { supabase } from "./supabase";
 import TestBlock, { type VisitTest } from "./TestBlock";
 
@@ -34,10 +36,16 @@ const breadcrumbLinkClass =
 // Of raw_data (the full click or answer log), only the browser is read (ADR-047); the log itself isn't.
 // A visit's clinicians is who created it; a test's is who stopped it (empty unless stopped).
 const columns =
-  "code, sequences(id, status, created_at, link_token, clinicians(display_name), sequence_tests(id, practice_id, test_id, status, test_version, started_at, completed_at, screen_width, screen_height, scores, browser_scores, stop_reason, sheets, browser:raw_data->browser, clinicians(display_name)))";
+  "code, sequences(id, status, created_at, link_token, clinicians(display_name), sequence_tests(id, practice_id, test_id, status, test_version, started_at, completed_at, screen_width, screen_height, scores, browser_scores, stop_reason, stop_requested_at, holds_reached, holds_released, began_at, timed_part_started_at, sheets, browser:raw_data->browser, clinicians(display_name)))";
 
 const hasResults = (visit: Visit) =>
   visit.sequence_tests.some((test) => test.status === "completed" || test.status === "stopped");
+
+// The running test's own stop reasons: the first test still pending (ADR-048).
+function runningTestReasons(visit: Visit): Record<string, string> {
+  const running = visit.sequence_tests.find((test) => test.status === "pending");
+  return (running && testsById.get(running.test_id)?.stopReasons) ?? {};
+}
 
 function ClientPage() {
   const { clientId = "" } = useParams();
@@ -46,6 +54,7 @@ function ClientPage() {
   const [reloads, setReloads] = useState(0); // goes up after a new sequence, so the visits are read again
   // Which visits are open. Several can be open at once.
   const [openVisits, setOpenVisits] = useState<Set<string>>(new Set());
+  const openedFor = useRef<string | null>(null); // the client whose visits were last opened by default
 
   useEffect(() => {
     if (!validId) return;
@@ -60,9 +69,14 @@ function ClientPage() {
       .then(({ data, error }) => {
         if (cancelled) return;
         setLoad(error ? { state: "failed", clientId } : { state: "loaded", clientId, client: data });
-        // The newest visit with any results starts open.
-        const first = data?.sequences.find(hasResults);
-        setOpenVisits(new Set(first ? [first.id] : []));
+        // On a client's first load, any open visit and the newest visit with results start open.
+        // A re-read (after New sequence or a stop) keeps what the clinician has opened.
+        if (!error && openedFor.current !== clientId) {
+          openedFor.current = clientId;
+          const first = data?.sequences.find(hasResults);
+          const live = data?.sequences.filter((visit) => visit.status === "open").map((visit) => visit.id) ?? [];
+          setOpenVisits(new Set([...live, ...(first ? [first.id] : [])]));
+        }
       });
     return () => {
       cancelled = true;
@@ -158,6 +172,14 @@ function ClientPage() {
                         </h2>
                         {/* A visit's link works only while it's open (ADR-008). */}
                         {visit.status === "open" && <CopyLinkButton linkToken={visit.link_token} />}
+                        {visit.status === "open" && (
+                          <EndVisitButton
+                            sequenceId={visit.id}
+                            subtitle={`${client.code} · ${formatDate(visit.created_at)}`}
+                            testReasons={runningTestReasons(visit)}
+                            onEnded={() => setReloads((count) => count + 1)}
+                          />
+                        )}
                       </div>
                       <div id={`visit-${visit.id}`} hidden={!open} className="pb-2">
                         {open &&

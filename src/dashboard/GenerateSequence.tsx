@@ -10,7 +10,7 @@ const buttonClasses = {
   solid:
     "flex h-12 items-center gap-2 rounded-lg bg-accent px-6 font-semibold text-white hover:bg-accent-strong focus-visible:outline-4 focus-visible:outline-offset-4 focus-visible:outline-accent",
   outline:
-    "flex h-12 items-center gap-2 rounded-lg border-2 border-accent bg-surface px-6 font-semibold text-accent hover:bg-hover focus-visible:outline-4 focus-visible:outline-offset-4 focus-visible:outline-accent",
+    "flex h-12 items-center gap-2 rounded-lg border border-accent bg-surface px-6 font-medium text-accent hover:bg-hover focus-visible:outline-4 focus-visible:outline-offset-4 focus-visible:outline-accent",
 };
 
 // clientCode, when given, fixes the window to that client (opened from a client's page).

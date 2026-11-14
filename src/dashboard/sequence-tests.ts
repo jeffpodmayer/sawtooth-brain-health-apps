@@ -15,6 +15,7 @@ export const sequenceTests = [
     table: trailMakingTable,
     practice: practiceTrailMaking,
     sheetLabels: trailMaking.sheetLabels,
+    stopReasons: trailMaking.stopReasons,
   },
   {
     id: swaps.testId,
@@ -22,5 +23,9 @@ export const sequenceTests = [
     table: swapsTable,
     practice: practiceSwaps,
     sheetLabels: swaps.sheetLabels,
+    stopReasons: swaps.stopReasons,
   },
 ];
+
+// Each test by its id, for rows read from the database.
+export const testsById = new Map(sequenceTests.map((test) => [test.id, test]));

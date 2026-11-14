@@ -7,7 +7,7 @@ import { useState } from "react";
 import type { Json } from "../../supabase/functions/_shared/database.types.ts";
 import Chevron from "./Chevron";
 import { formatDate } from "./formatDate";
-import { sequenceTests } from "./sequence-tests";
+import { testsById } from "./sequence-tests";
 import type { NoteDialogState } from "./NoteDialog";
 import SetupInfo from "./SetupInfo";
 import SheetButtons from "./SheetButtons";
@@ -27,12 +27,16 @@ export type VisitTest = {
   scores: Json | null;
   browser_scores: Json | null;
   stop_reason: string | null;
+  stop_requested_at: string | null;
+  holds_reached: number;
+  holds_released: number;
+  began_at: string | null; // the client's tab began this test (9.3)
+  timed_part_started_at: string | null; // a timed part is running (9.3)
   sheets: Json | null;
   browser: Json | null; // raw_data's browser only
   clinicians: { display_name: string } | null; // whoever stopped the test
 };
 
-const plugins = new Map(sequenceTests.map((test) => [test.id, test]));
 const statusColors: Record<string, string> = { completed: "text-success-ink", stopped: "text-warning-ink" };
 // Score table widths: the row names and each score column get this share of the width (about 150px on a
 // laptop); the sheet buttons get what's left, at least 16% with SWAPS's five columns.
@@ -65,7 +69,7 @@ type Props = { test: VisitTest; clientCode: string; visitCreatedAt: string };
 function TestBlock({ test, clientCode, visitCreatedAt }: Props) {
   const [noteDialog, setNoteDialog] = useState<NoteDialogState>(null); // the note window, if open
   const [open, setOpen] = useState(true); // every test starts open when its visit opens
-  const plugin = plugins.get(test.test_id);
+  const plugin = testsById.get(test.test_id);
   const name = plugin?.name ?? test.test_id;
   const ran = test.status === "completed" || test.status === "stopped";
   const table = ran && test.scores !== null && plugin ? plugin.table(test.scores) : null;
@@ -77,7 +81,7 @@ function TestBlock({ test, clientCode, visitCreatedAt }: Props) {
       : null;
   const status = [
     testStatusLabels[test.status] ?? test.status,
-    test.stop_reason && (stopReasonLabels[test.stop_reason] ?? test.stop_reason),
+    test.stop_reason && (stopReasonLabels[test.stop_reason] ?? plugin?.stopReasons[test.stop_reason] ?? test.stop_reason),
     test.stop_reason && test.clinicians && `by ${test.clinicians.display_name}`,
     otherDay,
   ]
