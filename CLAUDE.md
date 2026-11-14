@@ -92,7 +92,7 @@ docs/            ROADMAP.md, DECISIONS.md
 - Shared code never knows how a test is scored. Test code never imports
   Supabase. All data goes through the `ResultStore` interface.
 - For the dashboard, each test also provides `scoreTable`, `practiceRow`,
-  `sheetLabels` and `stopReasons`, and saves `rawData.browser` (ADR-047, ADR-049).
+  `sheetLabels`, `stopReasons` and `timedParts`, and saves `rawData.browser` (ADR-047, ADR-049).
 
 **Scoring and timing**
 

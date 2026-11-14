@@ -192,6 +192,7 @@ export type Database = {
           stopped_by: string | null
           test_id: string
           test_version: string | null
+          timed_part: string | null
           timed_part_started_at: string | null
         }
         Insert: {
@@ -217,6 +218,7 @@ export type Database = {
           stopped_by?: string | null
           test_id: string
           test_version?: string | null
+          timed_part?: string | null
           timed_part_started_at?: string | null
         }
         Update: {
@@ -242,6 +244,7 @@ export type Database = {
           stopped_by?: string | null
           test_id?: string
           test_version?: string | null
+          timed_part?: string | null
           timed_part_started_at?: string | null
         }
         Relationships: [
