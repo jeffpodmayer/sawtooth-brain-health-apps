@@ -7,7 +7,7 @@ export const CLIENT_CODE_HINT = "Letters, numbers and hyphens, up to 20 characte
 
 // What's wrong with a typed code (already trimmed), or null if it fits the format.
 export function clientCodeProblem(code: string): string | null {
-  if (code === "") return "Type a client code.";
+  if (code === "") return "Type a client ID.";
   if (!CLIENT_CODE_FORMAT.test(code)) {
     return "Use only capital letters, numbers and hyphens, up to 20 characters (for example, SBH-0042).";
   }

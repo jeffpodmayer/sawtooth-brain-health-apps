@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import type { GivenGridScore, SwapsScores } from "./scoring/score-grid";
-import { detailScores, summarizeScores } from "./summary";
+import { practiceRow, scoreTable } from "./summary";
 
 const timedOut: GivenGridScore = { status: "timedOut", timeMs: 60000, attempted: 24, correct: 23, errors: 1, corrections: 1 };
 const practice = { wrongAnswers: 0 };
@@ -9,62 +9,59 @@ function scores(test: SwapsScores["test"], recall: SwapsScores["recall"]): Swaps
   return { test, recall, practice };
 }
 
-describe("SWAPS score summary", () => {
-  it("the usual run: test to 60 s, then recall", () => {
-    expect(summarizeScores(scores(timedOut, { status: "completed", correct: 5, blank: 1 }))).toEqual([
-      "Test: 23 correct, 24 attempted, 1 error, 1 correction",
-      "Recall: 5 of 7 correct, 1 blank",
-    ]);
+const recallDone = { status: "completed" as const, correct: 5, blank: 1 };
+
+describe("SWAPS score table", () => {
+  it("one table for test and recall; recall has only Correct, with blanks as a note, and no sheet", () => {
+    expect(scoreTable(scores(timedOut, recallDone))).toEqual({
+      columns: ["Correct", "Tried", "Errors", "Corrections", "Time"],
+      rows: [
+        { label: "Test", cells: ["23/75", "24", "1", "1", "Time limit (60 s)"], note: null, sheet: "sheet" },
+        { label: "Recall", cells: ["5/7"], note: "1 blank", sheet: null },
+      ],
+    });
   });
 
-  it("all 75 done before 60 s shows how long it took", () => {
-    const test = { ...timedOut, status: "completed" as const, timeMs: 52340, attempted: 75, correct: 74, errors: 1, corrections: 0 };
-    expect(summarizeScores(scores(test, { status: "completed", correct: 7, blank: 0 }))[0]).toBe(
-      "Test: 74 correct, 75 attempted, 1 error, 0 corrections, all done in 52.3 s",
-    );
-  });
-
-  it("stopped during the test: when it stopped, and recall not given", () => {
+  it("a stopped test shows when it stopped, and recall is not given", () => {
     const test = { ...timedOut, status: "stopped" as const, timeMs: 31000 };
-    expect(summarizeScores(scores(test, { status: "notGiven" }))).toEqual([
-      "Test: stopped at 31 s, 23 correct, 24 attempted, 1 error, 1 correction",
-      "Recall: not given",
+    expect(scoreTable(scores(test, { status: "notGiven" })).rows).toEqual([
+      { label: "Test", cells: ["23/75", "24", "1", "1", "Stopped at 31 s"], note: null, sheet: "sheet" },
+      { label: "Recall", cells: [], note: "Not given", sheet: null },
     ]);
   });
 
-  it("stopped during recall", () => {
-    expect(summarizeScores(scores(timedOut, { status: "stopped", correct: 3, blank: 4 }))[1]).toBe(
-      "Recall: stopped, 3 of 7 correct, 4 blank",
-    );
+  it("a test finished early shows just its time", () => {
+    const test = { ...timedOut, status: "completed" as const, correct: 75, attempted: 75, timeMs: 52400 };
+    expect(scoreTable(scores(test, recallDone)).rows[0].cells.at(-1)).toBe("52.4 s");
   });
 
-  it("stopped before the test began: neither part given", () => {
-    expect(summarizeScores(scores({ status: "notGiven" }, { status: "notGiven" }))).toEqual([
-      "Test: not given",
-      "Recall: not given",
-    ]);
+  it("a test not given keeps its sheet name and says so", () => {
+    expect(scoreTable(scores({ status: "notGiven" }, { status: "notGiven" })).rows[0]).toEqual({
+      label: "Test",
+      cells: [],
+      note: "Not given",
+      sheet: "sheet",
+    });
   });
 
-  it("two errors and two corrections are plural", () => {
-    const test = { ...timedOut, errors: 2, corrections: 2 };
-    expect(summarizeScores(scores(test, { status: "notGiven" }))[0]).toBe(
-      "Test: 23 correct, 24 attempted, 2 errors, 2 corrections",
-    );
+  it("a stopped recall says so in its note", () => {
+    expect(scoreTable(scores(timedOut, { ...recallDone, status: "stopped" })).rows[1]).toEqual({
+      label: "Recall",
+      cells: ["5/7"],
+      note: "1 blank · stopped",
+      sheet: null,
+    });
   });
 });
 
-describe("SWAPS full scores", () => {
-  it("practice first, then the test and recall lines", () => {
-    const withPractice = { ...scores(timedOut, { status: "completed", correct: 5, blank: 1 }), practice: { wrongAnswers: 2 } };
-    expect(detailScores(withPractice)).toEqual([
-      "Practice: 2 wrong answers (not scored)",
-      "Test: 23 correct, 24 attempted, 1 error, 1 correction",
-      "Recall: 5 of 7 correct, 1 blank",
-    ]);
+describe("SWAPS practice row", () => {
+  it("wrong practice answers, not scored", () => {
+    const withPractice = { ...scores(timedOut, recallDone), practice: { wrongAnswers: 2 } };
+    expect(practiceRow(withPractice)).toEqual({ label: "Practice", parts: ["2 wrong answers", "not scored"] });
   });
 
-  it("one wrong practice answer is singular", () => {
-    const withPractice = { ...scores(timedOut, { status: "notGiven" }), practice: { wrongAnswers: 1 } };
-    expect(detailScores(withPractice)[0]).toBe("Practice: 1 wrong answer (not scored)");
+  it("one wrong answer is singular", () => {
+    const withPractice = { ...scores(timedOut, recallDone), practice: { wrongAnswers: 1 } };
+    expect(practiceRow(withPractice).parts[0]).toBe("1 wrong answer");
   });
 });

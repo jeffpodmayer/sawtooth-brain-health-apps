@@ -13,9 +13,3 @@ export const stopReasonLabels: Record<string, string> = {
   interrupted: "Interrupted",
   unable_to_complete: "Unable to complete",
 };
-
-export const sequenceStatusLabels: Record<string, string> = {
-  open: "Open",
-  completed: "Completed",
-  discontinued: "Discontinued",
-};

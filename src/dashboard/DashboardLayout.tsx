@@ -1,38 +1,48 @@
-// The bar across the top of every dashboard page, with the page links and sign-out.
+// The bar across the top of every dashboard page (redesigned at 8.9): the practice name, and the clinician's
+// name with Sign out. The client page's breadcrumb leads back to the Clients list.
 
-import { useState } from "react";
-import { NavLink, Outlet } from "react-router";
-import GenerateSequence from "./GenerateSequence";
+import { useEffect, useState } from "react";
+import { Outlet } from "react-router";
+import AccountBar from "./AccountBar";
 import { supabase } from "./supabase";
-
-const navLinkClass =
-  "inline-flex h-12 items-center px-2 font-bold text-accent underline-offset-8 aria-[current=page]:underline focus-visible:outline-4 focus-visible:outline-offset-4 focus-visible:outline-accent";
-const signOutClass =
-  "h-12 rounded-lg border-2 border-accent px-6 font-bold text-accent focus-visible:outline-4 focus-visible:outline-offset-4 focus-visible:outline-accent";
+import { type Me } from "./useMe";
+import { useSession } from "./useSession";
 
 function DashboardLayout() {
-  const [sequencesMade, setSequencesMade] = useState(0);
+  const session = useSession();
+  const userId = session?.user.id;
+  const [me, setMe] = useState<Me | null>(null);
 
+  // The signed-in clinician's name and practice. RLS lets them read only their own practice.
+  useEffect(() => {
+    if (!userId) return;
+    let cancelled = false;
+    supabase
+      .from("clinicians")
+      .select("display_name, practices(name)")
+      .eq("id", userId)
+      .maybeSingle()
+      .then(({ data }) => {
+        if (cancelled || !data) return;
+        setMe({ displayName: data.display_name, practiceName: data.practices?.name ?? "" });
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [userId]);
+
+  // The dashboard's font and 18px text (client screens stay at 20px), and its buttons show a pointer on hover.
   return (
-    <>
-      <header className="flex items-center justify-between border-b-2 border-form-gray px-8 py-4">
-        <div className="flex items-center gap-8">
-          <p className="text-xl font-bold">Sawtooth Assessments</p>
-          <nav aria-label="Dashboard" className="flex gap-6">
-            <NavLink to="/dashboard/clients" className={navLinkClass}>
-              Clients
-            </NavLink>
-          </nav>
-        </div>
-        <div className="flex items-center gap-4">
-          <GenerateSequence onCreated={() => setSequencesMade((count) => count + 1)} />
-          <button type="button" onClick={() => supabase.auth.signOut()} className={signOutClass}>
-            Sign out
-          </button>
+    <div className="font-dashboard text-lg [&_button:not(:disabled)]:cursor-pointer">
+      <header className="border-b border-line">
+        <div className="mx-auto flex max-w-6xl items-center justify-between px-8 py-3">
+          <p className="font-semibold">{me?.practiceName}</p>
+          <AccountBar displayName={me?.displayName ?? null} />
         </div>
       </header>
-      <Outlet context={sequencesMade} />
-    </>
+      {/* Pages read the clinician's name with useMe. */}
+      <Outlet context={me} />
+    </div>
   );
 }
 

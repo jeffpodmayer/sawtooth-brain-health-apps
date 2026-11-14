@@ -1,15 +1,14 @@
-// The screen after Generate Test Sequence (roadmap 8.4b): the client's link, ready to copy.
+// The step after Generate Test Sequence (roadmap 8.4b, restyled at 8.9): the client's link, ready to copy.
+// The window's title and summary line come from GenerateSequence.
 
 import { useState } from "react";
-import { formatDate } from "./formatDate";
+import { clientLink } from "./links";
 import type { CreatedSequence } from "./SequenceForm";
 
-const fieldClass =
-  "mt-2 block h-14 w-full rounded-lg border-2 border-ink-muted bg-white px-4 text-ink focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-accent";
 const copyButtonClass =
-  "h-14 rounded-lg bg-accent px-8 font-bold text-white focus-visible:outline-4 focus-visible:outline-offset-4 focus-visible:outline-accent";
+  "h-12 shrink-0 rounded-lg bg-accent px-6 font-semibold text-white hover:bg-accent-strong focus-visible:outline-4 focus-visible:outline-offset-4 focus-visible:outline-accent";
 const doneButtonClass =
-  "h-14 rounded-lg border-2 border-accent px-8 font-bold text-accent focus-visible:outline-4 focus-visible:outline-offset-4 focus-visible:outline-accent";
+  "h-12 rounded-lg border-2 border-line bg-surface px-6 font-semibold text-ink hover:bg-hover focus-visible:outline-4 focus-visible:outline-offset-4 focus-visible:outline-accent";
 
 type Props = {
   created: CreatedSequence;
@@ -17,42 +16,41 @@ type Props = {
 };
 
 function SequenceLink({ created, onDone }: Props) {
-  const [copyStatus, setCopyStatus] = useState("");
+  const [copyStatus, setCopyStatus] = useState<"copied" | "failed" | null>(null);
 
-  // The address this dashboard is on, so development makes development links and production makes production ones.
-  const link = `${window.location.origin}/t/${created.linkToken}`;
+  const link = clientLink(created.linkToken);
 
   async function handleCopy() {
     try {
       await navigator.clipboard.writeText(link);
-      setCopyStatus("Copied.");
+      setCopyStatus("copied");
     } catch {
-      setCopyStatus("Couldn't copy. Select the link and copy it yourself.");
+      setCopyStatus("failed");
     }
   }
 
   return (
     <div className="mt-6">
-      <p className="font-bold">
-        {created.code}:{" "}
-        {created.clientIsNew ? "new client" : `existing client, added ${formatDate(created.clientAddedAt)}`}
+      <div className="flex items-center gap-3 rounded-lg bg-page p-2 pl-4">
+        <input
+          readOnly
+          aria-label="Link"
+          value={link}
+          onFocus={(event) => event.currentTarget.select()}
+          className="min-w-0 flex-1 bg-transparent text-base text-ink focus-visible:outline-4 focus-visible:outline-offset-2 focus-visible:outline-accent"
+        />
+        <button type="button" onClick={handleCopy} autoFocus className={copyButtonClass}>
+          {copyStatus === "copied" ? "Copied ✓" : "Copy link"}
+        </button>
+      </div>
+      <p role="status" className="mt-2 min-h-8 text-base">
+        {copyStatus === "copied" && "Copied."}
+        {copyStatus === "failed" && "Couldn't copy. Select the link and copy it yourself."}
       </p>
-      <p className="mt-2">Tests: {created.testNames.join(", ")}</p>
 
-      <label className="mt-6 block font-bold">
-        Link
-        <input readOnly value={link} onFocus={(event) => event.currentTarget.select()} className={fieldClass} />
-      </label>
-      <p role="status" className="mt-2 min-h-8">
-        {copyStatus}
-      </p>
-
-      <div className="mt-4 flex flex-wrap justify-end gap-4">
+      <div className="mt-4 flex justify-end">
         <button type="button" onClick={onDone} className={doneButtonClass}>
           Done
-        </button>
-        <button type="button" onClick={handleCopy} autoFocus className={copyButtonClass}>
-          Copy link
         </button>
       </div>
     </div>

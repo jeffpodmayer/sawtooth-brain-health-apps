@@ -2,14 +2,28 @@
 
 @theme {
   --font-sans: "Atkinson Hyperlegible", sans-serif;
+  /* The dashboard only (ADR-047): the newer Atkinson, which has a semibold. Client screens keep the original. */
+  --font-dashboard: "Atkinson Hyperlegible Next Variable", "Atkinson Hyperlegible", sans-serif;
 
   --color-page: #f7f6f2;
   --color-ink: #1b2430;
   --color-ink-muted: #4a5562;
   --color-accent: #0f5f63;
+  --color-accent-strong: #0b4a4d;
   --color-success-bg: #e3f1ee;
   --color-success-ink: #0b4e51;
+  --color-warning-ink: #8a5300;
+  --color-danger: #b42318;
+  --color-danger-strong: #8f1c13;
+  --color-danger-tint: #fbeceb;
   --color-form-gray: #bfbfbf;
+  --color-surface: #ffffff;
+  --color-line: #e5e2db;
+  /* The band behind each test's name in a visit, marking where one test ends and the next begins. */
+  --color-band: #eef3f2;
+  --color-field-line: #8a919a;
+  /* Hover tint for rows and buttons on white; a light teal-gray that stands apart from the page color. */
+  --color-hover: #ebf3f2;
 }
 
 @layer base {

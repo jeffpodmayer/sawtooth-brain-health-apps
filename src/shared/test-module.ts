@@ -22,6 +22,23 @@ export type TestResult = {
   sheets: Record<string, string>;
 };
 
+// A finished test's scores as a table on the dashboard's client page (ADR-047). Raw numbers only.
+export type ScoreTable = {
+  columns: string[]; // "Time", "Lines", "Errors"
+  rows: ScoreRow[];
+};
+
+// One row of a score table.
+export type ScoreRow = {
+  label: string; // "Part A", "Test", "Recall"
+  cells: string[]; // the row's values for the first columns, in order (none for a part not given)
+  note: string | null; // shown grey across the columns after the cells: "1 blank", "Not given (code 996)"
+  sheet: string | null; // the name of this row's sheet (a key of the test's sheetLabels), if it has one
+};
+
+// A test's samples or practice: not scored, and not shown on the dashboard for now (ADR-047).
+export type PracticeRow = { label: string; parts: string[] };
+
 export type TestProps = {
   sequenceId: string;
 

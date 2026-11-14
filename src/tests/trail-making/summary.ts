@@ -1,46 +1,45 @@
-// One line per timed part, for the dashboard's client page (roadmap 8.6), and one per page,
-// samples included, for the result detail (8.7). Raw scores only (SPEC: Scoring).
+// This test's scores for the dashboard's client page (ADR-047): a table with one row per timed part,
+// with its sheet, and the samples as a separate row. Raw scores only (SPEC: Scoring).
 
+import type { PracticeRow, ScoreRow, ScoreTable } from "../../shared/test-module";
 import type { PartScore, SampleScore, TrailMakingScores } from "./scoring/score-part";
+
+// Each part has 25 circles, so 24 lines (SPEC: Pages).
+const linesPerPart = 24;
 
 // scores come from the database, where only save-result's own scoring writes them (ADR-040),
 // so they have this test's shape.
-export function summarizeScores(scores: unknown): string[] {
+
+// One row per timed part, with that part's sheet, for the client page (ADR-047).
+export function scoreTable(scores: unknown): ScoreTable {
   const { partA, partB } = scores as TrailMakingScores;
-  return [summarizePart("Part A", partA), summarizePart("Part B", partB)];
+  return {
+    columns: ["Time", "Lines", "Errors"],
+    rows: [partRow("Part A", "partA", partA), partRow("Part B", "partB", partB)],
+  };
 }
 
-// Every page in the order given, samples included, for the result detail (roadmap 8.7).
-export function detailScores(scores: unknown): string[] {
-  const { partA, partB, sampleA, sampleB } = scores as TrailMakingScores;
-  return [
-    summarizeSample("Sample A", sampleA),
-    summarizePart("Part A", partA),
-    summarizeSample("Sample B", sampleB),
-    summarizePart("Part B", partB),
-  ];
+// The samples, which aren't scored, as one row (ADR-047).
+export function practiceRow(scores: unknown): PracticeRow {
+  const { sampleA, sampleB } = scores as TrailMakingScores;
+  return { label: "Samples", parts: [sampleText("A", sampleA), sampleText("B", sampleB)] };
 }
 
-// A sample is null if the test ended before reaching it (SPEC: Recording).
-function summarizeSample(label: string, sample: SampleScore | null): string {
-  if (sample === null) return `${label}: not reached`;
-  return sample.passed ? `${label}: passed` : `${label}: not passed`;
-}
-
-function summarizePart(label: string, part: PartScore): string {
+function partRow(label: string, sheet: string, part: PartScore): ScoreRow {
   if (part.status === "notGiven") {
-    return part.code === null ? `${label}: not given` : `${label}: not given (code ${part.code})`;
+    return { label, cells: [], note: part.code === null ? "Not given" : `Not given (code ${part.code})`, sheet };
   }
   const time =
     part.status === "timedOut"
-      ? `time limit (${part.timeSeconds} s)`
+      ? `Time limit (${part.timeSeconds} s)`
       : part.status === "stopped"
-        ? `stopped at ${part.timeSeconds} s`
+        ? `Stopped at ${part.timeSeconds} s`
         : `${part.timeSeconds} s`;
-  return `${label}: ${time}, ${count(part.correctLines, "correct line")}, ${count(part.errors, "error")}`;
+  return { label, cells: [time, `${part.correctLines}/${linesPerPart}`, `${part.errors}`], note: null, sheet };
 }
 
-// "1 error", "2 errors".
-function count(n: number, word: string): string {
-  return `${n} ${word}${n === 1 ? "" : "s"}`;
+// A sample is null if the test ended before reaching it (SPEC: Recording).
+function sampleText(letter: string, sample: SampleScore | null): string {
+  if (sample === null) return `${letter} not reached`;
+  return sample.passed ? `${letter} passed` : `${letter} not passed`;
 }

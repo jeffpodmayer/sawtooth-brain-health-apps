@@ -1,24 +1,26 @@
-// One client's visits and tests, newest visit first (roadmap 8.6).
+// One client's visits, newest first (roadmap 8.6, redesigned at 8.9). Each visit opens to show its tests.
 // Reads go through RLS, so another practice's client looks the same as one that doesn't exist.
 
-import { Fragment, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router";
+import Chevron from "./Chevron";
+import CopyLinkButton from "./CopyLinkButton";
 import { formatDate } from "./formatDate";
+import GenerateSequence from "./GenerateSequence";
 import { isUuid } from "./isUuid";
-import ResultDetail, { type ResultDetails } from "./ResultDetail";
-import { sequenceTests } from "./sequence-tests";
-import { sequenceStatusLabels, testStatusLabels } from "./statusLabels";
 import { supabase } from "./supabase";
-import { useSequencesMade } from "./useSequencesMade";
+import TestBlock, { type VisitTest } from "./TestBlock";
 
 type Visit = {
   id: string;
   status: string;
   created_at: string;
-  sequence_tests: (ResultDetails & { id: string; status: string })[];
+  link_token: string;
+  clinicians: { display_name: string } | null; // whoever created the visit
+  sequence_tests: VisitTest[];
 };
 
-type Client = { code: string; created_at: string; sequences: Visit[] };
+type Client = { code: string; sequences: Visit[] };
 
 // Each finished load remembers which client it was for.
 type Load =
@@ -26,36 +28,24 @@ type Load =
   | { state: "failed"; clientId: string }
   | { state: "loaded"; clientId: string; client: Client | null };
 
-const testNames = new Map(sequenceTests.map((test) => [test.id, test.name]));
-const summaries = new Map(sequenceTests.map((test) => [test.id, test.summarize]));
+const breadcrumbLinkClass =
+  "rounded-lg font-semibold text-accent underline-offset-8 hover:text-accent-strong hover:underline focus-visible:outline-4 focus-visible:outline-offset-4 focus-visible:outline-accent";
 
-const backLinkClass =
-  "inline-flex h-12 items-center font-bold text-accent underline underline-offset-4 focus-visible:outline-4 focus-visible:outline-offset-4 focus-visible:outline-accent";
-// The same look as Sign out.
-const detailsButtonClass =
-  "h-12 rounded-lg border-2 border-accent px-6 font-bold text-accent focus-visible:outline-4 focus-visible:outline-offset-4 focus-visible:outline-accent";
-
-// raw_data (the full click or answer log) is never read: the page doesn't show it.
-// clinicians is whoever stopped the test (empty unless it was stopped).
+// Of raw_data (the full click or answer log), only the browser is read (ADR-047); the log itself isn't.
+// A visit's clinicians is who created it; a test's is who stopped it (empty unless stopped).
 const columns =
-  "code, created_at, sequences(id, status, created_at, sequence_tests(id, practice_id, test_id, status, test_version, started_at, completed_at, screen_width, screen_height, scores, browser_scores, stop_reason, sheets, clinicians(display_name)))";
+  "code, sequences(id, status, created_at, link_token, clinicians(display_name), sequence_tests(id, practice_id, test_id, status, test_version, started_at, completed_at, screen_width, screen_height, scores, browser_scores, stop_reason, sheets, browser:raw_data->browser, clinicians(display_name)))";
+
+const hasResults = (visit: Visit) =>
+  visit.sequence_tests.some((test) => test.status === "completed" || test.status === "stopped");
 
 function ClientPage() {
   const { clientId = "" } = useParams();
   const validId = isUuid(clientId);
   const [load, setLoad] = useState<Load>({ state: "loading" });
-  const sequencesMade = useSequencesMade();
-  // Which tests have their details open. Several can be open at once.
-  const [openTests, setOpenTests] = useState<Set<string>>(new Set());
-
-  function toggle(testId: string) {
-    setOpenTests((current) => {
-      const next = new Set(current);
-      if (next.has(testId)) next.delete(testId);
-      else next.add(testId);
-      return next;
-    });
-  }
+  const [reloads, setReloads] = useState(0); // goes up after a new sequence, so the visits are read again
+  // Which visits are open. Several can be open at once.
+  const [openVisits, setOpenVisits] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     if (!validId) return;
@@ -70,29 +60,64 @@ function ClientPage() {
       .then(({ data, error }) => {
         if (cancelled) return;
         setLoad(error ? { state: "failed", clientId } : { state: "loaded", clientId, client: data });
+        // The newest visit with any results starts open.
+        const first = data?.sequences.find(hasResults);
+        setOpenVisits(new Set(first ? [first.id] : []));
       });
     return () => {
       cancelled = true;
     };
-    // sequencesMade isn't used inside: it's here so a new sequence re-reads the visits.
-  }, [clientId, validId, sequencesMade]);
+    // reloads isn't used inside: it's here so a new sequence re-reads the visits.
+  }, [clientId, validId, reloads]);
+
+  function toggleVisit(visitId: string) {
+    setOpenVisits((current) => {
+      const next = new Set(current);
+      if (next.has(visitId)) next.delete(visitId);
+      else next.add(visitId);
+      return next;
+    });
+  }
 
   // A load for a different client (the address changed) counts as still loading.
   const current = load.state !== "loading" && load.clientId === clientId ? load : null;
   const notFound = !validId || (current?.state === "loaded" && current.client === null);
+  const client = current?.state === "loaded" ? current.client : null;
+  const visits = client?.sequences ?? [];
 
   return (
-    <main className="mx-auto max-w-5xl p-8">
-      <Link to="/dashboard/clients" className={backLinkClass}>
-        All clients
-      </Link>
+    <main className="mx-auto max-w-6xl px-8 py-8">
+      {/* The breadcrumb is the page's title: "Clients" links back to the list, and the client ID is the heading. */}
+      <div className="flex items-center justify-between gap-4">
+        <nav aria-label="Breadcrumb">
+          <ol className="flex flex-wrap items-baseline gap-3 text-4xl">
+            <li>
+              <Link to="/dashboard/clients" className={breadcrumbLinkClass}>
+                Clients
+              </Link>
+            </li>
+            {(client || notFound) && (
+              <>
+                <li aria-hidden="true" className="text-ink-muted">
+                  /
+                </li>
+                <li aria-current="page">
+                  <h1 className="font-semibold">{client ? client.code : "Client not found"}</h1>
+                </li>
+              </>
+            )}
+          </ol>
+        </nav>
+        {client && (
+          <GenerateSequence
+            look="outline"
+            clientCode={client.code}
+            onCreated={() => setReloads((count) => count + 1)}
+          />
+        )}
+      </div>
 
-      {notFound && (
-        <>
-          <h1 className="mt-4 text-4xl font-bold">Client not found</h1>
-          <p className="mt-4">No client in your practice has this address.</p>
-        </>
-      )}
+      {notFound && <p className="mt-4">No client in your practice has this address.</p>}
 
       {!notFound && current === null && <p className="mt-8">Loading…</p>}
 
@@ -102,72 +127,52 @@ function ClientPage() {
         </p>
       )}
 
-      {!notFound && current?.state === "loaded" && current.client && (
+      {client && (
         <>
-          <h1 className="mt-4 text-4xl font-bold">{current.client.code}</h1>
-          <p className="mt-2 text-ink-muted">Added {formatDate(current.client.created_at)}</p>
+          {visits.length === 0 && <p className="mt-8">No visits yet.</p>}
 
-          {current.client.sequences.length === 0 && <p className="mt-8">No visits yet.</p>}
-
-          {current.client.sequences.map((visit) => (
-            <section key={visit.id} className="mt-10">
-              <h2 className="text-2xl font-bold">Visit created {formatDate(visit.created_at)}</h2>
-              <p className="mt-1">{sequenceStatusLabels[visit.status] ?? visit.status}</p>
-              <table className="mt-3 w-full text-left">
-                <thead>
-                  <tr className="border-b-2 border-form-gray">
-                    <th scope="col" className="py-3 pr-8">Test</th>
-                    <th scope="col" className="py-3 pr-8">Status</th>
-                    <th scope="col" className="py-3 pr-8">Date</th>
-                    <th scope="col" className="py-3 pr-8">Scores</th>
-                    <th scope="col" className="py-3">Details</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {visit.sequence_tests.map((test) => {
-                    const ran = test.status === "completed" || test.status === "stopped";
-                    const open = openTests.has(test.id);
-                    return (
-                      <Fragment key={test.id}>
-                        <tr className="border-b border-form-gray">
-                          <td className="py-3 pr-8">{testNames.get(test.test_id) ?? test.test_id}</td>
-                          <td className="py-3 pr-8">{testStatusLabels[test.status] ?? test.status}</td>
-                          <td className="py-3 pr-8">{test.completed_at ? formatDate(test.completed_at) : "—"}</td>
-                          <td className="py-3 pr-8">
-                            <ul>
-                              {test.scores !== null &&
-                                (summaries.get(test.test_id)?.(test.scores) ?? []).map((line) => (
-                                  <li key={line}>{line}</li>
-                                ))}
-                            </ul>
-                          </td>
-                          <td className="py-3">
-                            {ran && (
-                              <button
-                                type="button"
-                                aria-expanded={open}
-                                aria-controls={`detail-${test.id}`}
-                                onClick={() => toggle(test.id)}
-                                className={detailsButtonClass}
-                              >
-                                Details
-                              </button>
-                            )}
-                          </td>
-                        </tr>
-                        {/* Built only while open, so a closed test fetches nothing. */}
-                        {ran && (
-                          <tr id={`detail-${test.id}`} hidden={!open} className="border-b border-form-gray">
-                            <td colSpan={5}>{open && <ResultDetail result={test} />}</td>
-                          </tr>
-                        )}
-                      </Fragment>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </section>
-          ))}
+          {visits.length > 0 && (
+            <>
+              <div className="mt-8 overflow-hidden rounded-xl border border-line bg-surface">
+                {visits.map((visit) => {
+                  const open = openVisits.has(visit.id);
+                  return (
+                    <section key={visit.id} className="border-b border-line last:border-b-0">
+                      <div className="flex items-center gap-4 pr-6 hover:bg-hover">
+                        <h2 className="flex-1">
+                          <button
+                            type="button"
+                            aria-expanded={open}
+                            aria-controls={`visit-${visit.id}`}
+                            onClick={() => toggleVisit(visit.id)}
+                            className="flex w-full items-center gap-4 px-6 py-4 text-left focus-visible:outline-4 focus-visible:-outline-offset-4 focus-visible:outline-accent"
+                          >
+                            <Chevron open={open} />
+                            <span className="flex-1">
+                              <span className="block font-semibold">{formatDate(visit.created_at)}</span>
+                              <span className="block text-base text-ink-muted">
+                                Created by {visit.clinicians?.display_name ?? "—"}
+                              </span>
+                            </span>
+                          </button>
+                        </h2>
+                        {/* A visit's link works only while it's open (ADR-008). */}
+                        {visit.status === "open" && <CopyLinkButton linkToken={visit.link_token} />}
+                      </div>
+                      <div id={`visit-${visit.id}`} hidden={!open} className="pb-2">
+                        {open &&
+                          visit.sequence_tests.map((test) => (
+                            <div key={test.id}>
+                              <TestBlock test={test} clientCode={client.code} visitCreatedAt={visit.created_at} />
+                            </div>
+                          ))}
+                      </div>
+                    </section>
+                  );
+                })}
+              </div>
+            </>
+          )}
         </>
       )}
     </main>

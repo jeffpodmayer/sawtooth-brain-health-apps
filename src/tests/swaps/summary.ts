@@ -1,37 +1,59 @@
-// One line for the test and one for recall, for the dashboard's client page (roadmap 8.6).
-// Raw scores only (SPEC: Scoring). Practice isn't scored, so it shows only in the result detail (8.7).
+// This test's scores for the dashboard's client page (ADR-047): one table with a row for the test, with the
+// answer sheet, and one for recall, plus practice as a separate row. Raw scores only (SPEC: Scoring).
 
-import { keyNumbers } from "./scoring/form-a";
+import type { PracticeRow, ScoreRow, ScoreTable } from "../../shared/test-module";
+import { gridItems, keyNumbers } from "./scoring/form-a";
 import type { GridScore, SwapsScores } from "./scoring/score-grid";
 import type { RecallScore } from "./scoring/score-recall";
 
 const recallSymbols = Object.keys(keyNumbers).length;
 
+// The scored items: row 1 item 7 to the end (SPEC: Parts).
+const testItems = gridItems.filter((item) => item.part === "test").length;
+
 // scores come from the database, where only save-result's own scoring writes them (ADR-040),
 // so they have this test's shape.
-export function summarizeScores(scores: unknown): string[] {
+
+// Test and recall share one table. Recall fills only Correct; its blanks are a note (ADR-047).
+export function scoreTable(scores: unknown): ScoreTable {
   const { test, recall } = scores as SwapsScores;
-  return [summarizeTest(test), summarizeRecall(recall)];
+  return {
+    columns: ["Correct", "Tried", "Errors", "Corrections", "Time"],
+    rows: [testRow(test), recallRow(recall)],
+  };
 }
 
-// Practice, then the test and recall lines, for the result detail (roadmap 8.7).
-export function detailScores(scores: unknown): string[] {
+// Practice, which isn't scored, as one row (ADR-047).
+export function practiceRow(scores: unknown): PracticeRow {
   const { practice } = scores as SwapsScores;
-  return [`Practice: ${count(practice.wrongAnswers, "wrong answer")} (not scored)`, ...summarizeScores(scores)];
+  return { label: "Practice", parts: [count(practice.wrongAnswers, "wrong answer"), "not scored"] };
 }
 
-function summarizeTest(test: GridScore): string {
-  if (test.status === "notGiven") return "Test: not given";
-  const counts = `${test.correct} correct, ${test.attempted} attempted, ${count(test.errors, "error")}, ${count(test.corrections, "correction")}`;
-  if (test.status === "stopped") return `Test: stopped at ${seconds(test.timeMs)} s, ${counts}`;
-  if (test.status === "completed") return `Test: ${counts}, all done in ${seconds(test.timeMs)} s`;
-  return `Test: ${counts}`; // timed out: the usual ending, at 60 s
+function testRow(test: GridScore): ScoreRow {
+  if (test.status === "notGiven") return { label: "Test", cells: [], note: "Not given", sheet: "sheet" };
+  const time =
+    test.status === "timedOut"
+      ? `Time limit (${seconds(test.timeMs)} s)`
+      : test.status === "stopped"
+        ? `Stopped at ${seconds(test.timeMs)} s`
+        : `${seconds(test.timeMs)} s`;
+  return {
+    label: "Test",
+    cells: [`${test.correct}/${testItems}`, `${test.attempted}`, `${test.errors}`, `${test.corrections}`, time],
+    note: null,
+    sheet: "sheet",
+  };
 }
 
-function summarizeRecall(recall: RecallScore): string {
-  if (recall.status === "notGiven") return "Recall: not given";
-  const counts = `${recall.correct} of ${recallSymbols} correct, ${recall.blank} blank`;
-  return recall.status === "stopped" ? `Recall: stopped, ${counts}` : `Recall: ${counts}`;
+function recallRow(recall: RecallScore): ScoreRow {
+  if (recall.status === "notGiven") return { label: "Recall", cells: [], note: "Not given", sheet: null };
+  const blank = `${recall.blank} blank`;
+  return {
+    label: "Recall",
+    cells: [`${recall.correct}/${recallSymbols}`],
+    note: recall.status === "stopped" ? `${blank} · stopped` : blank,
+    sheet: null,
+  };
 }
 
 // Milliseconds as seconds, to the nearest tenth.
@@ -39,7 +61,7 @@ function seconds(ms: number): number {
   return Math.round(ms / 100) / 10;
 }
 
-// "1 error", "2 errors".
+// "1 wrong answer", "2 wrong answers".
 function count(n: number, word: string): string {
   return `${n} ${word}${n === 1 ? "" : "s"}`;
 }
