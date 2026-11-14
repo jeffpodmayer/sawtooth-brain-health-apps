@@ -14,11 +14,12 @@ const testItems = gridItems.filter((item) => item.part === "test").length;
 // scores come from the database, where only save-result's own scoring writes them (ADR-040),
 // so they have this test's shape.
 
-// Test and recall share one table. Recall fills only Correct; its blanks are a note (ADR-047).
+// Test and recall share one table. Recall fills only Correct; its blanks are a note (ADR-047). Their totals
+// differ (75 and 7), so each row's name carries its own; the time's unit sits in its heading.
 export function scoreTable(scores: unknown): ScoreTable {
   const { test, recall } = scores as SwapsScores;
   return {
-    columns: ["Correct", "Tried", "Errors", "Corrections", "Time"],
+    columns: ["Correct", "Tried", "Errors", "Corrections", "Time (s)"],
     rows: [testRow(test), recallRow(recall)],
   };
 }
@@ -58,27 +59,29 @@ export function csvRows(scores: unknown): CsvRow[] {
 }
 
 function testRow(test: GridScore): ScoreRow {
-  if (test.status === "notGiven") return { label: "Test", cells: [], note: "Not given", sheet: "sheet" };
+  const label = `Test (of ${testItems})`;
+  if (test.status === "notGiven") return { label, cells: [], note: "Not given", sheet: "sheet" };
   const time =
     test.status === "timedOut"
-      ? `Time limit (${seconds(test.timeMs)} s)`
+      ? `${seconds(test.timeMs)} (time limit)`
       : test.status === "stopped"
-        ? `Stopped at ${seconds(test.timeMs)} s`
-        : `${seconds(test.timeMs)} s`;
+        ? `${seconds(test.timeMs)} (stopped)`
+        : `${seconds(test.timeMs)}`;
   return {
-    label: "Test",
-    cells: [`${test.correct}/${testItems}`, `${test.attempted}`, `${test.errors}`, `${test.corrections}`, time],
+    label,
+    cells: [`${test.correct}`, `${test.attempted}`, `${test.errors}`, `${test.corrections}`, time],
     note: null,
     sheet: "sheet",
   };
 }
 
 function recallRow(recall: RecallScore): ScoreRow {
-  if (recall.status === "notGiven") return { label: "Recall", cells: [], note: "Not given", sheet: null };
+  const label = `Recall (of ${recallSymbols})`;
+  if (recall.status === "notGiven") return { label, cells: [], note: "Not given", sheet: null };
   const blank = `${recall.blank} blank`;
   return {
-    label: "Recall",
-    cells: [`${recall.correct}/${recallSymbols}`],
+    label,
+    cells: [`${recall.correct}`],
     note: recall.status === "stopped" ? `${blank} · stopped` : blank,
     sheet: null,
   };

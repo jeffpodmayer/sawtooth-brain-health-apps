@@ -4,7 +4,7 @@
 
 import type { ScoreTable } from "../shared/test-module";
 
-// "Part A — Time: 38 s · Lines: 24/24 · Errors: 0", "Recall — Correct: 5/7 · 1 blank".
+// "Part A — Time (s): 38 · Lines (of 24): 24 · Errors: 0", "Recall (of 7) — Correct: 5 · 1 blank".
 export function sheetScoreLines(table: ScoreTable, sheet: string): string[] {
   return table.rows
     .filter((row) => row.sheet === sheet || row.sheet === null)

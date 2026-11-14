@@ -1,17 +1,30 @@
-// Generate Test Sequence (roadmap 8.4b, restyled at 8.9): the "New sequence" button on the Clients and client
+// New Test Sequence (roadmap 8.4b, restyled at 8.9): the "New sequence" button on the Clients and client
 // pages and the window it opens. The window is the browser's own modal <dialog>: the page behind can't be
 // reached, Esc closes it, and focus goes back to the button afterwards.
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
+import { useNavigate } from "react-router";
 import SequenceForm, { type CreatedSequence } from "./SequenceForm";
 import SequenceLink from "./SequenceLink";
 import { buttonClass, dialogBodyClass, dialogClass, dialogCloseClass, dialogHeaderClass } from "./styles";
+import { supabase } from "./supabase";
+
+// A pipe between parts of a line. Seen only; a screen reader hears a comma instead of "vertical bar".
+function Pipe() {
+  return (
+    <>
+      <span aria-hidden="true"> | </span>
+      <span className="sr-only">, </span>
+    </>
+  );
+}
 
 // clientCode, when given, fixes the window to that client (opened from a client's page).
 type Props = { onCreated: () => void; clientCode?: string };
 
 function GenerateSequence({ onCreated, clientCode }: Props) {
   const dialogRef = useRef<HTMLDialogElement>(null);
+  const navigate = useNavigate();
   const [open, setOpen] = useState(false);
   const [created, setCreated] = useState<CreatedSequence | null>(null);
 
@@ -27,10 +40,27 @@ function GenerateSequence({ onCreated, clientCode }: Props) {
 
   const close = () => dialogRef.current?.close();
 
-  let subtitle = clientCode ? `New visit for ${clientCode}` : "";
+  // After the link is copied: close, then go to that client's page, where the new visit shows live.
+  // From a client's page, that's where we already are. From the Clients list, the client is found by
+  // their ID (RLS); if that fails, the clinician stays on the list, which has re-read itself.
+  async function handleCopied(code: string) {
+    close();
+    if (clientCode) return;
+    const { data } = await supabase.from("clients").select("id").eq("code", code).maybeSingle();
+    if (data) navigate(`/dashboard/clients/${data.id}`);
+  }
+
+  let subtitle: ReactNode = clientCode ? `New visit for ${clientCode}` : null;
   if (created) {
-    const client = created.clientIsNew ? "New client" : "Existing client";
-    subtitle = `${created.code} · ${client} · ${created.testNames.join(", ")}`;
+    subtitle = (
+      <>
+        {created.code}
+        <Pipe />
+        {created.clientIsNew ? "New client" : "Existing client"}
+        <Pipe />
+        {created.testNames.join(", ")}
+      </>
+    );
   }
 
   return (
@@ -86,7 +116,7 @@ function GenerateSequence({ onCreated, clientCode }: Props) {
                   onCancel={close}
                 />
               ) : (
-                <SequenceLink created={created} onDone={close} />
+                <SequenceLink created={created} onCopied={() => handleCopied(created.code)} />
               )}
             </div>
           </>

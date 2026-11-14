@@ -1,8 +1,10 @@
-// The Generate Test Sequence form (roadmap 8.4b, restyled at 8.9): a client ID and the tests to give.
+// The New Test Sequence form (roadmap 8.4b, restyled at 8.9): a client ID, picked or typed, and the tests to give.
 // create_sequence saves the client (if new), the sequence and its tests together (ADR-044).
 
-import { useEffect, useState, type ChangeEvent, type SubmitEvent } from "react";
+import { useEffect, useState, type ChangeEvent, type KeyboardEvent, type ReactNode, type SubmitEvent } from "react";
+import { matchingClients, type ClientSummary } from "./client-search";
 import { clientCodeProblem, digitsOnly } from "./clientCode";
+import { loadClients } from "./clients";
 import { formatDate } from "./formatDate";
 import { sequenceTests } from "./sequence-tests";
 import { buttonClass, fieldClass } from "./styles";
@@ -20,9 +22,6 @@ type Test = { id: string; name: string };
 
 type TestsLoad = { state: "loading" } | { state: "failed" } | { state: "loaded"; tests: Test[] };
 
-// What the database said about a typed code. Shown only while that code is still in the field.
-type Lookup = { code: string; addedAt: string | null };
-
 type Props = {
   fixedCode?: string; // opened from a client's page: the ID is shown, not typed
   onCreated: (created: CreatedSequence) => void;
@@ -34,7 +33,10 @@ function SequenceForm({ fixedCode, onCreated, onCancel }: Props) {
   const [ticked, setTicked] = useState<Set<string>>(new Set());
   const [code, setCode] = useState(fixedCode ?? "");
   const [codeProblem, setCodeProblem] = useState<string | null>(null);
-  const [lookup, setLookup] = useState<Lookup | null>(null);
+  // The practice's clients for the dropdown; null until read, or if the read failed.
+  const [clients, setClients] = useState<ClientSummary[] | null>(null);
+  const [listOpen, setListOpen] = useState(false);
+  const [active, setActive] = useState(-1); // the highlighted option, or -1 for none
   const [creating, setCreating] = useState(false);
   const [problem, setProblem] = useState<string | null>(null);
 
@@ -60,32 +62,61 @@ function SequenceForm({ fixedCode, onCreated, onCancel }: Props) {
     };
   }, []);
 
-  // Once typing pauses, ask whether the code is already one of the practice's clients (RLS).
-  // A fixed ID came from the client's own page, so it's already a client.
+  // The practice's clients, read once when the window opens, so typing never waits on the network.
+  // A fixed ID came from the client's own page, so there's nothing to pick. If the read fails, the
+  // dropdown and the line under the field stay empty, and create_sequence still decides new or existing.
   useEffect(() => {
     if (fixedCode) return;
-    const typed = code.trim();
-    if (clientCodeProblem(typed) !== null) return;
     let cancelled = false;
-    const timer = setTimeout(() => {
-      supabase
-        .from("clients")
-        .select("created_at")
-        .eq("code", typed)
-        .maybeSingle()
-        .then(({ data, error }) => {
-          if (cancelled || error) return;
-          setLookup({ code: typed, addedAt: data?.created_at ?? null });
-        });
-    }, 300);
+    loadClients().then(
+      (loaded) => !cancelled && setClients(loaded),
+      () => {},
+    );
     return () => {
       cancelled = true;
-      clearTimeout(timer);
     };
-  }, [code, fixedCode]);
+  }, [fixedCode]);
+
+  const matches = clients ? matchingClients(clients, code) : [];
+  const exact = clients?.find((client) => client.code === code) ?? null;
+  // Hidden once the field holds an existing client's whole ID, so a picked client doesn't keep the list open.
+  const showList = listOpen && matches.length > 0 && exact === null;
+  const activeId = showList && active >= 0 ? `client-option-${matches[active].code}` : undefined;
+
+  // Keeps the highlighted option in view when the arrow keys move past the visible part of the list.
+  useEffect(() => {
+    if (activeId) document.getElementById(activeId)?.scrollIntoView({ block: "nearest" });
+  }, [activeId]);
 
   function handleCodeChange(event: ChangeEvent<HTMLInputElement>) {
     setCode(digitsOnly(event.currentTarget.value));
+    setListOpen(true);
+    setActive(-1);
+    setCodeProblem(null);
+    setProblem(null);
+  }
+
+  function handleCodeKeyDown(event: KeyboardEvent<HTMLInputElement>) {
+    if (event.key === "ArrowDown") {
+      event.preventDefault();
+      setListOpen(true);
+      setActive((index) => Math.min(index + 1, matches.length - 1));
+    } else if (event.key === "ArrowUp") {
+      event.preventDefault();
+      setActive((index) => Math.max(index - 1, 0));
+    } else if (event.key === "Enter" && showList && active >= 0) {
+      event.preventDefault(); // picks the client instead of submitting the form
+      pick(matches[active]);
+    } else if (event.key === "Escape" && showList) {
+      event.preventDefault(); // closes the list, not the window
+      setListOpen(false);
+    }
+  }
+
+  function pick(client: ClientSummary) {
+    setCode(client.code);
+    setListOpen(false);
+    setActive(-1);
     setCodeProblem(null);
     setProblem(null);
   }
@@ -136,13 +167,21 @@ function SequenceForm({ fixedCode, onCreated, onCancel }: Props) {
     });
   }
 
-  const currentLookup = lookup?.code === code.trim() ? lookup : null;
-  let codeStatus = "";
+  // Once all four digits are in, a quiet note beside the field says whether it's an existing or a new client.
+  // The pipe is only seen; a screen reader hears a comma instead of "vertical bar".
+  const known = clients !== null && clientCodeProblem(code) === null;
+  let codeStatus: ReactNode = null;
   if (codeProblem) codeStatus = codeProblem;
-  else if (currentLookup?.addedAt) codeStatus = `Existing client, added ${formatDate(currentLookup.addedAt)}.`;
-  else if (currentLookup) codeStatus = "New client.";
-  // A found or new client gets a teal mark; a problem stays plain text.
-  const statusMark = codeProblem ? null : currentLookup?.addedAt ? "✓" : currentLookup ? "＋" : null;
+  else if (known && exact) {
+    codeStatus = (
+      <>
+        Existing client
+        <span aria-hidden="true"> | </span>
+        <span className="sr-only">, </span>
+        {exact.lastVisitAt ? `Last visit ${formatDate(exact.lastVisitAt)}` : "No visits yet"}
+      </>
+    );
+  } else if (known) codeStatus = "New client";
 
   return (
     <form onSubmit={handleSubmit} noValidate className="mt-6">
@@ -153,33 +192,80 @@ function SequenceForm({ fixedCode, onCreated, onCancel }: Props) {
         </div>
       ) : (
         <>
-          <label className="block font-semibold">
+          <label htmlFor="sequence-code" className="block font-semibold">
             Client ID
-            <input
-              name="code"
-              value={code}
-              onChange={handleCodeChange}
-              autoComplete="off"
-              inputMode="numeric"
-              maxLength={4}
-              spellCheck={false}
-              aria-invalid={codeProblem !== null}
-              aria-describedby="sequence-code-status"
-              className={`mt-2 max-w-64 ${fieldClass}`}
-            />
           </label>
-          <p
-            id="sequence-code-status"
-            role="status"
-            className={`mt-1 min-h-7 font-semibold ${statusMark ? "text-success-ink" : ""}`}
-          >
-            {statusMark && <span aria-hidden="true">{statusMark} </span>}
-            {codeStatus}
-          </p>
+          {/* A combo box: type to filter the practice's clients, then pick one with the mouse or ↓/↑ and Enter. */}
+          {/* The note sits on the field's bottom edge, on one line; the field only needs room for four digits. */}
+          <div className="mt-2 flex items-end gap-4">
+            <div className="relative w-32 shrink-0">
+              <input
+                id="sequence-code"
+                name="code"
+                role="combobox"
+                aria-expanded={showList}
+                aria-controls="client-options"
+                aria-autocomplete="list"
+                aria-activedescendant={activeId}
+                value={code}
+                onChange={handleCodeChange}
+                onKeyDown={handleCodeKeyDown}
+                onFocus={() => setListOpen(true)}
+                onBlur={() => setListOpen(false)}
+                autoComplete="off"
+                inputMode="numeric"
+                maxLength={4}
+                spellCheck={false}
+                aria-invalid={codeProblem !== null}
+                aria-describedby="sequence-code-status"
+                className={fieldClass}
+              />
+              {showList && (
+                <ul
+                  id="client-options"
+                  role="listbox"
+                  aria-label="Clients"
+                  className="absolute left-0 top-full z-10 mt-1 max-h-64 w-64 overflow-y-auto rounded-lg border border-line bg-surface py-1 shadow-lg"
+                >
+                  {matches.map((client, index) => (
+                    <li
+                      key={client.id}
+                      id={`client-option-${client.code}`}
+                      role="option"
+                      aria-selected={index === active}
+                      onMouseDown={(event) => event.preventDefault()} // keeps the cursor in the field
+                      onClick={() => pick(client)}
+                      className={`cursor-pointer px-4 py-2 ${index === active ? "bg-hover" : "hover:bg-hover"}`}
+                    >
+                      <span className="flex items-center gap-2 font-semibold">
+                        {client.code}
+                        {client.visitOpen && (
+                          <span className="rounded-full bg-success-bg px-2 text-base font-normal text-success-ink">
+                            Open
+                          </span>
+                        )}
+                      </span>
+                      <span className="block text-base text-ink-muted">
+                        {client.lastVisitAt ? `Last visit ${formatDate(client.lastVisitAt)}` : "No visits yet"}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+            {/* A problem stays dark so it stands out; the existing or new note is grey. */}
+            <p
+              id="sequence-code-status"
+              role="status"
+              className={`pb-1 text-base ${codeProblem ? "text-ink" : "whitespace-nowrap text-ink-muted"}`}
+            >
+              {codeStatus}
+            </p>
+          </div>
         </>
       )}
 
-      <fieldset className="mt-2">
+      <fieldset className="mt-6">
         <legend className="font-semibold">Tests</legend>
         {testsLoad.state === "loading" && <p className="mt-2">Loading…</p>}
         {testsLoad.state === "failed" && (
@@ -194,7 +280,10 @@ function SequenceForm({ fixedCode, onCreated, onCancel }: Props) {
           <div className="mt-2 divide-y divide-line overflow-hidden rounded-lg border border-line">
             {testsLoad.tests.map((test) => {
               return (
-                <label key={test.id} className="flex h-14 cursor-pointer items-center gap-4 bg-surface px-4 hover:bg-hover">
+                <label
+                  key={test.id}
+                  className="flex h-14 cursor-pointer items-center gap-4 bg-surface px-4 hover:bg-hover"
+                >
                   <input
                     type="checkbox"
                     checked={ticked.has(test.id)}

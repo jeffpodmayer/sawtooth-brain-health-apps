@@ -14,12 +14,15 @@ export function useCopy(text: string) {
     return () => clearTimeout(timer);
   }, [status]);
 
-  async function copy() {
+  // Says whether it worked, so a caller can move on only after a real copy.
+  async function copy(): Promise<boolean> {
     try {
       await navigator.clipboard.writeText(text);
       setStatus("copied");
+      return true;
     } catch {
       setStatus("failed");
+      return false;
     }
   }
 

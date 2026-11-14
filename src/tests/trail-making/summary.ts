@@ -10,11 +10,12 @@ const linesPerPart = 24;
 // scores come from the database, where only save-result's own scoring writes them (ADR-040),
 // so they have this test's shape.
 
-// One row per timed part, with that part's sheet, for the client page (ADR-047).
+// One row per timed part, with that part's sheet, for the client page (ADR-047). Units and the line total
+// sit in the column headings, so each cell is just its number.
 export function scoreTable(scores: unknown): ScoreTable {
   const { partA, partB } = scores as TrailMakingScores;
   return {
-    columns: ["Time", "Lines", "Errors"],
+    columns: ["Time (s)", `Lines (of ${linesPerPart})`, "Errors"],
     rows: [partRow("Part A", "partA", partA), partRow("Part B", "partB", partB)],
   };
 }
@@ -51,11 +52,11 @@ function partRow(label: string, sheet: string, part: PartScore): ScoreRow {
   }
   const time =
     part.status === "timedOut"
-      ? `Time limit (${part.timeSeconds} s)`
+      ? `${part.timeSeconds} (time limit)`
       : part.status === "stopped"
-        ? `Stopped at ${part.timeSeconds} s`
-        : `${part.timeSeconds} s`;
-  return { label, cells: [time, `${part.correctLines}/${linesPerPart}`, `${part.errors}`], note: null, sheet };
+        ? `${part.timeSeconds} (stopped)`
+        : `${part.timeSeconds}`;
+  return { label, cells: [time, `${part.correctLines}`, `${part.errors}`], note: null, sheet };
 }
 
 // A sample is null if the test ended before reaching it (SPEC: Recording).

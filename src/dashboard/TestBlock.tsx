@@ -74,7 +74,11 @@ function LoadingDots() {
   return (
     <span aria-hidden="true">
       {[0, 200, 400].map((delay) => (
-        <span key={delay} className="animate-loading-dot motion-reduce:animate-none" style={{ animationDelay: `${delay}ms` }}>
+        <span
+          key={delay}
+          className="animate-loading-dot motion-reduce:animate-none"
+          style={{ animationDelay: `${delay}ms` }}
+        >
           .
         </span>
       ))}
@@ -121,7 +125,8 @@ function TestBlock({ test, clientCode, visitCreatedAt, running, onChanged }: Pro
   // While ending, "Ending" with its dots comes first, before these; while live, the pill does.
   const status = [
     !ending && !live && liveLabel,
-    test.stop_reason && (stopReasonLabels[test.stop_reason] ?? plugin?.stopReasons[test.stop_reason] ?? test.stop_reason),
+    test.stop_reason &&
+      (stopReasonLabels[test.stop_reason] ?? plugin?.stopReasons[test.stop_reason] ?? test.stop_reason),
     otherDay,
   ]
     .filter(Boolean)
@@ -332,34 +337,31 @@ function TestBlock({ test, clientCode, visitCreatedAt, running, onChanged }: Pro
           </div>
         )}
 
-        {ran && (
-          <TestNotes
-            sequenceTestId={test.id}
-            practiceId={test.practice_id}
-            subtitle={`${name} · ${clientCode} · ${test.completed_at ? formatDate(test.completed_at) : ""}`}
-            dialog={noteDialog}
-            setDialog={setNoteDialog}
-          />
-        )}
+        {/* Notes can be added before, during and after a test, so a clinician can always write one down. The
+            note window's date is the test's finish, or the visit's date while it hasn't finished. */}
+        <TestNotes
+          sequenceTestId={test.id}
+          practiceId={test.practice_id}
+          subtitle={`${name} · ${clientCode} · ${formatDate(test.completed_at ?? visitCreatedAt)}`}
+          dialog={noteDialog}
+          setDialog={setNoteDialog}
+        />
 
         {/* Under the test's own rows and notes, so it plainly belongs to this test. */}
-        {ran && (
-          <button
-            type="button"
-            aria-haspopup="dialog"
-            onClick={() => setNoteDialog({ mode: "add", draft: "" })}
-            className={`-ml-2 mt-2 flex h-9 items-center gap-2 px-2 text-base ${textButtonClass}`}
-          >
-            <svg aria-hidden="true" viewBox="0 0 24 24" className="size-4 fill-none stroke-current stroke-2">
-              <path d="M12 5v14M5 12h14" />
-            </svg>
-            {/* Heard as "Add note to SWAPS"; seen as "+ Add note". */}
-            <span>
-              Add note<span className="sr-only"> to {name}</span>
-            </span>
-          </button>
-        )}
-
+        <button
+          type="button"
+          aria-haspopup="dialog"
+          onClick={() => setNoteDialog({ mode: "add", draft: "" })}
+          className={`-ml-2 mt-2 flex h-9 items-center gap-2 px-2 text-base ${textButtonClass}`}
+        >
+          <svg aria-hidden="true" viewBox="0 0 24 24" className="size-4 fill-none stroke-current stroke-2">
+            <path d="M12 5v14M5 12h14" />
+          </svg>
+          {/* Heard as "Add note to SWAPS"; seen as "+ Add note". */}
+          <span>
+            Add note<span className="sr-only"> to {name}</span>
+          </span>
+        </button>
       </div>
     </section>
   );

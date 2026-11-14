@@ -10,6 +10,7 @@ import { formatDate } from "./formatDate";
 import GenerateSequence from "./GenerateSequence";
 import { isUuid } from "./isUuid";
 import { testsById } from "./sequence-tests";
+import { buttonClass } from "./styles";
 import { supabase } from "./supabase";
 import TestBlock, { type VisitTest } from "./TestBlock";
 
@@ -127,7 +128,7 @@ function ClientPage() {
   const visits = client?.sequences ?? [];
 
   return (
-    <main className="mx-auto max-w-6xl px-8 py-8">
+    <main className="mx-auto max-w-6xl px-8 py-10">
       {/* The breadcrumb is the page's title: "Clients" links back to the list, and the client ID is the heading. */}
       <div className="flex items-center justify-between gap-4">
         <nav aria-label="Breadcrumb">
@@ -150,10 +151,17 @@ function ClientPage() {
           </ol>
         </nav>
         {client && (
-          <GenerateSequence
-            clientCode={client.code}
-            onCreated={() => setReloads((count) => count + 1)}
-          />
+          <div className="flex items-center gap-2">
+            <GenerateSequence clientCode={client.code} onCreated={() => setReloads((count) => count + 1)} />
+            {/* A placeholder for this client's actions (none yet), so the heading row matches the Clients list. */}
+            <button type="button" disabled aria-label="More actions" className={buttonClass("secondary", "icon")}>
+              <svg aria-hidden="true" viewBox="0 0 24 24" className="size-5 fill-current">
+                <circle cx="5" cy="12" r="2" />
+                <circle cx="12" cy="12" r="2" />
+                <circle cx="19" cy="12" r="2" />
+              </svg>
+            </button>
+          </div>
         )}
       </div>
 

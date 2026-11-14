@@ -4,20 +4,14 @@
 
 import { useEffect, useState } from "react";
 import { Link } from "react-router";
+import type { ClientSummary } from "./client-search";
+import { loadClients } from "./clients";
 import ClientsMenu from "./ClientsMenu";
 import { formatDate } from "./formatDate";
 import GenerateSequence from "./GenerateSequence";
 import { fieldClass } from "./styles";
-import { supabase } from "./supabase";
 
-// sequences holds only the client's newest visit, for the Last visit column.
-type Client = {
-  id: string;
-  code: string;
-  sequences: { created_at: string; status: string }[];
-};
-
-type Load = { state: "loading" } | { state: "failed" } | { state: "loaded"; clients: Client[] };
+type Load = { state: "loading" } | { state: "failed" } | { state: "loaded"; clients: ClientSummary[] };
 
 // One whole row is the link, so a click anywhere on it opens the client.
 const rowLinkClass =
@@ -30,23 +24,17 @@ function ClientsPage() {
 
   useEffect(() => {
     let cancelled = false;
-    supabase
-      .from("clients")
-      .select("id, code, sequences(created_at, status)")
-      .order("created_at", { ascending: false })
-      .order("created_at", { referencedTable: "sequences", ascending: false })
-      .limit(1, { referencedTable: "sequences" })
-      .then(({ data, error }) => {
-        if (cancelled) return;
-        setLoad(error ? { state: "failed" } : { state: "loaded", clients: data });
-      });
+    loadClients().then(
+      (clients) => !cancelled && setLoad({ state: "loaded", clients }),
+      () => !cancelled && setLoad({ state: "failed" }),
+    );
     return () => {
       cancelled = true;
     };
     // reloads isn't used inside: it's here so a new sequence re-reads the list.
   }, [reloads]);
 
-  // Client IDs are capitals only (2.3), so typing in lowercase still matches.
+  // Client IDs are four digits (ADR-054); capitals here only matter for any older ID.
   const query = search.trim().toUpperCase();
   const clients = load.state === "loaded" ? load.clients : [];
   const shown = clients.filter((client) => client.code.includes(query));
@@ -57,7 +45,7 @@ function ClientsPage() {
       <div className="flex items-center gap-4">
         <h1 className="flex-1 text-4xl font-semibold">Clients</h1>
         {load.state === "loaded" && clients.length > 0 && (
-          <div className="relative w-80">
+          <div className="relative w-60">
             {/* Read by screen readers; the placeholder shows the same words on screen. */}
             <label htmlFor="client-search" className="sr-only">
               Search client ID
@@ -85,8 +73,11 @@ function ClientsPage() {
         {/* New sequence and ⋯ sit closer together than the rest of the row. */}
         <div className="flex items-center gap-2">
           <GenerateSequence onCreated={() => setReloads((count) => count + 1)} />
-          {/* Export CSV, with the same search, once there are clients (roadmap 10.1). */}
-          {load.state === "loaded" && clients.length > 0 && <ClientsMenu matches={(code) => code.includes(query)} />}
+          {/* Export CSV, with the same search (roadmap 10.1). Always shown, switched off until there are clients. */}
+          <ClientsMenu
+            matches={(code) => code.includes(query)}
+            disabled={load.state !== "loaded" || clients.length === 0}
+          />
         </div>
       </div>
 
@@ -112,15 +103,14 @@ function ClientsPage() {
             {shown.length > 0 && (
               <ul>
                 {shown.map((client) => {
-                  const last = client.sequences[0];
                   return (
                     <li key={client.id} className="border-b border-line last:border-b-0">
                       <Link to={`/dashboard/clients/${client.id}`} className={rowLinkClass}>
                         <span className="font-semibold">{client.code}</span>
                         <span className="flex items-center gap-3 text-base">
                           <span className="sr-only">Last visit </span>
-                          {last ? formatDate(last.created_at) : "—"}
-                          {last?.status === "open" && (
+                          {client.lastVisitAt ? formatDate(client.lastVisitAt) : "—"}
+                          {client.visitOpen && (
                             <span className="rounded-full bg-success-bg px-2.5 py-0.5 text-success-ink">Open</span>
                           )}
                         </span>

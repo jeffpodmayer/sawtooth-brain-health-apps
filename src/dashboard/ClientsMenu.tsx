@@ -14,7 +14,8 @@ const itemClass =
   "block w-full px-4 py-3 text-left hover:bg-hover focus-visible:outline-3 focus-visible:-outline-offset-4 focus-visible:outline-accent disabled:opacity-70";
 
 // matches says whether a client ID is shown by the Clients list's search, so the export matches the screen.
-function ClientsMenu({ matches }: { matches: (code: string) => boolean }) {
+// disabled keeps the button in place (faded) while the list loads or is empty, so the heading row never shifts.
+function ClientsMenu({ matches, disabled = false }: { matches: (code: string) => boolean; disabled?: boolean }) {
   const [open, setOpen] = useState(false);
   const [busy, setBusy] = useState(false);
   const [failed, setFailed] = useState(false);
@@ -53,6 +54,7 @@ function ClientsMenu({ matches }: { matches: (code: string) => boolean }) {
         aria-label="More actions"
         aria-expanded={open}
         aria-controls={panelId}
+        disabled={disabled}
         onClick={() => setOpen(!open)}
         className={buttonClass("secondary", "icon")}
       >

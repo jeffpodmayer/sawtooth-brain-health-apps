@@ -12,26 +12,26 @@ function scores(partA: TrailMakingScores["partA"], partB: TrailMakingScores["par
 }
 
 describe("Trail Making score table", () => {
-  it("one row per part, with its sheet: time, lines out of 24 and errors", () => {
+  it("one row per part, with its sheet: time in seconds, lines (of 24) and errors", () => {
     const partB = { ...finished, timeMs: 91300, timeSeconds: 91.3, errors: 1 };
     expect(scoreTable(scores(finished, partB))).toEqual({
-      columns: ["Time", "Lines", "Errors"],
+      columns: ["Time (s)", "Lines (of 24)", "Errors"],
       rows: [
-        { label: "Part A", cells: ["38 s", "24/24", "0"], note: null, sheet: "partA" },
-        { label: "Part B", cells: ["91.3 s", "24/24", "1"], note: null, sheet: "partB" },
+        { label: "Part A", cells: ["38", "24", "0"], note: null, sheet: "partA" },
+        { label: "Part B", cells: ["91.3", "24", "1"], note: null, sheet: "partB" },
       ],
     });
   });
 
   it("a timed-out part shows the time limit", () => {
     const partB = { ...finished, status: "timedOut" as const, timeSeconds: 300, correctLines: 18, errors: 3 };
-    expect(scoreTable(scores(finished, partB)).rows[1].cells).toEqual(["Time limit (300 s)", "18/24", "3"]);
+    expect(scoreTable(scores(finished, partB)).rows[1].cells).toEqual(["300 (time limit)", "18", "3"]);
   });
 
   it("a stopped part shows when it stopped, and the part after it is not given", () => {
     const partA = { ...finished, status: "stopped" as const, timeSeconds: 31, correctLines: 9, errors: 1 };
     expect(scoreTable(scores(partA, { status: "notGiven", code: null })).rows).toEqual([
-      { label: "Part A", cells: ["Stopped at 31 s", "9/24", "1"], note: null, sheet: "partA" },
+      { label: "Part A", cells: ["31 (stopped)", "9", "1"], note: null, sheet: "partA" },
       { label: "Part B", cells: [], note: "Not given", sheet: "partB" },
     ]);
   });

@@ -1,5 +1,6 @@
-// The step after Generate Test Sequence (roadmap 8.4b, restyled at 8.9): the client's link, ready to copy.
-// The window's title and summary line come from GenerateSequence.
+// The step after New Test Sequence (roadmap 8.4b, restyled at 8.9): the client's link, ready to copy.
+// The window's title and summary line come from GenerateSequence. Copy link copies and closes the window;
+// if the browser blocks copying, the window stays open so the link isn't lost.
 
 import CopyIcon from "./CopyIcon";
 import { clientLink } from "./links";
@@ -9,12 +10,16 @@ import { useCopy } from "./useCopy";
 
 type Props = {
   created: CreatedSequence;
-  onDone: () => void;
+  onCopied: () => void;
 };
 
-function SequenceLink({ created, onDone }: Props) {
+function SequenceLink({ created, onCopied }: Props) {
   const link = clientLink(created.linkToken);
-  const { status: copyStatus, copy: handleCopy } = useCopy(link);
+  const { status: copyStatus, copy } = useCopy(link);
+
+  async function handleCopy() {
+    if (await copy()) onCopied();
+  }
 
   return (
     <div className="mt-6">
@@ -31,16 +36,11 @@ function SequenceLink({ created, onDone }: Props) {
           {copyStatus === "copied" ? "Copied" : "Copy link"}
         </button>
       </div>
-      <p role="status" className="mt-2 min-h-8 text-base">
-        {copyStatus === "copied" && "Copied."}
-        {copyStatus === "failed" && "Couldn't copy. Select the link and copy it yourself."}
-      </p>
-
-      <div className="mt-4 flex justify-end">
-        <button type="button" onClick={onDone} className={buttonClass("secondary")}>
-          Done
-        </button>
-      </div>
+      {copyStatus === "failed" && (
+        <p role="alert" className="mt-3 text-base">
+          Couldn't copy. Select the link and copy it yourself.
+        </p>
+      )}
     </div>
   );
 }
