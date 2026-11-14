@@ -3,7 +3,7 @@
 The build, broken into small steps. Each step is about one session and teaches
 one thing. Tick a box only when its "Check" passes.
 
-**Current step:** 9.4
+**Current step:** 9.5
 
 How to use this file:
 
@@ -442,9 +442,11 @@ clicks Continue, and the controls sit on the client page, on the running test's 
   - Note: `reportProgress` answers saved or not saved. 9.5 decides how a hold report is retried, since Continue can't appear until the hold is recorded
   - Note: production still needs migration `add_visit_pings` and Edge Functions `check-status` and `report-progress` at the Phase 9 release
 
-- [ ] **9.4 Status-check fallback**
+- [x] **9.4 Status-check fallback**
   - Learn: polling an Edge Function every few seconds; stopping the polling cleanly
   - Check: with real-time blocked, a stop or Continue still arrives within the polling interval
+  - Note: `src/client/watch-test.ts` asks `check-status` at the start, on each "check now" ping, and 3 seconds after each answer, always (real-time can fail without saying so). One check at a time; stopping cancels the timer and the listener and drops a late answer; a refused answer stops it too. Unit tests with fake timers
+  - Note: tried on the development page with `*realtime*` blocked in Chrome's DevTools: Continue and End test arrived within 3 seconds. The other browsers are checked at 9.6
 
 - [ ] **9.5 What the client sees: holds and stops**
   - Learn: connecting the hold and the stop to each test (5.11, 6.10); adding a prop to the plug-in contract
