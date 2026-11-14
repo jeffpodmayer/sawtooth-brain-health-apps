@@ -88,7 +88,7 @@ values (
 insert into public.sequence_tests (
   id, practice_id, sequence_id, test_id, position, status, test_version,
   started_at, completed_at, scores, raw_data, screen_width, screen_height,
-  stop_reason, stopped_by, sheets
+  stop_requested_at, stop_reason, stopped_by, sheets
 )
 values (
   '40000000-0000-4000-8000-000000000002',
@@ -103,7 +103,7 @@ values (
   }',
   '{"seed": true}',
   1440, 900,
-  'gave_up', '10000000-0000-4000-8000-000000000001',
+  now() - interval '10 minutes', 'gave_up', '10000000-0000-4000-8000-000000000001',
   '{}'
 );
 

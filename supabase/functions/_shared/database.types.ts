@@ -173,6 +173,8 @@ export type Database = {
           browser_scores: Json | null
           completed_at: string | null
           created_at: string
+          holds_reached: number
+          holds_released: number
           id: string
           position: number
           practice_id: string
@@ -185,6 +187,7 @@ export type Database = {
           started_at: string | null
           status: string
           stop_reason: string | null
+          stop_requested_at: string | null
           stopped_by: string | null
           test_id: string
           test_version: string | null
@@ -193,6 +196,8 @@ export type Database = {
           browser_scores?: Json | null
           completed_at?: string | null
           created_at?: string
+          holds_reached?: number
+          holds_released?: number
           id?: string
           position: number
           practice_id: string
@@ -205,6 +210,7 @@ export type Database = {
           started_at?: string | null
           status?: string
           stop_reason?: string | null
+          stop_requested_at?: string | null
           stopped_by?: string | null
           test_id: string
           test_version?: string | null
@@ -213,6 +219,8 @@ export type Database = {
           browser_scores?: Json | null
           completed_at?: string | null
           created_at?: string
+          holds_reached?: number
+          holds_released?: number
           id?: string
           position?: number
           practice_id?: string
@@ -225,6 +233,7 @@ export type Database = {
           started_at?: string | null
           status?: string
           stop_reason?: string | null
+          stop_requested_at?: string | null
           stopped_by?: string | null
           test_id?: string
           test_version?: string | null
