@@ -37,7 +37,6 @@ export type VisitTest = {
   timed_part_started_at: string | null; // when it started (9.3)
   sheets: Json | null;
   browser: Json | null; // raw_data's browser only
-  clinicians: { display_name: string } | null; // whoever stopped the test
 };
 
 const statusColors: Record<string, string> = { completed: "text-success-ink", stopped: "text-warning-ink" };
@@ -121,7 +120,6 @@ function TestBlock({ test, clientCode, visitCreatedAt, running, onChanged }: Pro
   const status = [
     !ending && !live && liveLabel,
     test.stop_reason && (stopReasonLabels[test.stop_reason] ?? plugin?.stopReasons[test.stop_reason] ?? test.stop_reason),
-    test.stop_reason && test.clinicians && `by ${test.clinicians.display_name}`,
     otherDay,
   ]
     .filter(Boolean)
@@ -280,7 +278,7 @@ function TestBlock({ test, clientCode, visitCreatedAt, running, onChanged }: Pro
                       {row.cells.map((cell, index) => (
                         <td
                           key={table.columns[index]}
-                          className={`py-4 text-center ${index === 0 ? "font-semibold" : ""}`}
+                          className={`whitespace-nowrap py-4 text-center ${index === 0 ? "font-semibold" : ""}`}
                         >
                           {cell}
                         </td>

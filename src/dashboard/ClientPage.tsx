@@ -34,9 +34,9 @@ const breadcrumbLinkClass =
   "rounded-lg font-semibold text-accent underline-offset-8 hover:text-accent-strong hover:underline focus-visible:outline-4 focus-visible:outline-offset-4 focus-visible:outline-accent";
 
 // Of raw_data (the full click or answer log), only the browser is read (ADR-047); the log itself isn't.
-// A visit's clinicians is who created it; a test's is who stopped it (empty unless stopped).
+// A visit's clinicians is who created it.
 const columns =
-  "code, sequences(id, status, created_at, link_token, clinicians(display_name), sequence_tests(id, practice_id, test_id, status, test_version, started_at, completed_at, screen_width, screen_height, scores, browser_scores, stop_reason, stop_requested_at, holds_reached, holds_released, began_at, timed_part, timed_part_started_at, sheets, browser:raw_data->browser, clinicians(display_name)))";
+  "code, sequences(id, status, created_at, link_token, clinicians(display_name), sequence_tests(id, practice_id, test_id, status, test_version, started_at, completed_at, screen_width, screen_height, scores, browser_scores, stop_reason, stop_requested_at, holds_reached, holds_released, began_at, timed_part, timed_part_started_at, sheets, browser:raw_data->browser))";
 
 const hasResults = (visit: Visit) =>
   visit.sequence_tests.some((test) => test.status === "completed" || test.status === "stopped");
