@@ -1,11 +1,21 @@
 // The tests a sequence can include, in the order they're given (roadmap 8.4b), with each test's score table
-// and practice row for the client page, and its sheet labels (ADR-047). Only test-info.ts and summary.ts
-// are read, so the dashboard never downloads a test's screens. A new test is added here, and to
-// enabled_tests' allowed ids by migration.
+// and practice row for the client page, its sheet labels (ADR-047) and its CSV columns (10.1). Only
+// test-info.ts and summary.ts are read, so the dashboard never downloads a test's screens. A new test is
+// added here, and to enabled_tests' allowed ids by migration.
 
-import { practiceRow as practiceSwaps, scoreTable as swapsTable } from "../tests/swaps/summary";
+import {
+  csvMeasures as swapsCsvMeasures,
+  csvRows as swapsCsvRows,
+  practiceRow as practiceSwaps,
+  scoreTable as swapsTable,
+} from "../tests/swaps/summary";
 import * as swaps from "../tests/swaps/test-info";
-import { practiceRow as practiceTrailMaking, scoreTable as trailMakingTable } from "../tests/trail-making/summary";
+import {
+  csvMeasures as trailMakingCsvMeasures,
+  csvRows as trailMakingCsvRows,
+  practiceRow as practiceTrailMaking,
+  scoreTable as trailMakingTable,
+} from "../tests/trail-making/summary";
 import * as trailMaking from "../tests/trail-making/test-info";
 
 export const sequenceTests = [
@@ -14,6 +24,8 @@ export const sequenceTests = [
     name: trailMaking.testName,
     table: trailMakingTable,
     practice: practiceTrailMaking,
+    csvMeasures: trailMakingCsvMeasures,
+    csvRows: trailMakingCsvRows,
     sheetLabels: trailMaking.sheetLabels,
     stopReasons: trailMaking.stopReasons,
     timedParts: trailMaking.timedParts,
@@ -24,6 +36,8 @@ export const sequenceTests = [
     name: swaps.testName,
     table: swapsTable,
     practice: practiceSwaps,
+    csvMeasures: swapsCsvMeasures,
+    csvRows: swapsCsvRows,
     sheetLabels: swaps.sheetLabels,
     stopReasons: swaps.stopReasons,
     timedParts: swaps.timedParts,

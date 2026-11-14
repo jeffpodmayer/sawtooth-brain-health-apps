@@ -1,7 +1,7 @@
 // This test's scores for the dashboard's client page (ADR-047): one table with a row for the test, with the
 // answer sheet, and one for recall, plus practice as a separate row. Raw scores only (SPEC: Scoring).
 
-import type { PracticeRow, ScoreRow, ScoreTable } from "../../shared/test-module";
+import type { CsvRow, PracticeRow, ScoreRow, ScoreTable } from "../../shared/test-module";
 import { gridItems, keyNumbers } from "./scoring/form-a";
 import type { GridScore, SwapsScores } from "./scoring/score-grid";
 import type { RecallScore } from "./scoring/score-recall";
@@ -27,6 +27,34 @@ export function scoreTable(scores: unknown): ScoreTable {
 export function practiceRow(scores: unknown): PracticeRow {
   const { practice } = scores as SwapsScores;
   return { label: "Practice", parts: [count(practice.wrongAnswers, "wrong answer"), "not scored"] };
+}
+
+// The CSV export's columns for this test (roadmap 10.1), in the score table's order. Raw values only.
+export const csvMeasures = ["Correct", "Tried", "Errors", "Corrections", "Time (s)", "Blank"];
+
+// The status words in the CSV, from the stored ones.
+const csvStatus = { completed: "completed", timedOut: "timed out", stopped: "stopped", notGiven: "not given" };
+
+// A CSV row for the test and one for recall (roadmap 10.1). Practice isn't scored, so it isn't exported.
+export function csvRows(scores: unknown): CsvRow[] {
+  const { test, recall } = scores as SwapsScores;
+  const blank = { Correct: null, Tried: null, Errors: null, Corrections: null, "Time (s)": null, Blank: null };
+  const testValues =
+    test.status === "notGiven"
+      ? blank
+      : {
+          ...blank,
+          Correct: test.correct,
+          Tried: test.attempted,
+          Errors: test.errors,
+          Corrections: test.corrections,
+          "Time (s)": seconds(test.timeMs),
+        };
+  const recallValues = recall.status === "notGiven" ? blank : { ...blank, Correct: recall.correct, Blank: recall.blank };
+  return [
+    { part: "Test", status: csvStatus[test.status], values: testValues },
+    { part: "Recall", status: csvStatus[recall.status], values: recallValues },
+  ];
 }
 
 function testRow(test: GridScore): ScoreRow {

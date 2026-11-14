@@ -4,6 +4,7 @@
 
 import { useEffect, useState } from "react";
 import { Link } from "react-router";
+import ClientsMenu from "./ClientsMenu";
 import GenerateSequence from "./GenerateSequence";
 import { supabase } from "./supabase";
 
@@ -79,6 +80,8 @@ function ClientsPage() {
           </div>
         )}
         <GenerateSequence look="solid" onCreated={() => setReloads((count) => count + 1)} />
+        {/* Export CSV, with the same search, once there are clients (roadmap 10.1). */}
+        {load.state === "loaded" && clients.length > 0 && <ClientsMenu matches={(code) => code.includes(query)} />}
       </div>
 
       {load.state === "loading" && <p className="mt-8">Loading…</p>}

@@ -1,7 +1,7 @@
 // This test's scores for the dashboard's client page (ADR-047): a table with one row per timed part,
 // with its sheet, and the samples as a separate row. Raw scores only (SPEC: Scoring).
 
-import type { PracticeRow, ScoreRow, ScoreTable } from "../../shared/test-module";
+import type { CsvRow, PracticeRow, ScoreRow, ScoreTable } from "../../shared/test-module";
 import type { PartScore, SampleScore, TrailMakingScores } from "./scoring/score-part";
 
 // Each part has 25 circles, so 24 lines (SPEC: Pages).
@@ -23,6 +23,26 @@ export function scoreTable(scores: unknown): ScoreTable {
 export function practiceRow(scores: unknown): PracticeRow {
   const { sampleA, sampleB } = scores as TrailMakingScores;
   return { label: "Samples", parts: [sampleText("A", sampleA), sampleText("B", sampleB)] };
+}
+
+// The CSV export's columns for this test (roadmap 10.1), in order. Raw values only.
+export const csvMeasures = ["Time (s)", "Lines", "Errors", "Code"];
+
+// The status words in the CSV, from the stored ones.
+const csvStatus = { completed: "completed", timedOut: "timed out", stopped: "stopped", notGiven: "not given" };
+
+// One CSV row per timed part (roadmap 10.1). The samples aren't scored, so they aren't exported.
+export function csvRows(scores: unknown): CsvRow[] {
+  const { partA, partB } = scores as TrailMakingScores;
+  return [csvRow("Part A", partA), csvRow("Part B", partB)];
+}
+
+function csvRow(part: string, score: PartScore): CsvRow {
+  const values =
+    score.status === "notGiven"
+      ? { "Time (s)": null, Lines: null, Errors: null, Code: score.code }
+      : { "Time (s)": score.timeSeconds, Lines: score.correctLines, Errors: score.errors, Code: null };
+  return { part, status: csvStatus[score.status], values };
 }
 
 function partRow(label: string, sheet: string, part: PartScore): ScoreRow {

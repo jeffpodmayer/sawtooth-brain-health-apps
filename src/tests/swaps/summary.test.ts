@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import type { GivenGridScore, SwapsScores } from "./scoring/score-grid";
-import { practiceRow, scoreTable } from "./summary";
+import { csvMeasures, csvRows, practiceRow, scoreTable } from "./summary";
 
 const timedOut: GivenGridScore = { status: "timedOut", timeMs: 60000, attempted: 24, correct: 23, errors: 1, corrections: 1 };
 const practice = { wrongAnswers: 0 };
@@ -63,5 +63,43 @@ describe("SWAPS practice row", () => {
   it("one wrong answer is singular", () => {
     const withPractice = { ...scores(timedOut, recallDone), practice: { wrongAnswers: 1 } };
     expect(practiceRow(withPractice).parts[0]).toBe("1 wrong answer");
+  });
+});
+
+describe("SWAPS CSV rows", () => {
+  it("a row for the test and one for recall, with raw numbers", () => {
+    expect(csvRows(scores(timedOut, recallDone))).toEqual([
+      {
+        part: "Test",
+        status: "timed out",
+        values: { Correct: 23, Tried: 24, Errors: 1, Corrections: 1, "Time (s)": 60, Blank: null },
+      },
+      {
+        part: "Recall",
+        status: "completed",
+        values: { Correct: 5, Tried: null, Errors: null, Corrections: null, "Time (s)": null, Blank: 1 },
+      },
+    ]);
+  });
+
+  it("time is in seconds to the nearest tenth, and a stopped part says so", () => {
+    const test = { ...timedOut, status: "stopped" as const, timeMs: 31260 };
+    const [testRow, recallRow] = csvRows(scores(test, { ...recallDone, status: "stopped" }));
+    expect([testRow.status, testRow.values["Time (s)"], recallRow.status]).toEqual(["stopped", 31.3, "stopped"]);
+  });
+
+  it("a part not given has no values", () => {
+    expect(csvRows(scores({ status: "notGiven" }, { status: "notGiven" })).map((row) => row.status)).toEqual([
+      "not given",
+      "not given",
+    ]);
+    for (const row of csvRows(scores({ status: "notGiven" }, { status: "notGiven" }))) {
+      expect(Object.values(row.values).every((value) => value === null)).toBe(true);
+    }
+  });
+
+  it("every row has exactly the test's measures", () => {
+    const rows = [...csvRows(scores(timedOut, recallDone)), ...csvRows(scores({ status: "notGiven" }, { status: "notGiven" }))];
+    for (const row of rows) expect(Object.keys(row.values)).toEqual(csvMeasures);
   });
 });

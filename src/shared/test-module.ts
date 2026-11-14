@@ -39,6 +39,10 @@ export type ScoreRow = {
 // A test's samples or practice: not scored, and not shown on the dashboard for now (ADR-047).
 export type PracticeRow = { label: string; parts: string[] };
 
+// One part's row in the CSV export (roadmap 10.1): raw values only, keyed by the test's csvMeasures.
+// A value the part doesn't have is null (a blank cell).
+export type CsvRow = { part: string; status: string; values: Record<string, number | null> };
+
 export type TestProps = {
   sequenceId: string;
 
