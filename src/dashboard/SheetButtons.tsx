@@ -1,9 +1,12 @@
-// A score row's sheet buttons on the client page (ADR-047): view the sheet in a window, or download it.
-// A sheet is SVG sent by the browser and could contain script, so it shows only through <img>, which never
-// runs it (ADR-041). The files are private: each click gets a fresh signed URL that works for 10 minutes,
-// marked as a download, so opening one directly downloads it instead of showing it as a page.
+// A score row's sheet buttons on the client page (ADR-047): view the sheet in a window, or download it as a PDF
+// (roadmap 10.2). A sheet is SVG sent by the browser and could contain script, so it's only ever drawn through
+// <img>, which never runs it (ADR-041). The files are private: View gets a fresh signed URL that works for
+// 10 minutes, marked as a download, so opening one directly downloads it instead of showing it as a page.
+// Download reads the file through the storage rules and makes the PDF in the browser.
 
 import { useEffect, useId, useRef, useState } from "react";
+import { saveFile } from "./save-file";
+import { sheetPdf } from "./sheet-pdf";
 import { supabase } from "./supabase";
 
 const SIGNED_URL_SECONDS = 10 * 60;
@@ -17,8 +20,11 @@ const tipClass =
 const closeButtonClass =
   "-mr-3 -mt-2 flex size-12 shrink-0 items-center justify-center rounded-lg hover:bg-hover focus-visible:outline-4 focus-visible:-outline-offset-4 focus-visible:outline-accent";
 
-// title names the sheet, e.g. "TEST-001 · Trail Making · Part A". fileName is what a download is saved as.
-function SheetButtons({ path, title, fileName }: { path: string; title: string; fileName: string }) {
+// title names the sheet, e.g. "TEST-001 · Trail Making · Part A". heading tops the PDF, e.g. the title and the
+// test's date, with scoreLines under it. fileName is what the PDF is saved as.
+type Props = { path: string; title: string; heading: string; scoreLines: string[]; fileName: string };
+
+function SheetButtons({ path, title, heading, scoreLines, fileName }: Props) {
   const dialogRef = useRef<HTMLDialogElement>(null);
   const titleId = useId();
   const [viewUrl, setViewUrl] = useState<string | null>(null);
@@ -30,29 +36,30 @@ function SheetButtons({ path, title, fileName }: { path: string; title: string; 
     if (viewUrl) dialogRef.current?.showModal();
   }, [viewUrl]);
 
-  async function signedUrl(download: string | true): Promise<string | null> {
+  async function view() {
     setBusy(true);
     setFailed(false);
     const { data, error } = await supabase.storage
       .from("sheets")
-      .createSignedUrl(path, SIGNED_URL_SECONDS, { download });
+      .createSignedUrl(path, SIGNED_URL_SECONDS, { download: true });
     setBusy(false);
-    if (error) {
-      setFailed(true);
-      return null;
-    }
-    return data.signedUrl;
+    if (error) setFailed(true);
+    else setViewUrl(data.signedUrl);
   }
 
-  async function view() {
-    const url = await signedUrl(true);
-    if (url) setViewUrl(url);
-  }
-
-  // The file is marked as a download, so the browser saves it and stays on this page.
+  // The sheet as a one-page PDF with a heading, made in this browser and saved as a download.
   async function download() {
-    const url = await signedUrl(fileName);
-    if (url) window.location.assign(url);
+    setBusy(true);
+    setFailed(false);
+    try {
+      const { data, error } = await supabase.storage.from("sheets").download(path);
+      if (error) throw error;
+      saveFile(await sheetPdf(await data.text(), heading, scoreLines), fileName);
+    } catch {
+      setFailed(true);
+    } finally {
+      setBusy(false);
+    }
   }
 
   return (

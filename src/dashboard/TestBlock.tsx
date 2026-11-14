@@ -13,6 +13,7 @@ import type { NoteDialogState } from "./NoteDialog";
 import RunningTestControls from "./RunningTestControls";
 import SetupInfo from "./SetupInfo";
 import SheetButtons from "./SheetButtons";
+import { sheetScoreLines } from "./sheet-scores";
 import { stopReasonLabels, testStatusLabels } from "./statusLabels";
 import TestNotes from "./TestNotes";
 
@@ -297,7 +298,9 @@ function TestBlock({ test, clientCode, visitCreatedAt, running, onChanged }: Pro
                           <SheetButtons
                             path={path}
                             title={`${clientCode} · ${name} · ${label}`}
-                            fileName={`${clientCode} ${name} ${label} ${fileDate(test.completed_at)}.svg`}
+                            heading={`${clientCode} · ${name} · ${label} · ${fileDate(test.completed_at)}`}
+                            scoreLines={row.sheet ? sheetScoreLines(table, row.sheet) : []}
+                            fileName={`${clientCode} ${name} ${label} ${fileDate(test.completed_at)}.pdf`}
                           />
                         ) : (
                           <span className="text-base text-ink-muted">No sheet</span>

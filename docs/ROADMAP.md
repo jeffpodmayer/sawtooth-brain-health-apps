@@ -3,7 +3,7 @@
 The build, broken into small steps. Each step is about one session and teaches
 one thing. Tick a box only when its "Check" passes.
 
-**Current step:** 10.1
+**Current step:** 10.4
 
 How to use this file:
 
@@ -490,18 +490,24 @@ Phase 9 code review (at the release, 2026-11-13):
 
 ## Phase 10 — CSV and sheet downloads
 
-- [ ] **10.1 CSV export**
+- [x] **10.1 CSV export**
   - Learn: Papa Parse; protecting spreadsheets from formula injection
-  - Check: the download matches what's filtered on screen, one row per test, grouped by client ID; a value starting with `=` opens as text in Excel
+  - Check: the download has the clients the search shows, one row per part, grouped by client ID; a value starting with `=` opens as text in Excel
   - Note: the check was written for the Results list, removed at 8.7. Decide where the export lives first: one download of every result on the Clients list, or one per client page (decided at 8.7)
+  - Note: built as ADR-052: Export CSV in a ⋯ menu to the right of New sequence on the Clients list, following the search. One row per part (Client ID, Visit date, Test, Part, Status, then each test's measures), from each test's `csvMeasures` and `csvRows`. Only completed and stopped tests. No notes, clinician names, browser, version or times
+  - Note: formula protection uses our own pattern, since Papa Parse's built-in one misses a cell with a line break. A client ID can't start with `=` (2.3), so this is checked by unit test, not by hand
 
-- [ ] **10.2 Sheet download**
-  - Learn: making an SVG that stands alone (font embedded)
-  - Check: a downloaded sheet opens in a browser on another computer, looks the same and prints cleanly on one page
+- [x] **10.2 Sheet download**
+  - Learn: turning an SVG into a PDF in the browser; drawing untrusted SVG safely through an image
+  - Check: a downloaded sheet is a one-page PDF headed with the client ID, test, sheet and date, and its scores as on the client page; it opens on another computer, looks the same and prints cleanly on one page
+  - Note: changed from SVG to PDF (ADR-052): drawn as an image at 300 dpi on a Letter page, with jsPDF, which loads only on download. View still shows the SVG
+  - Note: checked by Jeff in Chrome (2026-11-13). Safari, Firefox and Edge at 10.4
 
-- [ ] **10.3 Check what leaves the app**
+- [x] **10.3 Check what leaves the app**
   - Learn: reviewing exports for privacy
   - Check: the CSV and sheets contain client codes only, with no names or details beyond what the brief allows
+  - Note: reviewed 2026-11-13. CSV: client ID, visit date, test, part, status and raw scores only. PDF: the heading (client ID, test, sheet, date), the raw score lines from the client page, the sheet drawing (the test's own labels and the client's answers) and hidden properties holding only that title, "jsPDF 4.2.1" and when it was made. File names: client ID, test, sheet and date. Both are read through RLS and the storage rules, so only the clinician's own practice
+  - Note: downloaded files are outside RLS on the clinician's computer. Mention it to the clinicians at 10.4 (ADR-052)
 
 - [ ] **10.4 Full run in every browser, and the clinicians' round**
   - Learn: an end-to-end manual test plan; measuring a timing gap across browsers; running a feedback round
@@ -512,6 +518,7 @@ Phase 9 code review (at the release, 2026-11-13):
   - Note: Howler switches the browser's audio off after 30 seconds of silence, so listen for a clipped first word on any clip that follows a long quiet stretch, such as the first clip after a timed part (found at 7.3)
   - Note: in each browser, also try a failed save (DevTools offline before a test ends, then Try again), and open both tests' sheets. The 409 path (two tabs finishing the same test on one link) wasn't tried by hand at 7.7. The SWAPS sheet hasn't been opened in Safari or Firefox yet
   - Note: in each browser, check that sheets show in a test's details on the client page, and that "Open image in new tab" downloads the file instead of opening it (8.7, ADR-046). Only Chrome was tried at 8.7
+  - Note: in each browser, download both tests' sheets as PDF and check the font and drawing look right (Safari especially, ADR-052), and run Export CSV
   - Note: first add each clinician's email to the preview's Cloudflare Access policy (only Jeff's is on it, see 1.9)
   - Note: first create each clinician's development login (moved from 8.2). Authentication → Users → Add user → Create new user, with a password of 12+ characters and "Auto confirm user" ticked (invites don't work, since Supabase's built-in email only reaches the Supabase team). Then add their `clinicians` row for Sawtooth in the SQL Editor. Real emails never go in `seed.sql`, and a reset deletes these logins, so do this after the last reset before the round
   - Note: questions waiting on the clinicians: whether they already have an ID for each client, and what one looks like (8.3); ADR-030, ADR-032, ADR-036 and ADR-038; SWAPS SW1, SW2, the timed recall, leaving out the row highlights (SPEC question 8), ending with no spoken cue (SPEC question 5) and the clinician-paced pause before recall (ADR-050); and the client wording for the welcome, the refused link, "Something went wrong", the first test's wait screen ("Hang tight!"), the break screen, "Saving…" and the end screen

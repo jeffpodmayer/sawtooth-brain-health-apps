@@ -1105,7 +1105,7 @@ know how a test is scored (ADR-001), and each test's `scores` has its own shape.
 
 ## ADR-046: Results show on the client page, with each test's full detail and sheets
 
-- **Status:** Accepted · **Date:** 2026-11-12 · Removes the results list (roadmap 8.5) · Adds to the test plug-in in ADR-001 and ADR-045 · Detail pieces and layout replaced by ADR-047
+- **Status:** Accepted · **Date:** 2026-11-12 · Removes the results list (roadmap 8.5) · Adds to the test plug-in in ADR-001 and ADR-045 · Detail pieces and layout replaced by ADR-047 · Where the CSV export lives answered by ADR-052
 
 **Context:** Roadmap 8.5 built a results list across all clients, and 8.7 planned a page for each result.
 Clinicians look at results one client at a time, so the list and a separate page added a step
@@ -1135,7 +1135,7 @@ without adding anything.
 
 ## ADR-047: The dashboard redesign
 
-- **Status:** Accepted · **Date:** 2026-11-13 · Replaces the score summary in ADR-045 and the detail pieces in ADR-046 · Narrows ADR-012 and ADR-015 for the dashboard
+- **Status:** Accepted · **Date:** 2026-11-13 · Replaces the score summary in ADR-045 and the detail pieces in ADR-046 · Narrows ADR-012 and ADR-015 for the dashboard · CSV columns added and sheet download changed to PDF by ADR-052
 
 **Context:** At roadmap 8.9, Jeff redesigned the dashboard from his own mock-ups. The client page shows each
 test's parts as a table, each row with its own sheet, so each test now hands the dashboard a table instead of text lines.
@@ -1331,3 +1331,45 @@ but clients never log in and never read tables (ADR-002).
 - Realtime's "Allow public access" setting must stay on in both Supabase projects.
 - A visit's channel name is as private as its link token. Never log or display it.
 - Real-time is only a shortcut. Without it, Stop and Continue arrive at the next status check.
+
+## ADR-052: What leaves the app: a CSV with a row per part, and sheets as PDFs
+
+- **Status:** Accepted · **Date:** 2026-11-13 · Adds to the test plug-in in ADR-001 and ADR-047 · Answers where the export lives (ADR-046) · Changes how a sheet is downloaded (ADR-047)
+
+**Context:** Roadmap 10.1 planned a CSV that matched the Results list, which was removed at 8.7 (ADR-046).
+Roadmap 10.2 planned sheet downloads as stand-alone SVG, but clinicians file and print PDFs. Both
+files leave the app and live on the clinician's computer afterwards.
+
+**Decision:**
+
+- Export CSV sits in a ⋯ menu to the right of New sequence on the Clients list. It exports every
+  completed or stopped test of the clients the search shows, read fresh through RLS.
+- One row per part: Client ID, Visit date, Test, Part, Status, then each test's measures. Clients are
+  sorted by client ID, visits oldest first, tests in the order given. A row is blank under other tests'
+  columns.
+- Each test's `summary.ts` provides `csvMeasures` (its columns, once) and `csvRows(scores)` (raw values,
+  null for a blank), listed in `sequence-tests.ts`. The shared builder never knows how a test is scored.
+- Nothing else goes in the CSV: no notes (free text could identify a client), no clinician names, no
+  browser, screen size, test version or times.
+- Any text cell starting with `=`, `+`, `-`, `@`, tab or carriage return gets a `'` in front, so Excel
+  opens it as text. We pass Papa Parse our own pattern, since its built-in one misses a cell with a line break.
+- Download on a sheet gives a one-page Letter PDF, made in the browser: a heading (client ID, test, sheet,
+  date), a line per score row with the client page's wording (from `scoreTable`: the rows pointing to this
+  sheet, plus rows with no sheet of their own, such as SWAPS's recall), then the sheet drawn as an image at
+  300 dpi. The scores go on the PDF only, never into the saved sheet, since they're the server's and can be
+  corrected (ADR-040). The SVG is drawn only through an `<img>`, so any
+  script in it never runs (ADR-041). jsPDF loads only when a sheet is downloaded. View still shows the SVG.
+- Download reads the file through the storage rules (`download`), not a signed link. View keeps its
+  10-minute signed link.
+- Papa Parse and jsPDF are pinned to exact versions at least two weeks old.
+
+**Consequences:**
+
+- A new test needs `csvMeasures` and `csvRows`, with unit tests, as well as `scoreTable`, `practiceRow`
+  and `sheetLabels`.
+- If a test's score shape changes, its `csvRows` must handle older results too (as in ADR-045).
+- The PDF is a picture of the sheet, not vector shapes: it prints cleanly but blurs if zoomed far in.
+- Drawing an SVG with an embedded font onto a canvas varies by browser, Safari especially. Check the PDF in
+  each browser at 10.4.
+- Downloaded files live on the clinician's computer, outside RLS. Keeping them safe is the practice's job;
+  mention it to the clinicians at 10.4.

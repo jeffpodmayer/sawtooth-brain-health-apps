@@ -4,6 +4,7 @@
 
 import { useId, useRef, useState } from "react";
 import { buildCsv } from "./csv-export";
+import { saveFile } from "./save-file";
 import { sequenceTests } from "./sequence-tests";
 import { supabase } from "./supabase";
 import { useDismiss } from "./useDismiss";
@@ -41,12 +42,8 @@ function ClientsMenu({ matches }: { matches: (code: string) => boolean }) {
       sequenceTests,
     );
     // The byte-order mark tells Excel the file is UTF-8.
-    const url = URL.createObjectURL(new Blob(["﻿", csv], { type: "text/csv;charset=utf-8" }));
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = `Results ${new Date().toLocaleDateString("en-CA")}.csv`;
-    link.click();
-    URL.revokeObjectURL(url);
+    const file = new Blob(["﻿", csv], { type: "text/csv;charset=utf-8" });
+    saveFile(file, `Results ${new Date().toLocaleDateString("en-CA")}.csv`);
   }
 
   return (

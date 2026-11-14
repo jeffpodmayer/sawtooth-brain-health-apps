@@ -22,7 +22,7 @@ depends on it.
 ## Stack
 
 - TypeScript + React + Vite, React Router, Tailwind CSS, SVG for test drawings
-- Fontsource (Atkinson Hyperlegible; Atkinson Hyperlegible Next for the dashboard), screenfull, Howler.js, Papa Parse
+- Fontsource (Atkinson Hyperlegible; Atkinson Hyperlegible Next for the dashboard), screenfull, Howler.js, Papa Parse, jsPDF
 - Supabase: auth (clinicians only), Postgres, Storage, real-time, Edge Functions (Deno)
 - Vitest for tests
 - ESLint for linting
@@ -94,7 +94,8 @@ docs/            ROADMAP.md, DECISIONS.md
 - Shared code never knows how a test is scored. Test code never imports
   Supabase. All data goes through the `ResultStore` interface.
 - For the dashboard, each test also provides `scoreTable`, `practiceRow`,
-  `sheetLabels`, `stopReasons`, `timedParts` and `holds`, and saves `rawData.browser` (ADR-047, ADR-049).
+  `csvMeasures`, `csvRows`, `sheetLabels`, `stopReasons`, `timedParts` and `holds`,
+  and saves `rawData.browser` (ADR-047, ADR-049, ADR-052).
 
 **Scoring and timing**
 
