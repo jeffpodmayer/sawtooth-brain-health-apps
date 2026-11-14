@@ -414,37 +414,45 @@ see their own practice.
   - Note: the client page reads each visit's link token (Copy link) and `raw_data->browser`, both through RLS
   - Note: show the redesign to the clinicians at 10.4
 
-## Phase 9 — Stop button with real-time
+## Phase 9 — Stop and Continue with real-time
 
-- [ ] **9.1 Stop controls on the dashboard**
-  - Learn: recording an action with who did it and why
-  - Check: "End current test" and "End whole sequence" both require a reason (Gave up / Interrupted); the action saves with the clinician's ID
-  - Note: a stop must be saved before the client's partial result arrives, so the status check (9.3) has something to read. `sequence_tests` doesn't allow that yet; add a stop-request state by migration (Phase 2 code review)
-  - Note: a test only learns that it was stopped, not why, so Trail Making can't yet record a part as `notGiven` with code 996 or 997. A stop during a sample needs 996 when the client couldn't do it (ADR-032). Settle how once the clinicians confirm the alphabet check (Phase 3 code review)
-  - Note: save-result refuses a result with a stop point (`stopped_not_supported_yet`). Extend it here to save a stopped test's partial result with its reason and clinician (ADR-040)
+Reshaped at the start of 9.1 (ADR-048): a test holds after each sample or practice until the clinician
+clicks Continue, and the controls sit on the client page, on the running test's row.
+
+- [ ] **9.1 Stop and Continue controls on the dashboard**
+  - Learn: recording an action with who did it and why; one database function per action (ADR-044)
+  - Check: the running test's row (the first `pending` test in an open visit) shows End current test, and Continue while it's holding (hold set by hand in development); the open visit's row shows End whole sequence, next to Copy link; both ends require a reason (Gave up / Interrupted); each action saves with the clinician's ID
+  - Note: a stop must be saved before the client's partial result arrives, so the status check (9.4) has something to read. `sequence_tests` doesn't allow that yet; add a stop-request state by migration (Phase 2 code review)
+  - Note: a test only learns that it was stopped, not why, so Trail Making can't yet record a part as `notGiven` with code 996 or 997. A stop during a sample needs 996 when the client couldn't do it (ADR-032). Settle how once the clinicians confirm the alphabet check (Phase 3 code review). Ending at the hold after a sample is the natural source of 996 (ADR-048)
   - Note: a sequence closes itself as `completed` once no test is pending (ADR-042). "End whole sequence" must set the sequence to `discontinued` before marking its remaining tests not given (found at 7.8)
   - Note: `seed.sql` creates the first visit (Trail Making completed, SWAPS stopped) as `completed` (fixed at 8.9; development's row was updated by hand). Check that this still fits the stop rule decided here
-  - Note: from the Phases 5–7 code review, while save-result and the close trigger are open here: (a) two saves finishing the last two tests at once can leave the sequence `open`, since neither sees the other's change (lock the sequence row in the trigger); (b) two tabs saving the same test can overwrite the saved test's sheets, since the pending check runs before the upload; (c) save-result doesn't require a finished test's sheets (Trail Making's partA and partB, SWAPS's sheet), only rejects unknown names
   - Note: the client page re-reads its visits after New sequence and then opens only the newest visit with results, closing any the clinician had opened. Keep open visits and tests open across a re-read, since stop controls will re-read while a test runs (Phase 8 code review)
 
-- [ ] **9.2 Real-time stop to the client's tab**
+- [ ] **9.2 The client page updates live**
+  - Learn: Supabase real-time for signed-in clinicians, through RLS
+  - Check: when a client reaches a hold or finishes a test, the client page shows it within a second or two without a reload; another practice's changes never arrive
+
+- [ ] **9.3 Stop and Continue reach the client's tab**
   - Learn: Supabase real-time channels; letting a client listen without letting it read tables (approach decided at the start of this step)
-  - Check: a stop reaches the client's tab within a second or two; the client can't hear any other sequence's messages
-  - Note: consider alerting the dashboard when a client's screen is too small, in case the client can't explain the problem on the call. This needs a client-to-dashboard message and a decision on how it fits with ADR-009 (no live progress view) (raised at 5.4)
-  - Note: the break screen can hold the next test until the clinician unlocks it: `SequenceRunner` takes `breakLocked`, which hides Continue. Offer this if the clinicians want firmer control than asking the client to wait. A clinician-only start (no client click) would call `continueAfterBreak` from the clinician's message, but can't restore full screen, and the first clip after the break must be checked in Safari (decided at 7.4)
+  - Check: the client's tab reports a hold (through an Edge Function, checked by link token); a stop or Continue reaches the tab within a second or two; the client can't hear any other sequence's messages
+  - Note: consider alerting the dashboard when a client's screen is too small, in case the client can't explain the problem on the call. ADR-048 allows only which test is running and whether it's holding, so this would need another decision (raised at 5.4)
 
-- [ ] **9.3 Status-check fallback**
+- [ ] **9.4 Status-check fallback**
   - Learn: polling an Edge Function every few seconds; stopping the polling cleanly
-  - Check: with real-time blocked, a stop still arrives within the polling interval
+  - Check: with real-time blocked, a stop or Continue still arrives within the polling interval
 
-- [ ] **9.4 What the client sees after a stop**
-  - Learn: connecting the stop to each test's partial-result hook (5.11, 6.10)
-  - Check: the partial result and sheet save with the stop reason; "end current test" goes to the break screen; "end whole sequence" goes to the end screen and closes the link
+- [ ] **9.5 What the client sees: holds and stops**
+  - Learn: connecting the hold and the stop to each test (5.11, 6.10); adding a prop to the plug-in contract
+  - Check: each test holds after its samples or practice until Continue, with the finished sample left on screen and nothing timed; a stop saves the partial result and sheet with its reason; "end current test" goes to the break screen; "end whole sequence" goes to the end screen and closes the link
+  - Note: the hold prop's shape is settled here (ADR-048). The development test pages need a way past a hold without the dashboard
+  - Note: the break screen stays a client click. `breakLocked` (`SequenceRunner`, `BreakScreen`) offered a clinician-locked break; ADR-048 puts the clinician's control inside tests instead, so remove it unless the clinicians ask for it (decided at 7.4, dropped at 9.1)
+  - Note: save-result refuses a result with a stop point (`stopped_not_supported_yet`). Extend it to save a stopped test's partial result with its reason and clinician (ADR-040)
+  - Note: from the Phases 5–7 code review, while save-result and the close trigger are open here: (a) two saves finishing the last two tests at once can leave the sequence `open`, since neither sees the other's change (lock the sequence row in the trigger); (b) two tabs saving the same test can overwrite the saved test's sheets, since the pending check runs before the upload; (c) save-result doesn't require a finished test's sheets (Trail Making's partA and partB, SWAPS's sheet), only rejects unknown names
   - Note: a failed save offers Try again with the same result, and a 409 counts as saved (decided at 7.7). But a 400 or 404 fails on every retry, so the client stays on Try again. "End whole sequence" closes the link, and save-result only accepts an open sequence, so the stopped test's partial result must be saved before the sequence closes, or save-result must accept it (found at 7.7)
 
-- [ ] **9.5 Test both paths in every browser**
+- [ ] **9.6 Test both paths in every browser**
   - Learn: blocking WebSockets in browser dev tools to simulate a home network
-  - Check: a stop works by real-time and by polling in Chrome, Edge, Safari and Firefox
+  - Check: holds, Continue and stops work by real-time and by polling in Chrome, Edge, Safari and Firefox
 
 ## Phase 10 — CSV and sheet downloads
 

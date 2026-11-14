@@ -199,7 +199,7 @@ identifying data as possible.
 
 ## ADR-009: Only clinicians end a test
 
-- **Status:** Accepted · **Date:** 2026-11-06
+- **Status:** Accepted · **Date:** 2026-11-06 · Live state and control placement changed by ADR-048
 
 **Context:** A client who gives up mid-test should be stopped by the clinician
 watching, not by a button that could be clicked by accident or used to skip.
@@ -655,7 +655,7 @@ found the grants written in 2.7 had no effect, on either project.
 
 ## ADR-028: How a test is stopped, and its calendar times
 
-- **Status:** Accepted · **Date:** 2026-11-08
+- **Status:** Accepted · **Date:** 2026-11-08 · A hold prop added by ADR-048
 
 **Context:** ADR-001 gives a test the props `{ sequenceId, onComplete }` and says
 the shared layer can stop a test and collect its partial result. Those two props
@@ -1185,3 +1185,40 @@ Only clinicians use the dashboard.
 - Test version and times are visible only in the database, or in the CSV export (10.1).
 - The device and operating system aren't recorded. Add them to both tests if the clinicians want them.
 - The clinicians haven't seen the redesign yet.
+
+## ADR-048: The clinician starts each timed part, and controls sit on the test's row
+
+- **Status:** Accepted · **Date:** 2026-11-13 · Changes ADR-009 (adds a small live state) and ADR-028 (a new test prop)
+
+**Context:** At the start of roadmap 9.1, Jeff changed the design: a test should wait after each
+sample or practice until the clinician clicks Continue, so the clinician can check in with the
+client before anything is timed. The stop controls should sit on the client page, on the row of
+the test that's running, not on a page of their own.
+
+**Decision:**
+
+- A test holds after each sample or practice, before the real part's instructions: after Trail
+  Making's Sample A and Sample B, and after SWAPS's practice. Nothing is timed during a hold.
+- While holding, the finished sample stays on screen with no new text. The clinician tells the
+  client to wait over the video call. Nothing is added to `script.json`.
+- The client's tab reports the hold to the server, through an Edge Function checked by link token.
+  The dashboard shows it on the test's row with a Continue button. Continue reaches the client's tab
+  the same way a stop does (real-time, with the status check as a fallback).
+- The running test is the first `pending` test in an open visit. Its row on the client page has
+  Continue (only while holding) and End current test. End whole sequence sits on the open visit's
+  row, next to Copy link. Both ends require a reason.
+- At a hold, the clinician chooses Continue or End current test. Ending there means the client
+  couldn't do the sample.
+- Tests get one more prop for the hold. Its shape is settled when the tests use it (roadmap 9.5).
+  Tests still never import Supabase; the shared layer passes the hold through.
+- ADR-009's "no live progress view" now allows exactly this: which test is running and whether
+  it's holding. Nothing else about the client's progress is shown.
+
+**Consequences:**
+
+- A test can't move past a hold without a clinician watching on the dashboard (ADR-005). Revisit if
+  clients ever test unwatched.
+- The hold gives ADR-032's code 996 a natural source: ending Trail Making at the hold after a
+  sample. How it's recorded is settled at 9.1.
+- The development test pages need a way past a hold without the dashboard.
+- Phase 9 is reshaped to carry Continue alongside Stop.
