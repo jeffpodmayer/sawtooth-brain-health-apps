@@ -14,24 +14,42 @@ const testItems = gridItems.filter((item) => item.part === "test").length;
 // scores come from the database, where only save-result's own scoring writes them (ADR-040),
 // so they have this test's shape.
 
-const columns = ["Correct", "Tried", "Errors", "Corrections", "Time (s)"];
+// A Status column last, like Trail Making's, so the numbers are plain (Jeff, 2026-11-14).
+const columns = ["Correct", "Tried", "Errors", "Corrections", "Time (s)", "Status"];
 
-// The table while the test runs (ADR-048): the same columns and rows, dashes where the numbers will go (recall
-// has only Correct and Time), no sheet yet. Each row names its timed part, for the dashboard's live counter.
-export function emptyTable(): ScoreTable {
+// The table while the test runs (ADR-048, ADR-058): the same columns and rows, dashes where the values will go,
+// until a section finishes; then its row fills from the live scores the client's tab sent. No sheet until the
+// result is saved. Each row names its timed part, for the live counter. live comes from the browser, so
+// anything that isn't a section score shows as dashes.
+export function liveTable(live: unknown): ScoreTable {
+  const sections = typeof live === "object" && live !== null ? (live as Record<string, unknown>) : {};
+  const test: ScoreRow = isGridScore(sections.test)
+    ? { ...testRow(sections.test), sheet: null }
+    : { label: `Test (of ${testItems})`, cells: ["—", "—", "—", "—", "—", "—"], note: null, sheet: null };
+  const recall: ScoreRow = {
+    label: `Recall (of ${recallSymbols})`,
+    cells: ["—", "—", "—", "", "", "—"],
+    note: null,
+    sheet: null,
+  };
   return {
     columns,
     rows: [
-      { label: `Test (of ${testItems})`, cells: ["—", "—", "—", "—", "—"], note: null, sheet: null, timedPart: "test" },
-      {
-        label: `Recall (of ${recallSymbols})`,
-        cells: ["—", "", "", "", "—"],
-        note: null,
-        sheet: null,
-        timedPart: "recall",
-      },
+      { ...test, timedPart: "test" },
+      { ...recall, timedPart: "recall" },
     ],
   };
+}
+
+function isGridScore(value: unknown): value is GridScore {
+  if (typeof value !== "object" || value === null) return false;
+  const score = value as Record<string, unknown>;
+  if (score.status === "notGiven") return true;
+  const counts = [score.timeMs, score.attempted, score.correct, score.errors, score.corrections];
+  return (
+    (score.status === "completed" || score.status === "timedOut" || score.status === "stopped") &&
+    counts.every((count) => typeof count === "number" && Number.isFinite(count))
+  );
 }
 
 // Test and recall share one table. Recall fills only Correct; its blanks are a note (ADR-047). Their totals
@@ -79,31 +97,38 @@ export function csvRows(scores: unknown): CsvRow[] {
   ];
 }
 
+const blankNumbers = ["", "", "", "", ""];
+
 function testRow(test: GridScore): ScoreRow {
   const label = `Test (of ${testItems})`;
-  if (test.status === "notGiven") return { label, cells: [], note: "Not given", sheet: "sheet" };
-  const time =
-    test.status === "timedOut"
-      ? `${seconds(test.timeMs)} (time limit)`
-      : test.status === "stopped"
-        ? `${seconds(test.timeMs)} (stopped)`
-        : `${seconds(test.timeMs)}`;
+  if (test.status === "notGiven") return { label, cells: [...blankNumbers, "Not given"], note: null, sheet: "sheet" };
+  const status = test.status === "timedOut" ? "Time limit" : test.status === "stopped" ? "Stopped" : "Completed";
   return {
     label,
-    cells: [`${test.correct}`, `${test.attempted}`, `${test.errors}`, `${test.corrections}`, time],
+    cells: [
+      `${test.correct}`,
+      `${test.attempted}`,
+      `${test.errors}`,
+      `${test.corrections}`,
+      `${seconds(test.timeMs)}`,
+      status,
+    ],
     note: null,
     sheet: "sheet",
   };
 }
 
+// Recall reads like the test: Tried is the symbols answered (7 minus blank) and Errors the wrong ones. It has no
+// corrections or time. Its answers are on the answer sheet, so it has no sheet of its own.
 function recallRow(recall: RecallScore): ScoreRow {
   const label = `Recall (of ${recallSymbols})`;
-  if (recall.status === "notGiven") return { label, cells: [], note: "Not given", sheet: null };
-  const blank = `${recall.blank} blank`;
+  if (recall.status === "notGiven") return { label, cells: [...blankNumbers, "Not given"], note: null, sheet: null };
+  const tried = recallSymbols - recall.blank;
+  const status = recall.status === "stopped" ? "Stopped" : "Completed";
   return {
     label,
-    cells: [`${recall.correct}`],
-    note: recall.status === "stopped" ? `${blank} · stopped` : blank,
+    cells: [`${recall.correct}`, `${tried}`, `${tried - recall.correct}`, "", "", status],
+    note: null,
     sheet: null,
   };
 }

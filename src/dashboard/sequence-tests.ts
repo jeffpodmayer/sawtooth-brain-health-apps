@@ -6,7 +6,7 @@
 import {
   csvMeasures as swapsCsvMeasures,
   csvRows as swapsCsvRows,
-  emptyTable as swapsEmptyTable,
+  liveTable as swapsLiveTable,
   practiceRow as practiceSwaps,
   scoreTable as swapsTable,
 } from "../tests/swaps/summary";
@@ -14,7 +14,7 @@ import * as swaps from "../tests/swaps/test-info";
 import {
   csvMeasures as trailMakingCsvMeasures,
   csvRows as trailMakingCsvRows,
-  emptyTable as trailMakingEmptyTable,
+  liveTable as trailMakingLiveTable,
   practiceRow as practiceTrailMaking,
   scoreTable as trailMakingTable,
 } from "../tests/trail-making/summary";
@@ -25,7 +25,7 @@ export const sequenceTests = [
     id: trailMaking.testId,
     name: trailMaking.testName,
     table: trailMakingTable,
-    emptyTable: trailMakingEmptyTable,
+    liveTable: trailMakingLiveTable,
     practice: practiceTrailMaking,
     csvMeasures: trailMakingCsvMeasures,
     csvRows: trailMakingCsvRows,
@@ -40,7 +40,7 @@ export const sequenceTests = [
     id: swaps.testId,
     name: swaps.testName,
     table: swapsTable,
-    emptyTable: swapsEmptyTable,
+    liveTable: swapsLiveTable,
     practice: practiceSwaps,
     csvMeasures: swapsCsvMeasures,
     csvRows: swapsCsvRows,

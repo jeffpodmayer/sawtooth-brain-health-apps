@@ -19,7 +19,7 @@ import { pageSize, visibleArea } from "./screen/form-layout";
 import NumberPad from "./screen/NumberPad";
 import { isRightNumber } from "./screen/practice";
 import RecallPage from "./screen/RecallPage";
-import { replayGrid, type LoggedAnswer } from "./scoring/score-grid";
+import { replayGrid, scoreGrid, type LoggedAnswer } from "./scoring/score-grid";
 import { replayRecall, type LoggedRecallAnswer } from "./scoring/score-recall";
 import { scoreSwaps, type StopPoint } from "./scoring/score-swaps";
 import script from "./script.json";
@@ -71,6 +71,7 @@ function Swaps({
   onHoldReached,
   onTimedPartStarted,
   onTimedPartEnded,
+  onSectionScored,
   onComplete,
   onLoadFailed,
 }: TestProps) {
@@ -288,6 +289,14 @@ function Swaps({
     onTimedPartStarted(timedPart);
     return () => onTimedPartEnded(timedPart);
   }, [timedPart, onTimedPartStarted, onTimedPartEnded]);
+
+  // Sends the test section's scores once it's over (time up, or every box filled), for the dashboard's live
+  // table (ADR-058). Recall is the last section: the saved result follows it straight away.
+  useEffect(() => {
+    if (stage === "recall") {
+      onSectionScored({ test: scoreGrid(answerLog.current, null) });
+    }
+  }, [stage, onSectionScored]);
 
   // Hands the result to the shared layer. The ref keeps it to once, even if the parent redraws.
   // If stage never reached "ended" itself, a clinician's stop ended the test, and stage says where

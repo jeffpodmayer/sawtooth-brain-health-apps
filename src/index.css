@@ -56,6 +56,17 @@
       opacity: 1;
     }
   }
+
+  /* A light band sweeping across a placeholder while it loads (the sheet viewer's page). */
+  --animate-sheen: sheen 1.6s ease-in-out infinite;
+  @keyframes sheen {
+    0% {
+      background-position: 100% 0;
+    }
+    100% {
+      background-position: -100% 0;
+    }
+  }
 }
 
 @layer base {

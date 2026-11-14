@@ -279,6 +279,7 @@ export default {
           screen_width: width as number,
           screen_height: height as number,
           sheets: sheetPaths,
+          live_scores: null, // the saved, re-checked scores replace the live ones (ADR-058)
         })
         .eq("id", row!.id)
         .eq("status", "pending");

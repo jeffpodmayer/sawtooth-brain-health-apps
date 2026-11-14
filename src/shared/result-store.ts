@@ -21,7 +21,9 @@ export type ProgressReport =
   | { event: "began" }
   | { event: "holdReached"; hold: number }
   | { event: "timedPartStarted"; part: string }
-  | { event: "timedPartEnded"; part: string };
+  | { event: "timedPartEnded"; part: string }
+  // Every finished section's scores so far, in the test's own shape, for the dashboard's live table (ADR-058).
+  | { event: "sectionScored"; scores: Record<string, unknown> };
 
 // The clinician's controls for the running test, as the server last told them (ADR-049).
 export type TestStatus = {

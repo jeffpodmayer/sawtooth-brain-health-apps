@@ -1188,7 +1188,7 @@ Only clinicians use the dashboard.
 
 ## ADR-048: The clinician starts each timed part, and controls sit on the test's row
 
-- **Status:** Accepted · **Date:** 2026-11-13 · Changes ADR-009 (adds a small live state) and ADR-028 (a new test prop) · Where tests hold changed by ADR-050
+- **Status:** Accepted · **Date:** 2026-11-13 · Changes ADR-009 (adds a small live state) and ADR-028 (a new test prop) · Where tests hold changed by ADR-050 · Live section scores added by ADR-058
 
 **Context:** At the start of roadmap 9.1, Jeff changed the design: a test should wait after each
 sample or practice until the clinician clicks Continue, so the clinician can check in with the
@@ -1479,7 +1479,10 @@ wanted their scores kept too, and the client page's table to say plainly how eac
   given for a sample; Completed, Time limit, Stopped, Skipped (code 996) or Not given (with any code) for a
   part. The sheet PDFs use the same wording and leave blank values out.
 - The CSV export has a row per page too, with the samples' numbers and passed, not passed or not given.
-- SWAPS's table is unchanged.
+- SWAPS's table gets the same Status column (Completed, Time limit, Stopped, Not given), with plain numbers.
+  Recall fills Correct, Tried (symbols answered, 7 minus blank) and Errors like the test, so its blanks show
+  without a note; it has no corrections or time. A row with no sheet of its own (recall, which is on the answer
+  sheet) leaves the sheet cell empty instead of saying "No sheet".
 
 **Consequences:**
 
@@ -1509,4 +1512,30 @@ the client's screen" for good (found by Jeff).
 - Ending a visit whose link was never opened no longer gets stuck.
 - A begun test whose tab has gone (closed or offline) still waits. A clinician's "Close without results" was
   considered and left out for now.
+
+## ADR-058: Each section's scores show on the dashboard as soon as it finishes
+
+- **Status:** Accepted · **Date:** 2026-11-14 · Widens ADR-048 (what the dashboard shows while a test runs) · Builds on ADR-040 and ADR-045
+
+**Context:** Scores appeared only once the whole test was saved. Jeff wanted each section's row (Trail Making's
+Sample A, Part A, Sample B, Part B; SWAPS's Test) to fill in as soon as that section finished.
+
+**Decision:**
+
+- While a test runs, its table on the client page has the finished table's columns and rows (each test's
+  `liveTable`): dashes until a section finishes, then that row's numbers, as they'll be saved. No sheets until
+  the result is saved. The live counter stays in the running part's Time cell.
+- As each section finishes, the client's tab sends every finished section's scores so far (a new progress report,
+  "section scored", through report-progress, checked by link token). Tests call a new prop, `onSectionScored`;
+  the shared layer passes the scores along unread. Trail Making reports after each page and after a skip; SWAPS
+  after its Test section (Recall is last, and the saved result follows it).
+- The server stores them in `live_scores` (migration `add_live_scores`, size-limited). Display only, like the
+  counter: never part of the result. save-result clears it when it saves, and the reload reset (ADR-053) clears it.
+
+**Consequences:**
+
+- The live numbers are the browser's own working, shown before the server's check (ADR-040). They come from the
+  same scoring code, so they should match; the saved, re-checked scores replace them, and a mismatch is still
+  flagged on the saved result. Each test's `liveTable` shows dashes for anything that isn't a section score.
+- A section's row fills within a second or two (real-time, or the next re-read).
 

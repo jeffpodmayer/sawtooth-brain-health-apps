@@ -39,20 +39,40 @@ export type VisitTest = {
   began_at: string | null; // the client's tab began this test (9.3)
   timed_part: string | null; // the running timed part's key, e.g. "partA" (9.3)
   timed_part_started_at: string | null; // when it started (9.3)
+  live_scores: Json | null; // the finished sections' scores while it runs, display only (ADR-058)
   sheets: Json | null;
   browser: Json | null; // raw_data's browser only
 };
 
 const statusColors: Record<string, string> = { completed: "text-success-ink", stopped: "text-warning-ink" };
 // "Ending…" is amber like Stopped. "In progress" and "Waiting for you" are ink; their dot carries the color.
-// Score table widths: the row names and each score column get this share of the width (about 150px on a
-// laptop); the sheet buttons get what's left, at least 16% with SWAPS's five columns.
-const columnPercent = 14;
+// Score table widths. The sheet buttons get a fixed width (two icons). The Status column is as wide as this
+// table's longest status needs, plus its indent, so "Not given (code 996)" stays on one line. The row names and
+// the other columns share the rest equally. The table never scrolls sideways: only if the window is too narrow
+// for everything does a long status wrap. The table while a test runs uses the same widths for its own rows.
+function TableColumns({ table }: { table: ScoreTable }) {
+  const statusIndex = table.columns.indexOf("Status");
+  // About 0.55em per character of Atkinson Hyperlegible Next at body size, a little over its average, plus the
+  // 3rem indent. "Completed", the heading and short words all fit the 10-character minimum.
+  const longest = Math.max(10, ...table.rows.map((row) => row.cells[statusIndex]?.length ?? 0));
+  const statusWidth = `calc(3rem + ${(longest * 0.55).toFixed(2)}em)`;
+  return (
+    <colgroup>
+      <col />
+      {table.columns.map((column) => (
+        <col key={column} style={column === "Status" ? { width: statusWidth } : undefined} />
+      ))}
+      <col style={{ width: "6rem" }} />
+    </colgroup>
+  );
+}
 
-// Numbers sit centred under their headings. A Status column holds words, which line up from the left, under the
-// left edge of its heading, set in a little so it isn't crowded against the numbers before it.
+// Numbers sit centred under their headings, on one line. A Status column holds words, which line up from the
+// left, under the left edge of its heading, set in a little so it isn't crowded against the numbers before it.
+// Its column fits its longest status (TableColumns); only on a window too narrow for that does a status wrap,
+// onto a second line within the row, instead of running into the sheet buttons.
 function alignFor(column: string): string {
-  return column === "Status" ? "pl-12 text-left" : "text-center";
+  return column === "Status" ? "pl-12 text-left leading-snug" : "whitespace-nowrap text-center";
 }
 
 // sheets is {name: path}, written only by save-result (ADR-041). Anything else counts as no sheet.
@@ -102,20 +122,14 @@ type Props = {
   onChanged: () => void; // re-reads the visits after Continue or Discontinue
 };
 
-// The table while a test runs (ADR-048): the finished table's columns and rows, dashes where the numbers will
-// go, and no sheet column until the result is saved. The running timed part's Time cell shows the live counter,
-// which stops at a stop request.
+// The table while a test runs (ADR-048, ADR-058): the finished table's columns and rows, each section filled as
+// it finishes and dashes elsewhere, and no sheet column until the result is saved. The running timed part's
+// Time cell shows the live counter, which stops at a stop request.
 function LiveTable({ table, test }: { table: ScoreTable; test: VisitTest }) {
   const timeColumn = table.columns.findIndex((column) => column.startsWith("Time"));
   return (
     <table className="mt-3 w-full table-fixed tabular-nums">
-      <colgroup>
-        <col style={{ width: `${columnPercent}%` }} />
-        {table.columns.map((column) => (
-          <col key={column} style={{ width: `${columnPercent}%` }} />
-        ))}
-        <col />
-      </colgroup>
+      <TableColumns table={table} />
       <thead>
         <tr className="border-b border-line text-base text-ink-muted">
           <td />
@@ -136,13 +150,16 @@ function LiveTable({ table, test }: { table: ScoreTable; test: VisitTest }) {
                 {row.label}
               </th>
               {row.cells.map((cell, index) => (
-                <td key={table.columns[index]} className={`whitespace-nowrap ${alignFor(table.columns[index])}`}>
+                <td key={table.columns[index]} className={alignFor(table.columns[index])}>
                   {counting && index === timeColumn ? (
                     <span className="font-semibold">
                       <TimedCounter startedAt={test.timed_part_started_at!} stoppedAt={test.stop_requested_at} />
                     </span>
+                  ) : cell === "—" ? (
+                    <span className="text-ink-muted">—</span>
                   ) : (
-                    <span className="text-ink-muted">{cell}</span>
+                    // A finished section's value looks as it will once saved: the first (the headline) is bold.
+                    <span className={index === 0 ? "font-semibold" : ""}>{cell}</span>
                   )}
                 </td>
               ))}
@@ -281,23 +298,18 @@ function TestBlock({ test, clientCode, visitCreatedAt, running, onChanged }: Pro
       <div id={`test-body-${test.id}`} hidden={!open} className="pl-16 pr-6">
         {/* While the test runs, its timed parts as rows; the running part's row shows the counter (ADR-048).
             The saved result's score table replaces these once the test is saved. */}
-        {test.status === "pending" && test.began_at && plugin && <LiveTable table={plugin.emptyTable()} test={test} />}
+        {test.status === "pending" && test.began_at && plugin && (
+          <LiveTable table={plugin.liveTable(test.live_scores)} test={test} />
+        )}
 
         {/* The samples or practice row (each test's practiceRow) is hidden for now (8.9); only scored rows show. */}
         {table && table.rows.length > 0 && (
           <div className="mt-3">
             {/* Row names are row headings and the test's columns are column headings, so a screen reader hears
-                "Part B, Errors, 3". Each column is the same share of the width, with its heading and numbers
-                centered (Status from the left); the last column (the sheet buttons, no heading) takes the rest.
-                Shares, not fixed widths, so the table narrows with the window and never scrolls sideways. */}
+                "Part B, Errors, 3". Numbers sit centred under their headings (Status from the left); the widths
+                come from TableColumns, so the table fits the window and never scrolls sideways. */}
             <table className="w-full table-fixed tabular-nums">
-              <colgroup>
-                <col style={{ width: `${columnPercent}%` }} />
-                {table.columns.map((column) => (
-                  <col key={column} style={{ width: `${columnPercent}%` }} />
-                ))}
-                <col />
-              </colgroup>
+              <TableColumns table={table} />
               <thead>
                 <tr className="border-b border-line text-base text-ink-muted">
                   <td />
@@ -325,7 +337,7 @@ function TestBlock({ test, clientCode, visitCreatedAt, running, onChanged }: Pro
                       {row.cells.map((cell, index) => (
                         <td
                           key={table.columns[index]}
-                          className={`whitespace-nowrap ${alignFor(table.columns[index])} ${index === 0 ? "font-semibold" : ""}`}
+                          className={`${alignFor(table.columns[index])} ${index === 0 ? "font-semibold" : ""}`}
                         >
                           {cell}
                         </td>
@@ -340,17 +352,20 @@ function TestBlock({ test, clientCode, visitCreatedAt, running, onChanged }: Pro
                         </td>
                       )}
                       <td className="text-right">
-                        {path && test.completed_at ? (
-                          <SheetButtons
-                            path={path}
-                            title={`${clientCode} · ${name} · ${label}`}
-                            heading={`${clientCode} · ${name} · ${label} · ${fileDate(test.completed_at)}`}
-                            scoreLines={row.sheet ? sheetScoreLines(table, row.sheet) : []}
-                            fileName={`${clientCode} ${name} ${label} ${fileDate(test.completed_at)}.pdf`}
-                          />
-                        ) : (
-                          <span className="text-base text-ink-muted">No sheet</span>
-                        )}
+                        {
+                          path && test.completed_at ? (
+                            <SheetButtons
+                              path={path}
+                              title={`${clientCode} · ${name} · ${label}`}
+                              heading={`${clientCode} · ${name} · ${label} · ${fileDate(test.completed_at)}`}
+                              scoreLines={row.sheet ? sheetScoreLines(table, row.sheet) : []}
+                              fileName={`${clientCode} ${name} ${label} ${fileDate(test.completed_at)}.pdf`}
+                            />
+                          ) : row.sheet !== null ? (
+                            // A row that should have a sheet but doesn't (e.g. an older result's sample).
+                            <span className="text-base text-ink-muted">No sheet</span>
+                          ) : null /* A row with no sheet of its own, like SWAPS's recall on the answer sheet. */
+                        }
                       </td>
                     </tr>
                   );

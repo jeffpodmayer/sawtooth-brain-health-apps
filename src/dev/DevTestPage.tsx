@@ -16,6 +16,7 @@ const store = createFakeResultStore();
 const reportLoadFailed = () => console.warn("Clips failed to load");
 const logTimedPartStarted = (part: string) => console.info("timed part started", part);
 const logTimedPartEnded = (part: string) => console.info("timed part ended", part);
+const logSectionScored = (scores: Record<string, unknown>) => console.info("section scored", scores);
 
 function DevTestPage() {
   const { testId } = useParams();
@@ -100,6 +101,7 @@ function DevTestPage() {
       onHoldReached={handleHoldReached}
       onTimedPartStarted={logTimedPartStarted}
       onTimedPartEnded={logTimedPartEnded}
+      onSectionScored={logSectionScored}
       onComplete={handleComplete}
       onLoadFailed={reportLoadFailed}
     />

@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { expectedOrder } from "./order";
 import type { LoggedClick, TimedPart } from "./score-part";
-import { scoreTest, type SkipPoint, type StopPoint } from "./score-test";
+import { scoreTest, sectionScores, type SkipPoint, type StopPoint } from "./score-test";
 
 // The first `count` circles of a part, clicked correctly one second apart.
 function correctClicks(part: TimedPart, count: number): LoggedClick[] {
@@ -251,5 +251,36 @@ describe("sample scores", () => {
       correctLines: 7,
       errors: 0,
     });
+  });
+});
+
+// The finished sections so far, for the dashboard's live table (ADR-058): each page up to the one just finished,
+// scored as it will be saved. Pages after it aren't included.
+describe("section scores while running", () => {
+  it("after Sample A: Sample A only", () => {
+    expect(Object.keys(sectionScores({ partA: [], partB: [] }, "sampleA", null))).toEqual(["sampleA"]);
+  });
+
+  it("after Part A: Sample A and Part A, scored as they'll be saved", () => {
+    const sections = sectionScores({ partA: fullA, partB: [] }, "partA", null);
+    expect(Object.keys(sections)).toEqual(["sampleA", "partA"]);
+    expect(sections.partA).toMatchObject({ status: "completed", correctLines: 24 });
+  });
+
+  it("after a skip: Sample A and Part A as the skip left them", () => {
+    const skip: SkipPoint = { page: "sampleA", phase: "practice", stoppedAtMs: 3000 };
+    expect(sectionScores({ partA: [], partB: [] }, "partA", skip)).toMatchObject({
+      sampleA: { passed: false },
+      partA: { status: "notGiven", code: 996 },
+    });
+  });
+
+  it("after Part B: every page", () => {
+    expect(Object.keys(sectionScores({ partA: fullA, partB: fullB }, "partB", null))).toEqual([
+      "sampleA",
+      "partA",
+      "sampleB",
+      "partB",
+    ]);
   });
 });

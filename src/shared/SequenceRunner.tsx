@@ -85,6 +85,11 @@ function SequenceRunner({ sequenceId, tests, store, onFinished }: SequenceRunner
     [store, id],
   );
 
+  const handleSectionScored = useCallback(
+    (scores: Record<string, unknown>) => store.reportProgress(id, { event: "sectionScored", scores }),
+    [store, id],
+  );
+
   // Once a save lands. The server says whether the visit is still open: after the last test, or
   // End whole sequence, it isn't, and the client goes to the end screen (ADR-049).
   const moveOn = useCallback(
@@ -181,6 +186,7 @@ function SequenceRunner({ sequenceId, tests, store, onFinished }: SequenceRunner
       onHoldReached={handleHoldReached}
       onTimedPartStarted={handleTimedPartStarted}
       onTimedPartEnded={handleTimedPartEnded}
+      onSectionScored={handleSectionScored}
       onComplete={handleComplete}
       onLoadFailed={handleLoadFailed}
     />

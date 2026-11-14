@@ -51,9 +51,9 @@ export default {
       .order("position");
     if (testsError) return failed("tests lookup", testsError.message);
 
-    // The running test starts again from its beginning (ADR-036), so its live state goes back to the
-    // start: no holds, not begun, no timed part, no skip (ADR-053, ADR-055). Not after a stop request:
-    // the tab must answer that stop as things stand (ADR-049). A test that never began is unchanged.
+    // The running test starts again from its beginning (ADR-036), so its live state goes back to the start:
+    // no holds, not begun, no timed part, no skip, no live scores (ADR-053, ADR-055, ADR-058). Not after a stop
+    // request: the tab must answer that stop as things stand (ADR-049). A test that never began is unchanged.
     if (tests.length > 0) {
       const { error: resetError } = await ctx.supabaseAdmin
         .from("sequence_tests")
@@ -64,6 +64,7 @@ export default {
           timed_part: null,
           timed_part_started_at: null,
           skip_requested: null,
+          live_scores: null,
         })
         .eq("id", tests[0].id)
         .eq("status", "pending")

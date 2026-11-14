@@ -97,11 +97,16 @@ export function TestListSkeleton() {
   );
 }
 
-// A test's notes: one short note bubble.
-export function NotesSkeleton() {
+// A sheet loading in its viewing window: fills the page it's placed on (letter size, with the page's own edge),
+// with a light sheen sweeping across it. The sheen stops, leaving a plain grey page, when the computer asks for
+// reduced motion.
+export function SheetSkeleton() {
   return (
-    <Loading>
-      <Bar className="h-12 w-2/3 rounded-2xl" />
+    <Loading className="absolute inset-0">
+      <span
+        aria-hidden="true"
+        className="block h-full w-full animate-sheen bg-[length:200%_100%] bg-[linear-gradient(90deg,var(--color-line)_25%,var(--color-surface)_50%,var(--color-line)_75%)] motion-reduce:animate-none"
+      />
     </Loading>
   );
 }

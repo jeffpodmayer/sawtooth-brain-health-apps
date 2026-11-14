@@ -177,6 +177,7 @@ export type Database = {
           holds_reached: number
           holds_released: number
           id: string
+          live_scores: Json | null
           position: number
           practice_id: string
           raw_data: Json | null
@@ -204,6 +205,7 @@ export type Database = {
           holds_reached?: number
           holds_released?: number
           id?: string
+          live_scores?: Json | null
           position: number
           practice_id: string
           raw_data?: Json | null
@@ -231,6 +233,7 @@ export type Database = {
           holds_reached?: number
           holds_released?: number
           id?: string
+          live_scores?: Json | null
           position?: number
           practice_id?: string
           raw_data?: Json | null

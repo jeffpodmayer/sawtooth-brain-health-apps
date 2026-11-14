@@ -7,16 +7,18 @@
 import { useEffect, useId, useRef, useState } from "react";
 import { saveFile } from "./save-file";
 import { sheetPdf } from "./sheet-pdf";
+import { SheetSkeleton } from "./Skeleton";
 import { dialogBodyClass, dialogClass, dialogCloseClass, dialogHeaderClass, iconButtonClass } from "./styles";
 import { supabase } from "./supabase";
 
 const SIGNED_URL_SECONDS = 10 * 60;
 const sheetIconClass = `size-10 text-accent disabled:opacity-70 ${iconButtonClass}`;
-// A small tip above each icon, shown on hover or keyboard focus, in the same white card style as the setup
-// info. Its right edge lines up with the button's, so it isn't cut off at the right side of the visits card.
-// Screen readers skip it: the button's own label already says the same, with the sheet's name.
+// A small tip above each icon, shown on hover or on keyboard focus (not after a click, so it doesn't stay up when
+// the window closes and the button gets focus back), in the same white card style as the setup info. Hidden while
+// the sheet's window is open. Its right edge lines up with the button's, so it isn't cut off at the right side of
+// the visits card. Screen readers skip it: the button's own label already says the same, with the sheet's name.
 const tipClass =
-  "pointer-events-none invisible absolute bottom-full right-0 z-10 mb-1 whitespace-nowrap rounded-lg border border-line bg-surface px-3 py-1.5 text-base text-ink shadow-md group-focus-within:visible group-hover:visible";
+  "pointer-events-none invisible absolute bottom-full right-0 z-10 mb-1 whitespace-nowrap rounded-lg border border-line bg-surface px-3 py-1.5 text-base text-ink shadow-md group-hover:visible group-has-[:focus-visible]:visible";
 
 // title names the sheet, e.g. "TEST-001 · Trail Making · Part A". heading tops the PDF, e.g. the title and the
 // test's date, with scoreLines under it. fileName is what the PDF is saved as.
@@ -25,24 +27,38 @@ type Props = { path: string; title: string; heading: string; scoreLines: string[
 function SheetButtons({ path, title, heading, scoreLines, fileName }: Props) {
   const dialogRef = useRef<HTMLDialogElement>(null);
   const titleId = useId();
+  const [open, setOpen] = useState(false);
   const [viewUrl, setViewUrl] = useState<string | null>(null);
+  const [imageLoaded, setImageLoaded] = useState(false);
   const [busy, setBusy] = useState(false);
   const [failed, setFailed] = useState(false);
 
-  // Shown once the image's address is ready.
+  // The window opens at once, at its final size, with a placeholder page until the sheet has loaded.
   useEffect(() => {
-    if (viewUrl) dialogRef.current?.showModal();
-  }, [viewUrl]);
+    if (open) dialogRef.current?.showModal();
+  }, [open]);
 
   async function view() {
-    setBusy(true);
     setFailed(false);
+    setViewUrl(null);
+    setImageLoaded(false);
+    setOpen(true);
     const { data, error } = await supabase.storage
       .from("sheets")
       .createSignedUrl(path, SIGNED_URL_SECONDS, { download: true });
-    setBusy(false);
-    if (error) setFailed(true);
-    else setViewUrl(data.signedUrl);
+    if (error) {
+      dialogRef.current?.close();
+      setFailed(true);
+    } else {
+      setViewUrl(data.signedUrl);
+    }
+  }
+
+  // Each opening starts fresh.
+  function handleClose() {
+    setOpen(false);
+    setViewUrl(null);
+    setImageLoaded(false);
   }
 
   // The sheet as a one-page PDF with a heading, made in this browser and saved as a download.
@@ -70,7 +86,7 @@ function SheetButtons({ path, title, heading, scoreLines, fileName }: Props) {
               <circle cx="12" cy="12" r="3" />
             </svg>
           </button>
-          <span aria-hidden="true" className={tipClass}>
+          <span aria-hidden="true" className={`${tipClass} ${open ? "hidden" : ""}`}>
             View test sheet
           </span>
         </div>
@@ -86,7 +102,7 @@ function SheetButtons({ path, title, heading, scoreLines, fileName }: Props) {
               <path d="M12 4v11m-5-5 5 5 5-5M5 20h14" />
             </svg>
           </button>
-          <span aria-hidden="true" className={tipClass}>
+          <span aria-hidden="true" className={`${tipClass} ${open ? "hidden" : ""}`}>
             Download test sheet
           </span>
         </div>
@@ -97,13 +113,8 @@ function SheetButtons({ path, title, heading, scoreLines, fileName }: Props) {
         </p>
       )}
 
-      <dialog
-        ref={dialogRef}
-        onClose={() => setViewUrl(null)}
-        aria-labelledby={titleId}
-        className={`max-w-4xl ${dialogClass}`}
-      >
-        {viewUrl && (
+      <dialog ref={dialogRef} onClose={handleClose} aria-labelledby={titleId} className={`max-w-4xl ${dialogClass}`}>
+        {open && (
           <>
             <div className={dialogHeaderClass}>
               <h2 id={titleId} className="text-3xl font-semibold">
@@ -122,11 +133,27 @@ function SheetButtons({ path, title, heading, scoreLines, fileName }: Props) {
               </button>
             </div>
             <div className={dialogBodyClass}>
-              <img
-                src={viewUrl}
-                alt={title}
-                className="mx-auto mt-6 max-h-[calc(100vh-12rem)] w-auto border border-line bg-white"
-              />
+              {/* A fixed-height frame, so the window never changes size: the placeholder sheens on the page until
+                  the sheet has loaded, then the sheet fills the page. */}
+              <div className="mt-6 flex h-[min(calc(100vh-12rem),44rem)] justify-center">
+                {/* The page: letter size, portrait, like a sheet of paper (white, a thin edge, a soft shadow).
+                    Every sheet is drawn on an 850 × 1100 page, the same shape, so it fills the page exactly. */}
+                <div className="relative aspect-[8.5/11] h-full max-w-full border border-line bg-white shadow-md">
+                  {!imageLoaded && <SheetSkeleton />}
+                  {viewUrl && (
+                    <img
+                      src={viewUrl}
+                      alt={title}
+                      onLoad={() => setImageLoaded(true)}
+                      onError={() => {
+                        dialogRef.current?.close();
+                        setFailed(true);
+                      }}
+                      className={`h-full w-full object-contain ${imageLoaded ? "" : "invisible"}`}
+                    />
+                  )}
+                </div>
+              </div>
             </div>
           </>
         )}

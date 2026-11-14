@@ -1,6 +1,6 @@
 // report-progress: the client's tab reports where the running test is (roadmap 9.3, ADR-048, ADR-049):
-// it began, it reached a hold, or a timed part started or ended. Times come from the server's clock and
-// are for the dashboard only; nothing here is part of the result.
+// it began, it reached a hold, a timed part started or ended, or a section finished with its scores (ADR-058).
+// Times come from the server's clock. All of it is for the dashboard only; nothing here is part of the result.
 
 import "@supabase/functions-js/edge-runtime.d.ts";
 import { withSupabase } from "@supabase/server";
@@ -34,6 +34,9 @@ function failed(step: string, message: string): Response {
   console.error(`report-progress: ${step} failed: ${message}`);
   return Response.json({ error: "server_error" }, { status: 500 });
 }
+
+// Live section scores are small: a few hundred bytes. The database refuses anything over this too.
+const MAX_LIVE_SCORES_BYTES = 20_000;
 
 // Saved, or nothing needed saving (a repeat, or a report after a stop request).
 function done(): Response {
@@ -102,6 +105,21 @@ export default {
       const { error } = await rows().update({ holds_reached: hold })
         .eq("id", running.id).eq("holds_reached", hold - 1).is("stop_requested_at", null);
       return error ? failed("hold", error.message) : done();
+    }
+
+    // A section finished: its scores so far, in the test's own shape, for the dashboard's live table (ADR-058).
+    // Display only: the saved result is re-checked on the server, and the dashboard shows dashes for anything
+    // that isn't a section score. Each report replaces the last, since it carries every finished section.
+    if (event === "sectionScored") {
+      const scores = body?.scores;
+      if (typeof scores !== "object" || scores === null || Array.isArray(scores)) return rejected("no section scores");
+      if (new TextEncoder().encode(JSON.stringify(scores)).length > MAX_LIVE_SCORES_BYTES) {
+        return rejected("section scores too large");
+      }
+      if (running.began_at === null) return rejected("section scores before the test began");
+      const { error } = await rows().update({ live_scores: scores })
+        .eq("id", running.id).eq("status", "pending").is("stop_requested_at", null);
+      return error ? failed("section scores", error.message) : done();
     }
 
     const part = body?.part;

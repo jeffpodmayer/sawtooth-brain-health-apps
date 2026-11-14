@@ -11,7 +11,6 @@ import GenerateSequence from "./GenerateSequence";
 import { isUuid } from "./isUuid";
 import { ClientPageSkeleton } from "./Skeleton";
 import { testsById } from "./sequence-tests";
-import { buttonClass } from "./styles";
 import { supabase } from "./supabase";
 import TestBlock, { type VisitTest } from "./TestBlock";
 
@@ -36,7 +35,7 @@ const breadcrumbLinkClass =
 
 // Of raw_data (the full click or answer log), only the browser is read (ADR-047); the log itself isn't.
 const columns =
-  "code, sequences(id, status, created_at, link_token, sequence_tests(id, practice_id, test_id, status, test_version, started_at, completed_at, screen_width, screen_height, scores, browser_scores, stop_reason, stop_requested_at, holds_reached, holds_released, skip_requested, began_at, timed_part, timed_part_started_at, sheets, browser:raw_data->browser))";
+  "code, sequences(id, status, created_at, link_token, sequence_tests(id, practice_id, test_id, status, test_version, started_at, completed_at, screen_width, screen_height, scores, browser_scores, stop_reason, stop_requested_at, holds_reached, holds_released, skip_requested, began_at, timed_part, timed_part_started_at, live_scores, sheets, browser:raw_data->browser))";
 
 const hasResults = (visit: Visit) =>
   visit.sequence_tests.some((test) => test.status === "completed" || test.status === "stopped");
@@ -156,14 +155,6 @@ function ClientPage() {
         {client && (
           <div className="flex items-center gap-2">
             <GenerateSequence clientCode={client.code} onCreated={() => setReloads((count) => count + 1)} />
-            {/* A placeholder for this client's actions (none yet), so the heading row matches the Clients list. */}
-            <button type="button" disabled aria-label="More actions" className={buttonClass("secondary", "icon")}>
-              <svg aria-hidden="true" viewBox="0 0 24 24" className="size-5 fill-current">
-                <circle cx="5" cy="12" r="2" />
-                <circle cx="12" cy="12" r="2" />
-                <circle cx="19" cy="12" r="2" />
-              </svg>
-            </button>
           </div>
         )}
       </div>

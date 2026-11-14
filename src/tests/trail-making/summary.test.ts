@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import type { GivenPartScore, SampleScore, TrailMakingScores } from "./scoring/score-part";
-import { csvMeasures, csvRows, emptyTable, practiceRow, scoreTable } from "./summary";
+import { csvMeasures, csvRows, liveTable, practiceRow, scoreTable } from "./summary";
 
 const finished: GivenPartScore = {
   status: "completed", code: null, timeMs: 38000, timeSeconds: 38, correctLines: 24, correctClicks: 25, errors: 0,
@@ -119,12 +119,14 @@ describe("Trail Making CSV rows", () => {
   });
 });
 
-// While the test runs (ADR-048): the finished table's columns and rows, all dashes, no sheets. Each timed part's
-// row names its key, so the dashboard can show the live counter in its Time cell.
+// While the test runs (ADR-048, ADR-058): the finished table's columns and rows. Each section fills in as it
+// finishes, from the live scores; the rest are dashes. No sheets until the result is saved. Each timed part's
+// row names its key, for the live counter.
 describe("Trail Making table while running", () => {
-  it("has every column and row, dashes throughout, no sheets, and the timed parts' keys", () => {
-    const dashes = ["—", "—", "—", "—"];
-    expect(emptyTable()).toEqual({
+  const dashes = ["—", "—", "—", "—"];
+
+  it("before any section finishes: every column and row, dashes throughout, the timed parts' keys", () => {
+    expect(liveTable(null)).toEqual({
       columns: ["Time (s)", "Lines", "Errors", "Status"],
       rows: [
         { label: "Sample A", cells: dashes, note: null, sheet: null },
@@ -135,7 +137,25 @@ describe("Trail Making table while running", () => {
     });
   });
 
+  it("fills each finished section as the saved table will, with no sheet", () => {
+    const table = liveTable({ sampleA: passed, partA: finished });
+    expect(table.rows[0]).toEqual({ label: "Sample A", cells: ["23.4", "7/7", "1", "Passed"], note: null, sheet: null });
+    expect(table.rows[1]).toEqual({
+      label: "Part A",
+      cells: ["38", "24/24", "0", "Completed"],
+      note: null,
+      sheet: null,
+      timedPart: "partA",
+    });
+    expect(table.rows[2].cells).toEqual(dashes);
+  });
+
+  it("shows dashes for anything that isn't a section score", () => {
+    expect(liveTable("junk").rows.every((row) => row.cells.join() === dashes.join())).toBe(true);
+    expect(liveTable({ partA: { status: 5 } }).rows[1].cells).toEqual(dashes);
+  });
+
   it("has the finished table's columns", () => {
-    expect(emptyTable().columns).toEqual(scoreTable(scores(finished, finished)).columns);
+    expect(liveTable(null).columns).toEqual(scoreTable(scores(finished, finished)).columns);
   });
 });

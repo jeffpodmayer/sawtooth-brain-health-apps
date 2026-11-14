@@ -91,6 +91,15 @@ function scoreTimedPart(part: TimedPart, clicks: readonly LoggedClick[], stop: S
     : { status: "notGiven", code: null };
 }
 
+// The finished sections so far, for the dashboard's live table while the test runs (ADR-058): every page up to
+// and including the one just finished, scored exactly as it will be saved. Display only; the saved result is
+// re-checked on the server as always.
+export function sectionScores(clicks: ClickLogs, upTo: Page, skip: SkipPoint | null): Partial<TrailMakingScores> {
+  const all = scoreTest(clicks, { page: upTo, phase: "finished", stoppedAtMs: null }, skip);
+  const done = pages.slice(0, pages.indexOf(upTo) + 1);
+  return Object.fromEntries(done.map((page) => [page, all[page]])) as Partial<TrailMakingScores>;
+}
+
 // A skip settles Part A and Sample A; the rest is scored from the stop, if any, as usual. Sample A counts as
 // passed only if the skip came once it was finished (its pause, or any point in Part A).
 export function scoreTest(clicks: ClickLogs, stop: StopPoint | null, skip: SkipPoint | null = null): TrailMakingScores {

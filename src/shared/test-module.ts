@@ -68,6 +68,11 @@ export type TestProps = {
   onTimedPartStarted: (part: string) => void;
   onTimedPartEnded: (part: string) => void;
 
+  // Called when a section finishes, with every finished section's scores so far, in the test's own shape, for
+  // the dashboard's live table (ADR-058). Display only: the saved result is re-checked on the server.
+  // The shared layer passes them along without reading them. Must keep the same identity between renders.
+  onSectionScored: (scores: Record<string, unknown>) => void;
+
   // Called once, whether the test finished, timed out or was stopped.
   onComplete: (result: TestResult) => void;
 

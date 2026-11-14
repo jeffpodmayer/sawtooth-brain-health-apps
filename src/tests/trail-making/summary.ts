@@ -13,19 +13,58 @@ const lines = (page: keyof typeof expectedOrder) => expectedOrder[page].length -
 
 const columns = ["Time (s)", "Lines", "Errors", "Status"];
 
-// The table while the test runs (ADR-048): the same columns and rows, dashes where the numbers will go, no
-// sheets yet. Each timed part's row names its key, so the dashboard shows the live counter in its Time cell.
-export function emptyTable(): ScoreTable {
+// The table while the test runs (ADR-048, ADR-058): the same columns and rows. Each section fills in from the
+// live scores the client's tab sent as it finished; the rest are dashes. No sheets until the result is saved.
+// Each timed part's row names its key, so the dashboard shows the live counter in its Time cell. live comes
+// from the browser, so anything that isn't a section score shows as dashes.
+export function liveTable(live: unknown): ScoreTable {
+  const sections = typeof live === "object" && live !== null ? (live as Record<string, unknown>) : {};
   const dashes = ["—", "—", "—", "—"];
+
+  function sample(label: string, key: "sampleA" | "sampleB"): ScoreRow {
+    const score = sections[key];
+    return isSampleScore(score)
+      ? { ...sampleRow(label, key, score), sheet: null }
+      : { label, cells: dashes, note: null, sheet: null };
+  }
+
+  function part(label: string, key: "partA" | "partB"): ScoreRow {
+    const score = sections[key];
+    const row = isPartScore(score)
+      ? { ...partRow(label, key, score), sheet: null }
+      : { label, cells: dashes, note: null, sheet: null };
+    return { ...row, timedPart: key };
+  }
+
   return {
     columns,
     rows: [
-      { label: "Sample A", cells: dashes, note: null, sheet: null },
-      { label: "Part A", cells: dashes, note: null, sheet: null, timedPart: "partA" },
-      { label: "Sample B", cells: dashes, note: null, sheet: null },
-      { label: "Part B", cells: dashes, note: null, sheet: null, timedPart: "partB" },
+      sample("Sample A", "sampleA"),
+      part("Part A", "partA"),
+      sample("Sample B", "sampleB"),
+      part("Part B", "partB"),
     ],
   };
+}
+
+function isNumber(value: unknown): value is number {
+  return typeof value === "number" && Number.isFinite(value);
+}
+
+function isSampleScore(value: unknown): value is SampleScore {
+  return typeof value === "object" && value !== null && typeof (value as SampleScore).passed === "boolean";
+}
+
+function isPartScore(value: unknown): value is PartScore {
+  if (typeof value !== "object" || value === null) return false;
+  const score = value as Record<string, unknown>;
+  if (score.status === "notGiven") return score.code === null || score.code === 996 || score.code === 997;
+  return (
+    (score.status === "completed" || score.status === "timedOut" || score.status === "stopped") &&
+    isNumber(score.timeSeconds) &&
+    isNumber(score.correctLines) &&
+    isNumber(score.errors)
+  );
 }
 
 // The client page's table. Lines show out of the page's own total (7 on a sample, 24 on a part), since they

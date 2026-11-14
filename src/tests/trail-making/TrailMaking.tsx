@@ -21,7 +21,7 @@ import { expectedOrder } from "./scoring/order";
 import { canSkipPartA, nextFlow, pages, startFlow } from "./scoring/page-flow";
 import { pageLayouts, type Point } from "./screen/page-layouts";
 import type { LoggedClick } from "./scoring/score-part";
-import { scoreTest, type SkipPoint, type StopPoint } from "./scoring/score-test";
+import { scoreTest, sectionScores, type SkipPoint, type StopPoint } from "./scoring/score-test";
 import { isScreenLargeEnough, pageScale } from "./screen/screen-check";
 import script from "./script.json";
 import { testId, testVersion } from "./test-info";
@@ -72,6 +72,7 @@ function TrailMaking({
   onHoldReached,
   onTimedPartStarted,
   onTimedPartEnded,
+  onSectionScored,
   onComplete,
   onLoadFailed,
 }: TestProps) {
@@ -249,7 +250,9 @@ function TrailMaking({
 
     player.stop();
     dispatchFlow("skipped");
-  }, [skipPending, page, phase, timedPart, layout, connected, wrongLines, player]);
+    // The skip settles Sample A and Part A, so their rows fill on the dashboard straight away (ADR-058).
+    onSectionScored(sectionScores(clickLogs.current, "partA", skipPoint.current));
+  }, [skipPending, page, phase, timedPart, layout, connected, wrongLines, player, onSectionScored]);
 
   // Continue: starts the held page's instructions.
   useEffect(() => {
@@ -290,6 +293,13 @@ function TrailMaking({
       sheets.current[page] = buildSheet(layout, connected, wrongLines);
     }
   }, [phase, page, layout, connected, wrongLines]);
+
+  // Sends the finished sections' scores as each page finishes, for the dashboard's live table (ADR-058).
+  useEffect(() => {
+    if (phase === "finished") {
+      onSectionScored(sectionScores(clickLogs.current, page, skipPoint.current));
+    }
+  }, [phase, page, onSectionScored]);
 
   // A clinician's stop. Notes where the test was and keeps the sheet as it stood, then ends the
   // test. Moving to "done" turns clicks off, clears the timers and hands over the result.
