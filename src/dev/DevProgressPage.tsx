@@ -7,6 +7,7 @@ import { useParams, useSearchParams } from "react-router";
 import { checkStatus } from "../client/check-status";
 import { listenForChecks } from "../client/listen-for-checks";
 import { reportProgress, type ProgressReport } from "../client/report-progress";
+import { watchTest } from "../client/watch-test";
 
 // A log line with the time it happened, for reading only (nothing here is measured).
 function stamped(line: string): string {
@@ -23,12 +24,13 @@ function DevProgressPage() {
   const [hold, setHold] = useState(1);
   const [part, setPart] = useState("partA");
 
-  // Listen while the page is open; each ping is answered by asking the server.
+  // Watch while the page is open: on each ping, and every few seconds anyway (9.4).
   useEffect(
     () =>
-      listenForChecks(token, async () => {
-        const result = await checkStatus(token, testId);
-        setLog((lines) => [stamped(`check → ${JSON.stringify(result)}`), ...lines]);
+      watchTest({
+        check: () => checkStatus(token, testId),
+        listen: (onCheck) => listenForChecks(token, onCheck),
+        onStatus: (result) => setLog((lines) => [stamped(`check → ${JSON.stringify(result)}`), ...lines]),
       }),
     [token, testId],
   );
