@@ -43,14 +43,14 @@ values
   ('9fd7e9ef-8180-4ee6-b96a-b54143062035', 'swaps'),
   ('4d5c949a-12ca-4902-b1fb-d73d7637f7e7', 'trail-making');
 
--- TEST-001 is in both practices on purpose: codes are unique per practice, not across the app.
+-- 1001 is in both practices on purpose: client IDs (four digits, ADR-054) are unique per practice, not across the app.
 insert into public.clients (id, practice_id, code)
 values
-  ('20000000-0000-4000-8000-000000000001', '9fd7e9ef-8180-4ee6-b96a-b54143062035', 'TEST-001'),
-  ('20000000-0000-4000-8000-000000000002', '9fd7e9ef-8180-4ee6-b96a-b54143062035', 'TEST-002'),
-  ('20000000-0000-4000-8000-000000000003', '4d5c949a-12ca-4902-b1fb-d73d7637f7e7', 'TEST-001');
+  ('20000000-0000-4000-8000-000000000001', '9fd7e9ef-8180-4ee6-b96a-b54143062035', '1001'),
+  ('20000000-0000-4000-8000-000000000002', '9fd7e9ef-8180-4ee6-b96a-b54143062035', '1002'),
+  ('20000000-0000-4000-8000-000000000003', '4d5c949a-12ca-4902-b1fb-d73d7637f7e7', '1001');
 
--- A finished visit for Sawtooth's TEST-001, created by Test Clinician One. Its tests are inserted already
+-- A finished visit for Sawtooth's 1001, created by Test Clinician One. Its tests are inserted already
 -- finished, so the trigger that closes a visit (roadmap 7.8) never runs; the visit is marked completed here.
 -- The database fills in link_token by itself.
 insert into public.sequences (id, practice_id, client_id, created_by, status)

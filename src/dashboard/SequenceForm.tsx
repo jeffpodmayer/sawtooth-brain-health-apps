@@ -2,9 +2,10 @@
 // create_sequence saves the client (if new), the sequence and its tests together (ADR-044).
 
 import { useEffect, useState, type ChangeEvent, type SubmitEvent } from "react";
-import { CLIENT_CODE_HINT, clientCodeProblem, upperCaseKeepingCursor } from "./clientCode";
+import { clientCodeProblem, digitsOnly } from "./clientCode";
 import { formatDate } from "./formatDate";
 import { sequenceTests } from "./sequence-tests";
+import { buttonClass, fieldClass } from "./styles";
 import { supabase } from "./supabase";
 
 export type CreatedSequence = {
@@ -21,13 +22,6 @@ type TestsLoad = { state: "loading" } | { state: "failed" } | { state: "loaded";
 
 // What the database said about a typed code. Shown only while that code is still in the field.
 type Lookup = { code: string; addedAt: string | null };
-
-const fieldClass =
-  "mt-2 block h-14 w-full rounded-lg border border-field-line bg-white px-4 text-ink focus-visible:border-accent focus-visible:outline-2 focus-visible:outline-offset-0 focus-visible:outline-accent";
-const createButtonClass =
-  "h-12 rounded-lg bg-accent px-6 font-semibold text-white hover:bg-accent-strong focus-visible:outline-4 focus-visible:outline-offset-4 focus-visible:outline-accent disabled:opacity-70";
-const cancelButtonClass =
-  "h-12 rounded-lg border-2 border-line bg-surface px-6 font-semibold text-ink hover:bg-hover focus-visible:outline-4 focus-visible:outline-offset-4 focus-visible:outline-accent";
 
 type Props = {
   fixedCode?: string; // opened from a client's page: the ID is shown, not typed
@@ -91,7 +85,7 @@ function SequenceForm({ fixedCode, onCreated, onCancel }: Props) {
   }, [code, fixedCode]);
 
   function handleCodeChange(event: ChangeEvent<HTMLInputElement>) {
-    setCode(upperCaseKeepingCursor(event.currentTarget));
+    setCode(digitsOnly(event.currentTarget.value));
     setCodeProblem(null);
     setProblem(null);
   }
@@ -150,10 +144,6 @@ function SequenceForm({ fixedCode, onCreated, onCancel }: Props) {
   // A found or new client gets a teal mark; a problem stays plain text.
   const statusMark = codeProblem ? null : currentLookup?.addedAt ? "✓" : currentLookup ? "＋" : null;
 
-  // Each ticked test's place in the order given (1, 2, …).
-  const chosenIds =
-    testsLoad.state === "loaded" ? testsLoad.tests.filter((test) => ticked.has(test.id)).map((test) => test.id) : [];
-
   return (
     <form onSubmit={handleSubmit} noValidate className="mt-6">
       {fixedCode ? (
@@ -170,20 +160,18 @@ function SequenceForm({ fixedCode, onCreated, onCancel }: Props) {
               value={code}
               onChange={handleCodeChange}
               autoComplete="off"
-              autoCapitalize="characters"
+              inputMode="numeric"
+              maxLength={4}
               spellCheck={false}
               aria-invalid={codeProblem !== null}
-              aria-describedby="sequence-code-hint sequence-code-status"
-              className={fieldClass}
+              aria-describedby="sequence-code-status"
+              className={`mt-2 max-w-64 ${fieldClass}`}
             />
           </label>
-          <p id="sequence-code-hint" className="mt-2 text-ink-muted">
-            {CLIENT_CODE_HINT}
-          </p>
           <p
             id="sequence-code-status"
             role="status"
-            className={`mt-2 min-h-8 font-semibold ${statusMark ? "text-success-ink" : ""}`}
+            className={`mt-1 min-h-7 font-semibold ${statusMark ? "text-success-ink" : ""}`}
           >
             {statusMark && <span aria-hidden="true">{statusMark} </span>}
             {codeStatus}
@@ -191,8 +179,8 @@ function SequenceForm({ fixedCode, onCreated, onCancel }: Props) {
         </>
       )}
 
-      <fieldset className="mt-4">
-        <legend className="font-semibold">Tests, in the order given</legend>
+      <fieldset className="mt-2">
+        <legend className="font-semibold">Tests</legend>
         {testsLoad.state === "loading" && <p className="mt-2">Loading…</p>}
         {testsLoad.state === "failed" && (
           <p role="alert" className="mt-2">
@@ -205,24 +193,14 @@ function SequenceForm({ fixedCode, onCreated, onCancel }: Props) {
         {testsLoad.state === "loaded" && testsLoad.tests.length > 0 && (
           <div className="mt-2 divide-y divide-line overflow-hidden rounded-lg border border-line">
             {testsLoad.tests.map((test) => {
-              const place = chosenIds.indexOf(test.id) + 1; // 0 when not ticked
               return (
-                <label
-                  key={test.id}
-                  className={`flex h-14 cursor-pointer items-center gap-4 px-4 ${place ? "bg-success-bg" : "bg-surface hover:bg-hover"}`}
-                >
+                <label key={test.id} className="flex h-14 cursor-pointer items-center gap-4 bg-surface px-4 hover:bg-hover">
                   <input
                     type="checkbox"
-                    checked={place > 0}
+                    checked={ticked.has(test.id)}
                     onChange={(event) => handleTickChange(test.id, event.currentTarget.checked)}
                     className="size-6 accent-accent"
                   />
-                  <span
-                    aria-hidden="true"
-                    className={`flex size-7 items-center justify-center rounded-full text-base font-semibold ${place ? "bg-accent text-white" : ""}`}
-                  >
-                    {place || ""}
-                  </span>
                   {test.name}
                 </label>
               );
@@ -231,15 +209,18 @@ function SequenceForm({ fixedCode, onCreated, onCancel }: Props) {
         )}
       </fieldset>
 
-      <p role="status" className="mt-4 min-h-8">
-        {problem}
-      </p>
+      {/* Takes space only when there's a problem; an alert is read out as soon as it appears. */}
+      {problem && (
+        <p role="alert" className="mt-4">
+          {problem}
+        </p>
+      )}
 
-      <div className="mt-4 flex flex-wrap justify-end gap-4">
-        <button type="button" onClick={onCancel} className={cancelButtonClass}>
+      <div className="mt-6 flex flex-wrap justify-end gap-4">
+        <button type="button" onClick={onCancel} className={buttonClass("secondary")}>
           Cancel
         </button>
-        <button type="submit" disabled={creating || testsLoad.state !== "loaded"} className={createButtonClass}>
+        <button type="submit" disabled={creating || testsLoad.state !== "loaded"} className={buttonClass("primary")}>
           {creating ? "Creating…" : "Create link"}
         </button>
       </div>

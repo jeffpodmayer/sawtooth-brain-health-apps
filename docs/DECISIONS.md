@@ -1400,3 +1400,25 @@ without Continue (Phase 9 code review).
 - Opening the link in a second tab resets the first tab's test too; it drops back to the wait or break
   screen until Continue. Two tabs on one link aren't supported.
 - Nothing records that a restart happened. Add a count by migration if the clinicians want to see it.
+
+## ADR-054: Client IDs are four digits
+
+- **Status:** Accepted · **Date:** 2026-11-14 · Narrows the client code format from roadmap 2.3 · Answers the client ID question left for 10.4
+
+**Context:** The client code format (2.3) allowed capitals, digits and hyphens, up to 20 characters, until
+the clinicians said what their IDs look like. Jeff learned that every client has a four-digit number.
+
+**Decision:**
+
+- A client ID is exactly four digits, such as 0042. It's stored as text, so a leading zero is kept.
+- The database enforces it (`clients_code_format_check`, migration `four_digit_client_codes`), and the
+  New Test Sequence form takes digits only, at most four, with the same rule (`clientCode.ts`).
+- Development's existing clients were renumbered by a one-off update, and `seed.sql` uses 1001 and 1002.
+  The migration changes only the rule, never data.
+
+**Consequences:**
+
+- A name or other identifying detail can no longer be typed as a client ID (ADR-008).
+- If any production client doesn't fit, the migration refuses to apply and changes nothing. Production has
+  no clients before launch (12.6), but check with a read-only query before the release.
+- If the practice ever uses a different format, the rule changes by a new migration.

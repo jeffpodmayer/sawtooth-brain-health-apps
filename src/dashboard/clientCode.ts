@@ -1,23 +1,17 @@
-// Client code rules for the dashboard's forms (used from roadmap 8.4).
-// The same rule as the database's clients_code_format_check (2.3). The database has the final say.
+// Client ID rules for the dashboard's forms (used from roadmap 8.4).
+// A client ID is exactly four digits, such as 0042 (ADR-054). The same rule as the database's
+// clients_code_format_check, which has the final say.
 
-export const CLIENT_CODE_FORMAT = /^[A-Z0-9-]{1,20}$/;
+export const CLIENT_CODE_FORMAT = /^[0-9]{4}$/;
 
-export const CLIENT_CODE_HINT = "Letters, numbers and hyphens, up to 20 characters. Never a name.";
-
-// What's wrong with a typed code (already trimmed), or null if it fits the format.
+// What's wrong with a typed ID (already trimmed), or null if it fits the format.
 export function clientCodeProblem(code: string): string | null {
   if (code === "") return "Type a client ID.";
-  if (!CLIENT_CODE_FORMAT.test(code)) {
-    return "Use only capital letters, numbers and hyphens, up to 20 characters (for example, SBH-0042).";
-  }
+  if (!CLIENT_CODE_FORMAT.test(code)) return "A client ID is four numbers, such as 0042.";
   return null;
 }
 
-// Turns what's typed into capitals, keeping the cursor where it was. Returns the new value.
-export function upperCaseKeepingCursor(input: HTMLInputElement): string {
-  const { selectionStart, selectionEnd } = input;
-  input.value = input.value.toUpperCase();
-  input.setSelectionRange(selectionStart, selectionEnd);
-  return input.value;
+// What the Client ID field keeps of what's typed or pasted: its digits, at most four.
+export function digitsOnly(typed: string): string {
+  return typed.replace(/\D/g, "").slice(0, 4);
 }

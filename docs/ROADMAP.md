@@ -370,6 +370,7 @@ see their own practice.
   - Check: the list shows Sawtooth's clients only; Fake Practice's clinician sees only theirs
   - Note: new client codes are added only in Generate Test Sequence (8.4), so a new client and their first visit take one step (decided 2026-11-11)
   - Note: build with the current code format (2.3). Whether the clinicians already have an ID for each client, and what one looks like, is asked at 10.4; loosen the format with a new migration then if needed (decided 2026-11-11)
+  - Note: answered 2026-11-14: every client has a four-digit ID, such as 0042. The format is now exactly four digits (ADR-054, migration `four_digit_client_codes`); development's clients were renumbered and `seed.sql` uses 1001 and 1002. Before the migration goes to production, check that production has no client IDs that don't fit
 
 - [x] **8.4a Create a sequence in the database**
   - Learn: a database function that saves several rows as one transaction; using `security definer` safely; calling it with `supabase.rpc`
