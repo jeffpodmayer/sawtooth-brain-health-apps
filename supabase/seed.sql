@@ -1,5 +1,8 @@
 -- Fake data for development only. Never run this on production (ADR-004).
 -- Loaded automatically after a database reset, once the migrations have run.
+-- Kept small for the clinicians' round (10.4): two Sawtooth clients with two visits each, showing the main
+-- outcomes. All scores are made up and the results have no sheets (sheets are image files, not SQL); a test
+-- run from a link saves real ones.
 
 -- Same ids as the first hand-made rows, so files in the sheets bucket stay in the right folders.
 insert into public.practices (id, name)
@@ -7,7 +10,8 @@ values
   ('9fd7e9ef-8180-4ee6-b96a-b54143062035', 'Sawtooth Brain Health Institute'),
   ('4d5c949a-12ca-4902-b1fb-d73d7637f7e7', 'Fake Practice (dev only)');
 
--- A reset deletes all logins, so the seed makes them again.
+-- A reset deletes all logins, so the seed makes them again. Real clinicians' logins are added by hand after a
+-- reset (roadmap 10.4) and never go in this file.
 -- The blank '' values are required: sign-in fails if those columns are empty (null).
 insert into auth.users (
   instance_id, id, aud, role, email, encrypted_password, email_confirmed_at,
@@ -43,127 +47,134 @@ values
   ('9fd7e9ef-8180-4ee6-b96a-b54143062035', 'swaps'),
   ('4d5c949a-12ca-4902-b1fb-d73d7637f7e7', 'trail-making');
 
--- 1001 is in both practices on purpose: client IDs (four digits, ADR-054) are unique per practice, not across the app.
+-- 1001 is in both practices on purpose: client IDs (four digits, ADR-054) are unique per practice, not across
+-- the app. The Fake Practice's client has no visits; it is there to check that practices can't see each other.
 insert into public.clients (id, practice_id, code)
 values
   ('20000000-0000-4000-8000-000000000001', '9fd7e9ef-8180-4ee6-b96a-b54143062035', '1001'),
   ('20000000-0000-4000-8000-000000000002', '9fd7e9ef-8180-4ee6-b96a-b54143062035', '1002'),
   ('20000000-0000-4000-8000-000000000003', '4d5c949a-12ca-4902-b1fb-d73d7637f7e7', '1001');
 
--- A finished visit for Sawtooth's 1001, created by Test Clinician One. Its tests are inserted already
--- finished, so the trigger that closes a visit (roadmap 7.8) never runs; the visit is marked completed here.
--- The database fills in link_token by itself.
-insert into public.sequences (id, practice_id, client_id, created_by, status)
-values (
-  '30000000-0000-4000-8000-000000000001',
-  '9fd7e9ef-8180-4ee6-b96a-b54143062035',
-  '20000000-0000-4000-8000-000000000001',
-  '10000000-0000-4000-8000-000000000001',
-  'completed'
-);
+-- Four Sawtooth visits. Finished tests are inserted already finished, so the trigger that closes a visit
+-- (roadmap 7.8) never runs; finished visits are marked completed here. The open visit has a fixed fake link
+-- token, so its link is the same after every reset (/t/ followed by 64 a's). Other tokens are filled in by the
+-- database.
+insert into public.sequences (id, practice_id, client_id, created_by, status, created_at, link_token)
+values
+  -- 1001, two weeks ago: both tests finished normally.
+  ('30000000-0000-4000-8000-000000000001', '9fd7e9ef-8180-4ee6-b96a-b54143062035',
+   '20000000-0000-4000-8000-000000000001', '10000000-0000-4000-8000-000000000001',
+   'completed', now() - interval '14 days', default),
+  -- 1001, three days ago: Part B reached its time limit; SWAPS was discontinued.
+  ('30000000-0000-4000-8000-000000000002', '9fd7e9ef-8180-4ee6-b96a-b54143062035',
+   '20000000-0000-4000-8000-000000000001', '10000000-0000-4000-8000-000000000001',
+   'completed', now() - interval '3 days', default),
+  -- 1002, a week ago: Part A skipped partway (996); SWAPS finished with one recall blank.
+  ('30000000-0000-4000-8000-000000000003', '9fd7e9ef-8180-4ee6-b96a-b54143062035',
+   '20000000-0000-4000-8000-000000000002', '10000000-0000-4000-8000-000000000002',
+   'completed', now() - interval '7 days', default),
+  -- 1002, today: open, both tests waiting.
+  ('30000000-0000-4000-8000-000000000004', '9fd7e9ef-8180-4ee6-b96a-b54143062035',
+   '20000000-0000-4000-8000-000000000002', '10000000-0000-4000-8000-000000000001',
+   'open', now() - interval '5 minutes', repeat('a', 64));
 
--- A finished Trail Making result. Scores follow its SPEC; the numbers are made up.
+-- Finished results that ran to the end (no stop): Trail Making and SWAPS in each finished visit.
 insert into public.sequence_tests (
   id, practice_id, sequence_id, test_id, position, status, test_version,
-  started_at, completed_at, scores, raw_data, screen_width, screen_height, sheets
+  started_at, completed_at, scores, raw_data, screen_width, screen_height, sheets, skip_requested
 )
-values (
-  '40000000-0000-4000-8000-000000000001',
-  '9fd7e9ef-8180-4ee6-b96a-b54143062035',
-  '30000000-0000-4000-8000-000000000001',
-  'trail-making', 1, 'completed', '0.0.0-seed',
-  now() - interval '30 minutes', now() - interval '20 minutes',
-  '{
-    "partA": {"status": "completed", "code": null, "timeMs": 38000, "timeSeconds": 38, "correctLines": 24, "correctClicks": 25, "errors": 0},
-    "partB": {"status": "completed", "code": null, "timeMs": 91000, "timeSeconds": 91, "correctLines": 24, "correctClicks": 25, "errors": 1},
-    "sampleA": {"passed": true},
-    "sampleB": {"passed": true}
-  }',
-  '{"seed": true}',
-  1440, 900,
-  '{}'
-);
+values
+  -- Visit 1: both Trail Making parts completed.
+  ('40000000-0000-4000-8000-000000000001', '9fd7e9ef-8180-4ee6-b96a-b54143062035',
+   '30000000-0000-4000-8000-000000000001', 'trail-making', 1, 'completed', '0.0.0-seed',
+   now() - interval '14 days' + interval '5 minutes', now() - interval '14 days' + interval '15 minutes',
+   '{
+     "sampleA": {"passed": true, "timeMs": 21400, "timeSeconds": 21.4, "correctLines": 7, "correctClicks": 8, "errors": 0},
+     "partA": {"status": "completed", "code": null, "timeMs": 42300, "timeSeconds": 42.3, "correctLines": 24, "correctClicks": 25, "errors": 0},
+     "sampleB": {"passed": true, "timeMs": 30800, "timeSeconds": 30.8, "correctLines": 7, "correctClicks": 8, "errors": 1},
+     "partB": {"status": "completed", "code": null, "timeMs": 97600, "timeSeconds": 97.6, "correctLines": 24, "correctClicks": 25, "errors": 2}
+   }',
+   '{"seed": true}', 1440, 900, '{}', null),
 
--- A SWAPS result stopped partway by a clinician, so its partial score is kept.
+  -- Visit 1: SWAPS to its time limit, then a full recall.
+  ('40000000-0000-4000-8000-000000000002', '9fd7e9ef-8180-4ee6-b96a-b54143062035',
+   '30000000-0000-4000-8000-000000000001', 'swaps', 2, 'completed', '0.0.0-seed',
+   now() - interval '14 days' + interval '17 minutes', now() - interval '14 days' + interval '22 minutes',
+   '{
+     "test": {"status": "timedOut", "timeMs": 60000, "attempted": 38, "correct": 36, "errors": 2, "corrections": 1},
+     "recall": {"status": "completed", "correct": 6, "blank": 0},
+     "practice": {"wrongAnswers": 0}
+   }',
+   '{"seed": true}', 1440, 900, '{}', null),
+
+  -- Visit 2: Part A completed, Part B reached its 300-second limit.
+  ('40000000-0000-4000-8000-000000000003', '9fd7e9ef-8180-4ee6-b96a-b54143062035',
+   '30000000-0000-4000-8000-000000000002', 'trail-making', 1, 'completed', '0.0.0-seed',
+   now() - interval '3 days' + interval '5 minutes', now() - interval '3 days' + interval '18 minutes',
+   '{
+     "sampleA": {"passed": true, "timeMs": 25100, "timeSeconds": 25.1, "correctLines": 7, "correctClicks": 8, "errors": 0},
+     "partA": {"status": "completed", "code": null, "timeMs": 39100, "timeSeconds": 39.1, "correctLines": 24, "correctClicks": 25, "errors": 1},
+     "sampleB": {"passed": true, "timeMs": 44600, "timeSeconds": 44.6, "correctLines": 7, "correctClicks": 8, "errors": 2},
+     "partB": {"status": "timedOut", "code": null, "timeMs": 300000, "timeSeconds": 300, "correctLines": 17, "correctClicks": 18, "errors": 3}
+   }',
+   '{"seed": true}', 1440, 900, '{}', null),
+
+  -- Visit 3: the clinician skipped Part A partway (996, ADR-055); Sample B and Part B followed.
+  ('40000000-0000-4000-8000-000000000005', '9fd7e9ef-8180-4ee6-b96a-b54143062035',
+   '30000000-0000-4000-8000-000000000003', 'trail-making', 1, 'completed', '0.0.0-seed',
+   now() - interval '7 days' + interval '5 minutes', now() - interval '7 days' + interval '16 minutes',
+   '{
+     "sampleA": {"passed": true, "timeMs": 33900, "timeSeconds": 33.9, "correctLines": 7, "correctClicks": 8, "errors": 2},
+     "partA": {"status": "stopped", "code": 996, "timeMs": 64200, "timeSeconds": 64.2, "correctLines": 9, "correctClicks": 10, "errors": 4},
+     "sampleB": {"passed": true, "timeMs": 41200, "timeSeconds": 41.2, "correctLines": 7, "correctClicks": 8, "errors": 1},
+     "partB": {"status": "completed", "code": null, "timeMs": 118400, "timeSeconds": 118.4, "correctLines": 24, "correctClicks": 25, "errors": 1}
+   }',
+   '{"seed": true}', 1440, 900, '{}', 'partA'),
+
+  -- Visit 3: SWAPS to its time limit with two corrections, and one recall symbol left blank.
+  ('40000000-0000-4000-8000-000000000006', '9fd7e9ef-8180-4ee6-b96a-b54143062035',
+   '30000000-0000-4000-8000-000000000003', 'swaps', 2, 'completed', '0.0.0-seed',
+   now() - interval '7 days' + interval '18 minutes', now() - interval '7 days' + interval '23 minutes',
+   '{
+     "test": {"status": "timedOut", "timeMs": 60000, "attempted": 31, "correct": 31, "errors": 0, "corrections": 2},
+     "recall": {"status": "completed", "correct": 5, "blank": 1},
+     "practice": {"wrongAnswers": 1}
+   }',
+   '{"seed": true}', 1440, 900, '{}', null);
+
+-- Visit 2: SWAPS discontinued by a clinician partway through the timed part, so its partial score is kept and
+-- recall was never given.
 insert into public.sequence_tests (
   id, practice_id, sequence_id, test_id, position, status, test_version,
   started_at, completed_at, scores, raw_data, screen_width, screen_height,
   stop_requested_at, stop_reason, stopped_by, sheets
 )
 values (
-  '40000000-0000-4000-8000-000000000002',
-  '9fd7e9ef-8180-4ee6-b96a-b54143062035',
-  '30000000-0000-4000-8000-000000000001',
-  'swaps', 2, 'stopped', '0.0.0-seed',
-  now() - interval '15 minutes', now() - interval '10 minutes',
+  '40000000-0000-4000-8000-000000000004', '9fd7e9ef-8180-4ee6-b96a-b54143062035',
+  '30000000-0000-4000-8000-000000000002', 'swaps', 2, 'stopped', '0.0.0-seed',
+  now() - interval '3 days' + interval '20 minutes', now() - interval '3 days' + interval '23 minutes',
   '{
-    "test": {"status": "stopped", "timeMs": 31000, "attempted": 24, "correct": 23, "errors": 1, "corrections": 1},
+    "test": {"status": "stopped", "timeMs": 28400, "attempted": 15, "correct": 14, "errors": 1, "corrections": 0},
     "recall": {"status": "notGiven"},
-    "practice": {"wrongAnswers": 0}
+    "practice": {"wrongAnswers": 2}
   }',
-  '{"seed": true}',
-  1440, 900,
-  now() - interval '10 minutes', 'gave_up', '10000000-0000-4000-8000-000000000001',
+  '{"seed": true}', 1440, 900,
+  now() - interval '3 days' + interval '23 minutes', 'gave_up', '10000000-0000-4000-8000-000000000001',
   '{}'
 );
+
+-- Visit 4: tests still to run. The database fills in status (pending) by itself.
+insert into public.sequence_tests (id, practice_id, sequence_id, test_id, position)
+values
+  ('40000000-0000-4000-8000-000000000007', '9fd7e9ef-8180-4ee6-b96a-b54143062035',
+   '30000000-0000-4000-8000-000000000004', 'trail-making', 1),
+  ('40000000-0000-4000-8000-000000000008', '9fd7e9ef-8180-4ee6-b96a-b54143062035',
+   '30000000-0000-4000-8000-000000000004', 'swaps', 2);
 
 insert into public.sequence_test_notes (id, practice_id, sequence_test_id, body, created_by)
 values (
-  '50000000-0000-4000-8000-000000000001',
-  '9fd7e9ef-8180-4ee6-b96a-b54143062035',
-  '40000000-0000-4000-8000-000000000001',
-  'Fake development note. Not about a real person.',
+  '50000000-0000-4000-8000-000000000001', '9fd7e9ef-8180-4ee6-b96a-b54143062035',
+  '40000000-0000-4000-8000-000000000004',
+  'Fake example note: the client asked to stop. Not about a real person.',
   '10000000-0000-4000-8000-000000000001'
-);
-
--- Sequences for trying the client link (roadmap 7.1). Their link tokens are fixed
--- and fake, so the same test links work after every reset. Development only.
-insert into public.sequences (id, practice_id, client_id, created_by, link_token, status)
-values
-  -- Open, nothing done yet: the link returns both tests.
-  ('30000000-0000-4000-8000-000000000002', '9fd7e9ef-8180-4ee6-b96a-b54143062035',
-   '20000000-0000-4000-8000-000000000002', '10000000-0000-4000-8000-000000000001',
-   repeat('a', 64), 'open'),
-  -- Open, reopened partway: Trail Making is done, so the link returns SWAPS only.
-  ('30000000-0000-4000-8000-000000000003', '9fd7e9ef-8180-4ee6-b96a-b54143062035',
-   '20000000-0000-4000-8000-000000000002', '10000000-0000-4000-8000-000000000001',
-   repeat('b', 64), 'open'),
-  -- Completed and discontinued: both links are refused.
-  ('30000000-0000-4000-8000-000000000004', '9fd7e9ef-8180-4ee6-b96a-b54143062035',
-   '20000000-0000-4000-8000-000000000002', '10000000-0000-4000-8000-000000000001',
-   repeat('c', 64), 'completed'),
-  ('30000000-0000-4000-8000-000000000005', '9fd7e9ef-8180-4ee6-b96a-b54143062035',
-   '20000000-0000-4000-8000-000000000002', '10000000-0000-4000-8000-000000000001',
-   repeat('d', 64), 'discontinued');
-
--- Tests still to run. The database fills in status (pending) by itself.
-insert into public.sequence_tests (id, practice_id, sequence_id, test_id, position)
-values
-  ('40000000-0000-4000-8000-000000000003', '9fd7e9ef-8180-4ee6-b96a-b54143062035',
-   '30000000-0000-4000-8000-000000000002', 'trail-making', 1),
-  ('40000000-0000-4000-8000-000000000004', '9fd7e9ef-8180-4ee6-b96a-b54143062035',
-   '30000000-0000-4000-8000-000000000002', 'swaps', 2),
-  ('40000000-0000-4000-8000-000000000006', '9fd7e9ef-8180-4ee6-b96a-b54143062035',
-   '30000000-0000-4000-8000-000000000003', 'swaps', 2);
-
--- The finished Trail Making in the reopened sequence. Same made-up scores as above.
-insert into public.sequence_tests (
-  id, practice_id, sequence_id, test_id, position, status, test_version,
-  started_at, completed_at, scores, raw_data, screen_width, screen_height, sheets
-)
-values (
-  '40000000-0000-4000-8000-000000000005',
-  '9fd7e9ef-8180-4ee6-b96a-b54143062035',
-  '30000000-0000-4000-8000-000000000003',
-  'trail-making', 1, 'completed', '0.0.0-seed',
-  now() - interval '30 minutes', now() - interval '20 minutes',
-  '{
-    "partA": {"status": "completed", "code": null, "timeMs": 38000, "timeSeconds": 38, "correctLines": 24, "correctClicks": 25, "errors": 0},
-    "partB": {"status": "completed", "code": null, "timeMs": 91000, "timeSeconds": 91, "correctLines": 24, "correctClicks": 25, "errors": 1},
-    "sampleA": {"passed": true},
-    "sampleB": {"passed": true}
-  }',
-  '{"seed": true}',
-  1440, 900,
-  '{}'
 );
