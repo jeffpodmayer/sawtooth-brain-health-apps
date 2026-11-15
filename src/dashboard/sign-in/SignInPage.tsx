@@ -2,8 +2,8 @@
 
 import { useState, type SubmitEvent } from "react";
 import { Navigate } from "react-router";
-import { buttonClass, fieldClass, textButtonClass } from "./styles";
-import { supabase } from "./supabase";
+import { buttonClass, fieldClass, textButtonClass } from "../styles";
+import { supabase } from "../supabase";
 import { useSession } from "./useSession";
 
 type Problem = "wrong" | "failed" | null;

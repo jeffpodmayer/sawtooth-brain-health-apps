@@ -2,7 +2,7 @@
 // Raw values only, from each test's own csvRows. Client IDs only, no other client details.
 
 import Papa from "papaparse";
-import type { CsvRow } from "../shared/test-module";
+import type { CsvRow } from "../../shared/test-module";
 
 export type ExportClient = {
   code: string;

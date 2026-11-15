@@ -5,12 +5,12 @@
 // which never read notes.
 
 import { useEffect, useState, type SubmitEvent } from "react";
-import { formatDateTime } from "./formatDate";
+import { formatDateTime } from "../ui/format-date";
 import NoteDialog, { type Note, type NoteDialogState } from "./NoteDialog";
-import { iconButtonClass } from "./styles";
-import { supabase } from "./supabase";
-import { useMe } from "./useMe";
-import { useSession } from "./useSession";
+import { iconButtonClass } from "../styles";
+import { supabase } from "../supabase";
+import { useMe } from "../sign-in/useMe";
+import { useSession } from "../sign-in/useSession";
 
 type Load = { state: "loading" } | { state: "failed" } | { state: "loaded"; notes: Note[] };
 

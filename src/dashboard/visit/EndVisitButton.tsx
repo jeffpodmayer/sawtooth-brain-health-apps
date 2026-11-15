@@ -2,10 +2,10 @@
 // with a reason, marks every later test not given and closes the link, all in one save (end_sequence).
 
 import { useState } from "react";
-import { stopReasonLabels } from "./statusLabels";
+import { stopReasonLabels } from "./status-labels";
 import StopDialog from "./StopDialog";
-import { buttonClass } from "./styles";
-import { supabase } from "./supabase";
+import { buttonClass } from "../styles";
+import { supabase } from "../supabase";
 
 type Props = {
   sequenceId: string;

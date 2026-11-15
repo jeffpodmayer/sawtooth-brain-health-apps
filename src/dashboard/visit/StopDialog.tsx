@@ -3,7 +3,7 @@
 // Cancel backs out, and focus goes back to the button that opened it. The caller does the saving.
 
 import { useEffect, useId, useRef, useState, type SubmitEvent } from "react";
-import { buttonClass, dialogBodyClass, dialogClass, dialogCloseClass, dialogHeaderClass } from "./styles";
+import { buttonClass, dialogBodyClass, dialogClass, dialogCloseClass, dialogHeaderClass } from "../styles";
 
 type Props = {
   open: boolean;

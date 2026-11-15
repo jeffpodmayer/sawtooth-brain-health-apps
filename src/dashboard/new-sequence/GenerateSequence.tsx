@@ -6,8 +6,8 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router";
 import SequenceForm from "./SequenceForm";
-import { buttonClass, dialogBodyClass, dialogClass, dialogCloseClass, dialogHeaderClass } from "./styles";
-import { supabase } from "./supabase";
+import { buttonClass, dialogBodyClass, dialogClass, dialogCloseClass, dialogHeaderClass } from "../styles";
+import { supabase } from "../supabase";
 
 // clientCode, when given, fixes the window to that client (opened from a client's page).
 type Props = { onCreated: () => void; clientCode?: string };

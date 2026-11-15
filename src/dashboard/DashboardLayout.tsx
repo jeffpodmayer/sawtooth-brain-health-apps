@@ -3,10 +3,10 @@
 
 import { useEffect, useState } from "react";
 import { Outlet } from "react-router";
-import AccountBar from "./AccountBar";
+import AccountBar from "./sign-in/AccountBar";
 import { supabase } from "./supabase";
-import { type Me } from "./useMe";
-import { useSession } from "./useSession";
+import { type Me } from "./sign-in/useMe";
+import { useSession } from "./sign-in/useSession";
 
 function DashboardLayout() {
   const session = useSession();

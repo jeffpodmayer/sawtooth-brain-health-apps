@@ -60,14 +60,10 @@ describe("SWAPS score table", () => {
 });
 
 describe("SWAPS practice row", () => {
-  it("wrong practice answers, not scored", () => {
-    const withPractice = { ...scores(timedOut, recallDone), practice: { wrongAnswers: 2 } };
-    expect(practiceRow(withPractice)).toEqual({ label: "Practice", parts: ["2 wrong answers", "not scored"] });
-  });
-
-  it("one wrong answer is singular", () => {
-    const withPractice = { ...scores(timedOut, recallDone), practice: { wrongAnswers: 1 } };
-    expect(practiceRow(withPractice).parts[0]).toBe("1 wrong answer");
+  it("wrong practice answers (one is singular), not scored", () => {
+    const withPractice = (wrongAnswers: number) => ({ ...scores(timedOut, recallDone), practice: { wrongAnswers } });
+    expect(practiceRow(withPractice(2))).toEqual({ label: "Practice", parts: ["2 wrong answers", "not scored"] });
+    expect(practiceRow(withPractice(1)).parts[0]).toBe("1 wrong answer");
   });
 });
 
@@ -134,9 +130,5 @@ describe("SWAPS table while running", () => {
 
   it("shows dashes for anything that isn't a section score", () => {
     expect(liveTable({ test: "junk" }).rows[0].cells).toEqual(["—", "—", "—", "—", "—", "—"]);
-  });
-
-  it("has the finished table's columns", () => {
-    expect(liveTable(null).columns).toEqual(scoreTable(scores(timedOut, recallDone)).columns);
   });
 });

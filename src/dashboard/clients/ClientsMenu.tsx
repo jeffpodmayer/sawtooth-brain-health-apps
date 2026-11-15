@@ -3,12 +3,12 @@
 // results are exported. A plain show/hide panel of real buttons: Tab reaches them, Esc or a click outside closes it.
 
 import { useId, useRef, useState } from "react";
-import { buildCsv } from "./csv-export";
-import { saveFile } from "./save-file";
-import { sequenceTests } from "./sequence-tests";
-import { buttonClass } from "./styles";
-import { supabase } from "./supabase";
-import { useDismiss } from "./useDismiss";
+import { buildCsv } from "../results/csv-export";
+import { saveFile } from "../results/save-file";
+import { sequenceTests } from "../sequence-tests";
+import { buttonClass } from "../styles";
+import { supabase } from "../supabase";
+import { useDismiss } from "../ui/useDismiss";
 
 const itemClass =
   "block w-full px-4 py-3 text-left hover:bg-hover focus-visible:outline-3 focus-visible:-outline-offset-4 focus-visible:outline-accent disabled:opacity-70";

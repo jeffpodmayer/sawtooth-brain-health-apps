@@ -3,7 +3,7 @@
 // TestNotes does the saving; this only shows what it's given.
 
 import { useEffect, useId, useRef, type ChangeEvent, type SubmitEvent } from "react";
-import { formatDateTime } from "./formatDate";
+import { formatDateTime } from "../ui/format-date";
 import {
   buttonClass,
   dialogBodyClass,
@@ -11,7 +11,7 @@ import {
   dialogCloseClass,
   dialogHeaderClass,
   textAreaClass,
-} from "./styles";
+} from "../styles";
 
 export type Note = {
   id: string;

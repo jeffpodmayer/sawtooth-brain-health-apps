@@ -4,11 +4,11 @@
 import "@fontsource-variable/atkinson-hyperlegible-next";
 import { useEffect } from "react";
 import { Navigate, Route, Routes } from "react-router";
-import ClientPage from "./ClientPage";
-import ClientsPage from "./ClientsPage";
+import ClientPage from "./visit/ClientPage";
+import ClientsPage from "./clients/ClientsPage";
 import DashboardLayout from "./DashboardLayout";
-import RequireSignIn from "./RequireSignIn";
-import SignInPage from "./SignInPage";
+import RequireSignIn from "./sign-in/RequireSignIn";
+import SignInPage from "./sign-in/SignInPage";
 
 function DashboardRoutes() {
   // The tab reads "Sawtooth · Dashboard" on every clinician page, so it stands apart from a client's "Sawtooth"

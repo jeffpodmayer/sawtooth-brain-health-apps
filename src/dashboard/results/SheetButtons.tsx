@@ -7,9 +7,9 @@
 import { useEffect, useId, useRef, useState } from "react";
 import { saveFile } from "./save-file";
 import { sheetPdf } from "./sheet-pdf";
-import { SheetSkeleton } from "./Skeleton";
-import { dialogBodyClass, dialogClass, dialogCloseClass, dialogHeaderClass, iconButtonClass } from "./styles";
-import { supabase } from "./supabase";
+import { SheetSkeleton } from "../ui/Skeleton";
+import { dialogBodyClass, dialogClass, dialogCloseClass, dialogHeaderClass, iconButtonClass } from "../styles";
+import { supabase } from "../supabase";
 
 const SIGNED_URL_SECONDS = 10 * 60;
 const sheetIconClass = `size-10 text-accent disabled:opacity-70 ${iconButtonClass}`;

@@ -2,14 +2,14 @@
 // create_sequence saves the client (if new), the sequence and its tests together (ADR-044).
 
 import { useEffect, useState, type ChangeEvent, type KeyboardEvent, type ReactNode, type SubmitEvent } from "react";
-import { matchingClients, type ClientSummary } from "./client-search";
-import { clientCodeProblem, digitsOnly } from "./clientCode";
-import { loadClients } from "./clients";
-import { formatDate } from "./formatDate";
-import { sequenceTests } from "./sequence-tests";
-import { TestListSkeleton } from "./Skeleton";
-import { buttonClass, fieldClass } from "./styles";
-import { supabase } from "./supabase";
+import { matchingClients, type ClientSummary } from "../clients/client-search";
+import { clientCodeProblem, digitsOnly } from "../clients/client-code";
+import { loadClients } from "../clients/clients";
+import { formatDate } from "../ui/format-date";
+import { sequenceTests } from "../sequence-tests";
+import { TestListSkeleton } from "../ui/Skeleton";
+import { buttonClass, fieldClass } from "../styles";
+import { supabase } from "../supabase";
 
 export type CreatedSequence = {
   code: string;

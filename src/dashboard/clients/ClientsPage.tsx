@@ -7,10 +7,10 @@ import { Link } from "react-router";
 import type { ClientSummary } from "./client-search";
 import { loadClients } from "./clients";
 import ClientsMenu from "./ClientsMenu";
-import { formatDate } from "./formatDate";
-import GenerateSequence from "./GenerateSequence";
-import { ClientsListSkeleton } from "./Skeleton";
-import { fieldClass } from "./styles";
+import { formatDate } from "../ui/format-date";
+import GenerateSequence from "../new-sequence/GenerateSequence";
+import { ClientsListSkeleton } from "../ui/Skeleton";
+import { fieldClass } from "../styles";
 
 type Load = { state: "loading" } | { state: "failed" } | { state: "loaded"; clients: ClientSummary[] };
 

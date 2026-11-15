@@ -4,19 +4,19 @@
 // The browser and screen size are behind the computer-screen button next to the test's name.
 
 import { useState } from "react";
-import type { Json } from "../../supabase/functions/_shared/database.types.ts";
-import type { ScoreTable } from "../shared/test-module";
-import Chevron from "./Chevron";
-import { formatDate } from "./formatDate";
-import { testsById } from "./sequence-tests";
+import type { Json } from "../../../supabase/functions/_shared/database.types.ts";
+import type { ScoreTable } from "../../shared/test-module";
+import Chevron from "../ui/Chevron";
+import { formatDate } from "../ui/format-date";
+import { testsById } from "../sequence-tests";
 import { LiveDot, TimedCounter } from "./LiveIndicators";
 import type { NoteDialogState } from "./NoteDialog";
 import RunningTestControls from "./RunningTestControls";
 import SetupInfo from "./SetupInfo";
-import SheetButtons from "./SheetButtons";
-import { sheetScoreLines } from "./sheet-scores";
-import { stopReasonLabels, testStatusLabels } from "./statusLabels";
-import { textButtonClass } from "./styles";
+import SheetButtons from "../results/SheetButtons";
+import { sheetScoreLines } from "../results/sheet-scores";
+import { stopReasonLabels, testStatusLabels } from "./status-labels";
+import { textButtonClass } from "../styles";
 import TestNotes from "./TestNotes";
 
 export type VisitTest = {

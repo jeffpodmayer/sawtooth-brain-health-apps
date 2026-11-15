@@ -381,7 +381,7 @@ see their own practice.
   - Learn: a modal with checkboxes; copying to the clipboard
   - Check: type a client code, tick tests (only the practice's enabled tests appear), get a link with a copy button; the link works in another tab
   - Check: a new code saves with its first sequence; an existing code shows as an existing client (with the date it was added), not an error; a wrong format shows a clear message
-  - Note: the code rules from 8.3 are in `src/dashboard/clientCode.ts` (capitals as typed, the format check, the hint)
+  - Note: the code rules from 8.3 are in `src/dashboard/clients/client-code.ts` (capitals as typed, the format check, the hint)
 
 - [x] **8.5 Results list**
   - Learn: grouping, sorting, filtering and searching a list

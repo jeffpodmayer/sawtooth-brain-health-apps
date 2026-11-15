@@ -3,15 +3,15 @@
 
 import { useEffect, useRef, useState } from "react";
 import { Link, useParams } from "react-router";
-import Chevron from "./Chevron";
+import Chevron from "../ui/Chevron";
 import CopyLinkButton from "./CopyLinkButton";
 import EndVisitButton from "./EndVisitButton";
-import { formatDate } from "./formatDate";
-import GenerateSequence from "./GenerateSequence";
-import { isUuid } from "./isUuid";
-import { ClientPageSkeleton } from "./Skeleton";
-import { testsById } from "./sequence-tests";
-import { supabase } from "./supabase";
+import { formatDate } from "../ui/format-date";
+import GenerateSequence from "../new-sequence/GenerateSequence";
+import { isUuid } from "../ui/is-uuid";
+import { ClientPageSkeleton } from "../ui/Skeleton";
+import { testsById } from "../sequence-tests";
+import { supabase } from "../supabase";
 import TestBlock, { type VisitTest } from "./TestBlock";
 
 type Visit = {

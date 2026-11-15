@@ -1,8 +1,8 @@
 // The signed-in clinician's name and a Sign out link, at the top right of every dashboard page (8.9).
 // No menu: signing out is one click.
 
-import { textButtonClass } from "./styles";
-import { supabase } from "./supabase";
+import { textButtonClass } from "../styles";
+import { supabase } from "../supabase";
 
 function AccountBar({ displayName }: { displayName: string | null }) {
   return (

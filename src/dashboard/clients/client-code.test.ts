@@ -1,5 +1,5 @@
 import { expect, it } from "vitest";
-import { clientCodeProblem, digitsOnly } from "./clientCode";
+import { clientCodeProblem, digitsOnly } from "./client-code";
 
 it("accepts four digits, including a leading zero", () => {
   expect(clientCodeProblem("1234")).toBeNull();

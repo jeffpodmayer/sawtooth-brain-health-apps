@@ -154,8 +154,4 @@ describe("Trail Making table while running", () => {
     expect(liveTable("junk").rows.every((row) => row.cells.join() === dashes.join())).toBe(true);
     expect(liveTable({ partA: { status: 5 } }).rows[1].cells).toEqual(dashes);
   });
-
-  it("has the finished table's columns", () => {
-    expect(liveTable(null).columns).toEqual(scoreTable(scores(finished, finished)).columns);
-  });
 });

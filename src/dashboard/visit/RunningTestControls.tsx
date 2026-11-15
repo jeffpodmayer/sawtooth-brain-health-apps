@@ -5,10 +5,10 @@
 
 import { useState } from "react";
 import SkipDialog from "./SkipDialog";
-import { stopReasonLabels } from "./statusLabels";
+import { stopReasonLabels } from "./status-labels";
 import StopDialog from "./StopDialog";
-import { buttonClass } from "./styles";
-import { supabase } from "./supabase";
+import { buttonClass } from "../styles";
+import { supabase } from "../supabase";
 
 type Props = {
   sequenceTestId: string;

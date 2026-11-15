@@ -2,7 +2,7 @@
 // their own practice. Used by the Clients list and the New Test Sequence form, so their dates always agree.
 
 import type { ClientSummary } from "./client-search";
-import { supabase } from "./supabase";
+import { supabase } from "../supabase";
 
 export async function loadClients(): Promise<ClientSummary[]> {
   const { data, error } = await supabase

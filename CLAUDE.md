@@ -59,7 +59,8 @@ Add new commands here when they are created.
 src/
   shared/        audio player, timing, sequence runner, ResultStore, full screen, UI pieces
   client/        client test screens (/t/<link-token>)
-  dashboard/     clinician side (/dashboard)
+  dashboard/     clinician side (/dashboard): routes, layout, styles and the test list at the top;
+                 sign-in/, clients/, new-sequence/, visit/ (a client's page), results/ (sheets, CSV), ui/
   tests/
     <test-name>/ one self-contained module per test: SPEC.md, script.json, the main component,
                  and scoring/ (pure code the server re-uses), screen/ and sheet/

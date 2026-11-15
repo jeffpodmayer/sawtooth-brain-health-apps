@@ -2,7 +2,7 @@
 // exactly what the client page says. Raw scores only. A row goes on the PDF of the sheet it points to; a row
 // with no sheet of its own (SWAPS's recall, drawn on the answer sheet) goes on the test's sheets too.
 
-import type { ScoreTable } from "../shared/test-module";
+import type { ScoreTable } from "../../shared/test-module";
 
 // "Part A — Time (s): 38 · Lines (of 24): 24 · Errors: 0", "Recall (of 7) — Correct: 5 · 1 blank".
 export function sheetScoreLines(table: ScoreTable, sheet: string): string[] {

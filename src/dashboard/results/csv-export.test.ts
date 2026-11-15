@@ -1,6 +1,6 @@
 import Papa from "papaparse";
 import { describe, expect, it } from "vitest";
-import type { CsvRow } from "../shared/test-module";
+import type { CsvRow } from "../../shared/test-module";
 import { buildCsv, type CsvTest, type ExportClient } from "./csv-export";
 
 // Two fake tests: one part each, sharing the "Time (s)" column.

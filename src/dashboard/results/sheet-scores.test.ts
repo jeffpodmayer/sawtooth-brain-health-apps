@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import type { ScoreTable } from "../shared/test-module";
+import type { ScoreTable } from "../../shared/test-module";
 import { sheetScoreLines } from "./sheet-scores";
 
 const trailMaking: ScoreTable = {

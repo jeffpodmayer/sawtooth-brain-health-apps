@@ -1412,7 +1412,7 @@ the clinicians said what their IDs look like. Jeff learned that every client has
 
 - A client ID is exactly four digits, such as 0042. It's stored as text, so a leading zero is kept.
 - The database enforces it (`clients_code_format_check`, migration `four_digit_client_codes`), and the
-  New Test Sequence form takes digits only, at most four, with the same rule (`clientCode.ts`).
+  New Test Sequence form takes digits only, at most four, with the same rule (`clients/client-code.ts`).
 - Development's existing clients were renumbered by a one-off update, and `seed.sql` uses 1001 and 1002.
   The migration changes only the rule, never data.
 

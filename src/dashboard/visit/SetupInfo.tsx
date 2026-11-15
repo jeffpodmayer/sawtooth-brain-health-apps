@@ -4,7 +4,7 @@
 // A click also shows it, for touch screens.
 
 import { useId, useRef, useState } from "react";
-import { useDismiss } from "./useDismiss";
+import { useDismiss } from "../ui/useDismiss";
 
 type Props = { testName: string; browser: string | null; screen: string | null };
 
