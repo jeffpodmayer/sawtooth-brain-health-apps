@@ -2,8 +2,8 @@
 // Edge Functions checked by the link token, plus the visit's "check now" channel (ADR-002, ADR-051).
 // Saves go through save-result (roadmap 7.7, 9.5); the server checks and re-scores each result (ADR-040).
 
-import { env } from "../shared/env";
-import type { ResultStore, SaveOutcome } from "../shared/result-store";
+import { env } from "../../shared/env";
+import type { ResultStore, SaveOutcome } from "../../shared/result-store";
 import { checkStatus } from "./check-status";
 import { listenForChecks } from "./listen-for-checks";
 import { createProgressQueue } from "./progress-queue";

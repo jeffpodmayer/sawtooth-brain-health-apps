@@ -2,7 +2,7 @@
 // The browser never queries tables (ADR-002): it sends the link token and
 // gets back the practice name and the tests still to run.
 
-import { env } from "../shared/env";
+import { env } from "../../shared/env";
 
 export type LinkDetails = {
   sequenceId: string;

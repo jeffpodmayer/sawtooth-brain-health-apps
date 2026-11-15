@@ -1,8 +1,8 @@
 // Tells the report-progress Edge Function where the running test is (roadmap 9.3, ADR-048, ADR-049).
 // For the dashboard only; nothing here is part of the result. The part key is passed along unread.
 
-import type { ProgressReport } from "../shared/result-store";
-import { env } from "../shared/env";
+import type { ProgressReport } from "../../shared/result-store";
+import { env } from "../../shared/env";
 
 const REPORT_TIME_LIMIT_MS = 10_000;
 

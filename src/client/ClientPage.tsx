@@ -8,9 +8,9 @@ import { enterFullScreen } from "../shared/full-screen";
 import SequenceRunner from "../shared/SequenceRunner";
 import TryAgainScreen from "../shared/TryAgainScreen";
 import { testsForIds } from "../cognitive-tests/registry";
-import { checkLink, type LinkCheck } from "./check-link";
+import { checkLink, type LinkCheck } from "./server/check-link";
 import EndScreen from "./EndScreen";
-import { createResultStore } from "./save-result";
+import { createResultStore } from "./server/save-result";
 import SoundCheck from "./sound-check/SoundCheck";
 
 // One message for every refused link, whatever the reason (ADR-037).

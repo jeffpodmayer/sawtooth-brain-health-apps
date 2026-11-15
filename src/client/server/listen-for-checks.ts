@@ -3,7 +3,7 @@
 // except what the Edge Functions tell it (ADR-037, ADR-043).
 
 import { RealtimeClient, type RealtimeChannel } from "@supabase/realtime-js";
-import { env } from "../shared/env";
+import { env } from "../../shared/env";
 import { visitChannelName } from "./visit-channel";
 
 // Calls onCheck on each ping, and each time the connection is (re)made, since pings sent while

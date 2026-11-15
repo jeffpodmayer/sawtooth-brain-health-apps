@@ -47,7 +47,7 @@ export default defineConfig([
   {
     // The one exception: the client's tab listens on its visit's channel with the real-time library alone,
     // never the Supabase client (ADR-051). Same rule as above, with only that package let through.
-    files: ['src/client/listen-for-checks.ts'],
+    files: ['src/client/server/listen-for-checks.ts'],
     rules: {
       'no-restricted-imports': ['error', {
         patterns: [

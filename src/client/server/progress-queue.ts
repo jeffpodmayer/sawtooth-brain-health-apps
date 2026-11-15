@@ -5,7 +5,7 @@
 // A failing report is also given up once a report for another test waits behind it: its test is over,
 // and it mustn't hold back the next test's reports.
 
-import type { ProgressReport } from "../shared/result-store";
+import type { ProgressReport } from "../../shared/result-store";
 import type { ReportOutcome } from "./report-progress";
 
 const RETRY_AFTER_MS = 2_000;

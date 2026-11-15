@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, expect, it, vi } from "vitest";
-import type { ProgressReport } from "../shared/result-store";
+import type { ProgressReport } from "../../shared/result-store";
 import { createProgressQueue } from "./progress-queue";
 import type { ReportOutcome } from "./report-progress";
 
