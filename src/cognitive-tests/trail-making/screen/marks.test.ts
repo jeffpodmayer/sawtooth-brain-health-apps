@@ -1,6 +1,9 @@
 import { describe, expect, it } from "vitest";
 import { arrowTo, slashAcross } from "./marks";
-import { pageLayouts, pageSize } from "./page-layouts";
+import { circleOuterRadius, pageLayouts, pageSize, type Point } from "./page-layouts";
+
+const distance = (a: Point, b: Point) => Math.hypot(a.x - b.x, a.y - b.y);
+const allCircles = Object.values(pageLayouts).flatMap((layout) => layout.circles);
 
 describe("slashAcross", () => {
   it("crosses the middle of the line at an angle", () => {
@@ -14,30 +17,40 @@ describe("slashAcross", () => {
 });
 
 describe("arrowTo", () => {
-  it("comes from the middle of the page, for a circle on the left", () => {
-    expect(arrowTo({ x: 125, y: 550 })).toEqual({
-      shaft: { x1: 187, y1: 550, x2: 233, y2: 550 },
-      head: "163,550 187,566 187,534",
-    });
-  });
+  // What matters about an arrow, not its exact pixels: its tip stops just outside the circle, and its shaft runs
+  // straight back from the tip, away from the circle and toward the middle of the page.
+  it("points at every real circle from just outside it, on the side facing the middle of the page", () => {
+    const middle = { x: pageSize.width / 2, y: pageSize.height / 2 };
 
-  it("comes from the middle of the page, for a circle near the top", () => {
-    expect(arrowTo({ x: 425, y: 150 })).toEqual({
-      shaft: { x1: 425, y1: 212, x2: 425, y2: 258 },
-      head: "425,188 409,212 441,212",
-    });
+    for (const circle of allCircles) {
+      const arrow = arrowTo(circle);
+      const [x, y] = arrow.head.split(" ")[0].split(",").map(Number);
+      const tip = { x, y };
+      const headBase = { x: arrow.shaft.x1, y: arrow.shaft.y1 };
+      const tail = { x: arrow.shaft.x2, y: arrow.shaft.y2 };
+
+      const gap = distance(tip, circle) - circleOuterRadius;
+      expect(gap).toBeGreaterThan(0);
+      expect(gap).toBeLessThanOrEqual(15);
+
+      for (const point of [headBase, tail]) {
+        const cross = (tip.x - circle.x) * (point.y - circle.y) - (tip.y - circle.y) * (point.x - circle.x);
+        expect(Math.abs(cross)).toBeLessThan(0.001);
+      }
+      expect(distance(headBase, circle)).toBeGreaterThan(distance(tip, circle));
+      expect(distance(tail, circle)).toBeGreaterThan(distance(headBase, circle));
+      expect(distance(tail, middle)).toBeLessThan(distance(circle, middle));
+    }
   });
 
   it("stays on the page for every real circle", () => {
-    for (const { circles } of Object.values(pageLayouts)) {
-      for (const circle of circles) {
-        const { shaft } = arrowTo(circle);
+    for (const circle of allCircles) {
+      const { shaft } = arrowTo(circle);
 
-        expect(shaft.x2).toBeGreaterThanOrEqual(0);
-        expect(shaft.x2).toBeLessThanOrEqual(pageSize.width);
-        expect(shaft.y2).toBeGreaterThanOrEqual(0);
-        expect(shaft.y2).toBeLessThanOrEqual(pageSize.height);
-      }
+      expect(shaft.x2).toBeGreaterThanOrEqual(0);
+      expect(shaft.x2).toBeLessThanOrEqual(pageSize.width);
+      expect(shaft.y2).toBeGreaterThanOrEqual(0);
+      expect(shaft.y2).toBeLessThanOrEqual(pageSize.height);
     }
   });
 });
