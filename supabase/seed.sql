@@ -1,8 +1,9 @@
 -- Fake data for development only. Never run this on production (ADR-004).
 -- Loaded automatically after a database reset, once the migrations have run.
 -- Kept small for the clinicians' round (10.4): two Sawtooth clients with two visits each, showing the main
--- outcomes. All scores are made up and the results have no sheets (sheets are image files, not SQL); a test
--- run from a link saves real ones.
+-- outcomes. All scores are made up. Each result's sheets are files in supabase/seed-sheets/, drawn by the tests'
+-- own buildSheet to match these scores; SQL can't upload files, so after a reset run
+-- `npx supabase seed buckets --remote=<development-ref> --yes` to put them in the sheets bucket.
 
 -- Same ids as the first hand-made rows, so files in the sheets bucket stay in the right folders.
 insert into public.practices (id, name)
@@ -94,7 +95,7 @@ values
      "sampleB": {"passed": true, "timeMs": 30800, "timeSeconds": 30.8, "correctLines": 7, "correctClicks": 8, "errors": 1},
      "partB": {"status": "completed", "code": null, "timeMs": 97600, "timeSeconds": 97.6, "correctLines": 24, "correctClicks": 25, "errors": 2}
    }',
-   '{"seed": true}', 1440, 900, '{}', null),
+   '{"seed": true}', 1440, 900, '{"sampleA": "9fd7e9ef-8180-4ee6-b96a-b54143062035/40000000-0000-4000-8000-000000000001/seed/sampleA.svg", "partA": "9fd7e9ef-8180-4ee6-b96a-b54143062035/40000000-0000-4000-8000-000000000001/seed/partA.svg", "sampleB": "9fd7e9ef-8180-4ee6-b96a-b54143062035/40000000-0000-4000-8000-000000000001/seed/sampleB.svg", "partB": "9fd7e9ef-8180-4ee6-b96a-b54143062035/40000000-0000-4000-8000-000000000001/seed/partB.svg"}', null),
 
   -- Visit 1: SWAPS to its time limit, then a full recall.
   ('40000000-0000-4000-8000-000000000002', '9fd7e9ef-8180-4ee6-b96a-b54143062035',
@@ -105,7 +106,7 @@ values
      "recall": {"status": "completed", "correct": 6, "blank": 0},
      "practice": {"wrongAnswers": 0}
    }',
-   '{"seed": true}', 1440, 900, '{}', null),
+   '{"seed": true}', 1440, 900, '{"sheet": "9fd7e9ef-8180-4ee6-b96a-b54143062035/40000000-0000-4000-8000-000000000002/seed/sheet.svg"}', null),
 
   -- Visit 2: Part A completed, Part B reached its 300-second limit.
   ('40000000-0000-4000-8000-000000000003', '9fd7e9ef-8180-4ee6-b96a-b54143062035',
@@ -117,7 +118,7 @@ values
      "sampleB": {"passed": true, "timeMs": 44600, "timeSeconds": 44.6, "correctLines": 7, "correctClicks": 8, "errors": 2},
      "partB": {"status": "timedOut", "code": null, "timeMs": 300000, "timeSeconds": 300, "correctLines": 17, "correctClicks": 18, "errors": 3}
    }',
-   '{"seed": true}', 1440, 900, '{}', null),
+   '{"seed": true}', 1440, 900, '{"sampleA": "9fd7e9ef-8180-4ee6-b96a-b54143062035/40000000-0000-4000-8000-000000000003/seed/sampleA.svg", "partA": "9fd7e9ef-8180-4ee6-b96a-b54143062035/40000000-0000-4000-8000-000000000003/seed/partA.svg", "sampleB": "9fd7e9ef-8180-4ee6-b96a-b54143062035/40000000-0000-4000-8000-000000000003/seed/sampleB.svg", "partB": "9fd7e9ef-8180-4ee6-b96a-b54143062035/40000000-0000-4000-8000-000000000003/seed/partB.svg"}', null),
 
   -- Visit 3: the clinician skipped Part A partway (996, ADR-055); Sample B and Part B followed.
   ('40000000-0000-4000-8000-000000000005', '9fd7e9ef-8180-4ee6-b96a-b54143062035',
@@ -129,7 +130,7 @@ values
      "sampleB": {"passed": true, "timeMs": 41200, "timeSeconds": 41.2, "correctLines": 7, "correctClicks": 8, "errors": 1},
      "partB": {"status": "completed", "code": null, "timeMs": 118400, "timeSeconds": 118.4, "correctLines": 24, "correctClicks": 25, "errors": 1}
    }',
-   '{"seed": true}', 1440, 900, '{}', 'partA'),
+   '{"seed": true}', 1440, 900, '{"sampleA": "9fd7e9ef-8180-4ee6-b96a-b54143062035/40000000-0000-4000-8000-000000000005/seed/sampleA.svg", "partA": "9fd7e9ef-8180-4ee6-b96a-b54143062035/40000000-0000-4000-8000-000000000005/seed/partA.svg", "sampleB": "9fd7e9ef-8180-4ee6-b96a-b54143062035/40000000-0000-4000-8000-000000000005/seed/sampleB.svg", "partB": "9fd7e9ef-8180-4ee6-b96a-b54143062035/40000000-0000-4000-8000-000000000005/seed/partB.svg"}', 'partA'),
 
   -- Visit 3: SWAPS to its time limit with two corrections, and one recall symbol left blank.
   ('40000000-0000-4000-8000-000000000006', '9fd7e9ef-8180-4ee6-b96a-b54143062035',
@@ -140,7 +141,7 @@ values
      "recall": {"status": "completed", "correct": 5, "blank": 1},
      "practice": {"wrongAnswers": 1}
    }',
-   '{"seed": true}', 1440, 900, '{}', null);
+   '{"seed": true}', 1440, 900, '{"sheet": "9fd7e9ef-8180-4ee6-b96a-b54143062035/40000000-0000-4000-8000-000000000006/seed/sheet.svg"}', null);
 
 -- Visit 2: SWAPS discontinued by a clinician partway through the timed part, so its partial score is kept and
 -- recall was never given.
@@ -160,7 +161,7 @@ values (
   }',
   '{"seed": true}', 1440, 900,
   now() - interval '3 days' + interval '23 minutes', 'gave_up', '10000000-0000-4000-8000-000000000001',
-  '{}'
+  '{"sheet": "9fd7e9ef-8180-4ee6-b96a-b54143062035/40000000-0000-4000-8000-000000000004/seed/sheet.svg"}'
 );
 
 -- Visit 4: tests still to run. The database fills in status (pending) by itself.
