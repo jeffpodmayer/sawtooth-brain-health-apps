@@ -28,7 +28,7 @@ export default defineConfig([
   },
   {
     // Client screens, shared code and tests never reach Supabase directly (CLAUDE.md, ADR-037, ADR-043).
-    files: ['src/client/**', 'src/shared/**', 'src/tests/**'],
+    files: ['src/client/**', 'src/shared/**', 'src/cognitive-tests/**'],
     rules: {
       'no-restricted-imports': ['error', {
         patterns: [

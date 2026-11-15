@@ -1,75 +1,42 @@
-# React + TypeScript + Vite
+# Sawtooth Assessment App
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Online cognitive tests for Sawtooth Brain Health Institute. Clients take the tests at home in a browser
+while a clinician watches over a video call. Clinicians sign in to a dashboard to set up test sequences
+and review results.
 
-Currently, two official plugins are available:
+Built with TypeScript, React, Vite and Tailwind CSS, with Supabase for the database, sign-in, storage
+and server functions.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Getting started
 
-## React Compiler
+Needs Node 24 and npm.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-
+```bash
+npm install
+cp .env.example .env.local   # then fill in the Supabase URL and publishable key
+npm run dev
 ```
 
-You can also install [eslint-plugin-react-x](https://npmx.dev/package/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://npmx.dev/package/eslint-plugin-react-dom) for React-specific lint rules:
+## Commands
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-
+```bash
+npm run dev         # local dev server
+npm run build       # production build
+npm test            # unit tests (scoring and test wording)
+npm run typecheck   # TypeScript check
+npm run lint        # ESLint
 ```
+
+## Where things are
+
+- `src/client/`: the client's screens (opened from a link)
+- `src/dashboard/`: the clinicians' dashboard
+- `src/cognitive-tests/`: one folder per cognitive test, with its spec, wording, screens and scoring
+- `src/shared/`: code used by both sides
+- `supabase/`: database migrations and server functions
+
+## Docs
+
+- [CLAUDE.md](CLAUDE.md): how the app is built and the rules it follows
+- [docs/ROADMAP.md](docs/ROADMAP.md): build phases and the current step
+- [docs/DECISIONS.md](docs/DECISIONS.md): why things are the way they are

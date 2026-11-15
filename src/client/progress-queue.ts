@@ -8,7 +8,7 @@
 import type { ProgressReport } from "../shared/result-store";
 import type { ReportOutcome } from "./report-progress";
 
-export const RETRY_AFTER_MS = 2_000;
+const RETRY_AFTER_MS = 2_000;
 
 type Send = (testId: string, report: ProgressReport) => Promise<ReportOutcome>;
 

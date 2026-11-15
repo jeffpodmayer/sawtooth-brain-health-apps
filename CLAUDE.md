@@ -61,7 +61,7 @@ src/
   client/        client test screens (/t/<link-token>)
   dashboard/     clinician side (/dashboard): routes, layout, styles and the test list at the top;
                  sign-in/, clients/, new-sequence/, visit/ (a client's page), results/ (sheets, CSV), ui/
-  tests/
+  cognitive-tests/
     <test-name>/ one self-contained module per test: SPEC.md, script.json, the main component,
                  and scoring/ (pure code the server re-uses), screen/ and sheet/
 supabase/
@@ -151,5 +151,5 @@ docs/            ROADMAP.md, DECISIONS.md
 
 - `docs/ROADMAP.md`: build phases and the current step
 - `docs/DECISIONS.md`: why things are the way they are (read before changing a rule above)
-- `src/tests/<test-name>/SPEC.md`: what each test does and how it is scored
-- `src/tests/<test-name>/script.json`: exact wording, line by line
+- `src/cognitive-tests/<test-name>/SPEC.md`: what each test does and how it is scored
+- `src/cognitive-tests/<test-name>/script.json`: exact wording, line by line

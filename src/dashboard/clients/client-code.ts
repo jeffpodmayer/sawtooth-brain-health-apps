@@ -2,7 +2,7 @@
 // A client ID is exactly four digits, such as 0042 (ADR-054). The same rule as the database's
 // clients_code_format_check, which has the final say.
 
-export const CLIENT_CODE_FORMAT = /^[0-9]{4}$/;
+const CLIENT_CODE_FORMAT = /^[0-9]{4}$/;
 
 // What's wrong with a typed ID (already trimmed), or null if it fits the format.
 export function clientCodeProblem(code: string): string | null {

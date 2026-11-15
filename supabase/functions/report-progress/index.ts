@@ -5,8 +5,8 @@
 import "@supabase/functions-js/edge-runtime.d.ts";
 import { withSupabase } from "@supabase/server";
 import type { Database } from "../_shared/database.types.ts";
-import * as swaps from "../../../src/tests/swaps/test-info.ts";
-import * as trailMaking from "../../../src/tests/trail-making/test-info.ts";
+import * as swaps from "../../../src/cognitive-tests/swaps/test-info.ts";
+import * as trailMaking from "../../../src/cognitive-tests/trail-making/test-info.ts";
 
 // A link token is 32 random bytes as 64 hex characters (see the sequences migration).
 const TOKEN_FORMAT = /^[0-9a-f]{64}$/;

@@ -9,16 +9,16 @@ import {
   liveTable as swapsLiveTable,
   practiceRow as practiceSwaps,
   scoreTable as swapsTable,
-} from "../tests/swaps/summary";
-import * as swaps from "../tests/swaps/test-info";
+} from "../cognitive-tests/swaps/summary";
+import * as swaps from "../cognitive-tests/swaps/test-info";
 import {
   csvMeasures as trailMakingCsvMeasures,
   csvRows as trailMakingCsvRows,
   liveTable as trailMakingLiveTable,
   practiceRow as practiceTrailMaking,
   scoreTable as trailMakingTable,
-} from "../tests/trail-making/summary";
-import * as trailMaking from "../tests/trail-making/test-info";
+} from "../cognitive-tests/trail-making/summary";
+import * as trailMaking from "../cognitive-tests/trail-making/test-info";
 
 export const sequenceTests = [
   {

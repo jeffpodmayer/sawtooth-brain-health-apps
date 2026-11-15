@@ -17,8 +17,8 @@ export async function readManifest(): Promise<AudioManifest> {
 export async function loadScripts() {
   // The client's sound check isn't a test, but it has a script and a clip too.
   const scriptFolders = ["src/client/sound-check"];
-  for (const folder of await readdir("src/tests", { withFileTypes: true })) {
-    if (folder.isDirectory()) scriptFolders.push(`src/tests/${folder.name}`);
+  for (const folder of await readdir("src/cognitive-tests", { withFileTypes: true })) {
+    if (folder.isDirectory()) scriptFolders.push(`src/cognitive-tests/${folder.name}`);
   }
 
   const tests = [];

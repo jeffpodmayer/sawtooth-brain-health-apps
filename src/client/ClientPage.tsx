@@ -7,7 +7,7 @@ import ClientScreen from "../shared/ClientScreen";
 import { enterFullScreen } from "../shared/full-screen";
 import SequenceRunner from "../shared/SequenceRunner";
 import TryAgainScreen from "../shared/TryAgainScreen";
-import { testsForIds } from "../tests/registry";
+import { testsForIds } from "../cognitive-tests/registry";
 import { checkLink, type LinkCheck } from "./check-link";
 import EndScreen from "./EndScreen";
 import { createResultStore } from "./save-result";

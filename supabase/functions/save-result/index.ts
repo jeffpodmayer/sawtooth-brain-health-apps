@@ -8,13 +8,13 @@
 import "@supabase/functions-js/edge-runtime.d.ts";
 import { withSupabase } from "@supabase/server";
 import type { Database, Json } from "../_shared/database.types.ts";
-import { rescore as rescoreSwaps } from "../../../src/tests/swaps/scoring/rescore.ts";
-import * as swaps from "../../../src/tests/swaps/test-info.ts";
-import { rescore as rescoreTrailMaking } from "../../../src/tests/trail-making/scoring/rescore.ts";
-import type { TrailMakingScores } from "../../../src/tests/trail-making/scoring/score-part.ts";
-import type { StopPoint } from "../../../src/tests/trail-making/scoring/score-test.ts";
-import { withStopCodes } from "../../../src/tests/trail-making/scoring/stop-codes.ts";
-import * as trailMaking from "../../../src/tests/trail-making/test-info.ts";
+import { rescore as rescoreSwaps } from "../../../src/cognitive-tests/swaps/scoring/rescore.ts";
+import * as swaps from "../../../src/cognitive-tests/swaps/test-info.ts";
+import { rescore as rescoreTrailMaking } from "../../../src/cognitive-tests/trail-making/scoring/rescore.ts";
+import type { TrailMakingScores } from "../../../src/cognitive-tests/trail-making/scoring/score-part.ts";
+import type { StopPoint } from "../../../src/cognitive-tests/trail-making/scoring/score-test.ts";
+import { withStopCodes } from "../../../src/cognitive-tests/trail-making/scoring/stop-codes.ts";
+import * as trailMaking from "../../../src/cognitive-tests/trail-making/test-info.ts";
 
 // A link token is 32 random bytes as 64 hex characters (see the sequences migration).
 const TOKEN_FORMAT = /^[0-9a-f]{64}$/;

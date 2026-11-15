@@ -4,7 +4,7 @@ import type { TestModule } from "../shared/test-module";
 import { swaps } from "./swaps";
 import { trailMaking } from "./trail-making";
 
-export const testModules: TestModule[] = [trailMaking, swaps];
+const testModules: TestModule[] = [trailMaking, swaps];
 
 // A sequence's tests, in the order given. Null if the app doesn't have one of them.
 export function testsForIds(ids: string[]): TestModule[] | null {

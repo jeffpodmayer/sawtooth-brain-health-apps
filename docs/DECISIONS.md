@@ -18,7 +18,7 @@ rules, but they all share links, audio, timing, saving and the dashboard.
 **Decision:**
 
 - One repo, one app. Shared code in `src/shared/`, client screens in `src/client/`,
-  dashboard in `src/dashboard/`, one self-contained folder per test in `src/tests/<test-name>/`.
+  dashboard in `src/dashboard/`, one self-contained folder per test in `src/cognitive-tests/<test-name>/`.
 - Each test exports `id`, `name`, `version` and a React component taking
   `{ sequenceId, onComplete }`. `onComplete` returns
   `{ testId, testVersion, sequenceId, startedAt, completedAt, scores, rawData }`.
@@ -367,7 +367,7 @@ checks no files in this project (the root `tsconfig.json` only links to
 
 **Consequences:**
 
-- Each test module in `src/tests/<test-name>/` holds its own scoring tests.
+- Each test module in `src/cognitive-tests/<test-name>/` holds its own scoring tests.
 - `src/shared/sample.test.ts` is a placeholder; delete it once real tests exist.
 
 ## ADR-017: Supabase region and organizations

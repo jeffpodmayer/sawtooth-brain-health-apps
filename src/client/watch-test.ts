@@ -5,7 +5,7 @@
 import type { StatusCheck } from "./check-status";
 
 // With real-time blocked, a stop or Continue arrives within this time.
-export const POLL_INTERVAL_MS = 3_000;
+const POLL_INTERVAL_MS = 3_000;
 
 export type WatchOptions = {
   check: () => Promise<StatusCheck>;
