@@ -3,10 +3,10 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useParams } from "react-router";
-import ClientScreen from "../shared/ClientScreen";
+import ClientScreen from "../shared/screens/ClientScreen";
 import { enterFullScreen } from "../shared/full-screen";
 import SequenceRunner from "../shared/SequenceRunner";
-import TryAgainScreen from "../shared/TryAgainScreen";
+import TryAgainScreen from "../shared/screens/TryAgainScreen";
 import { testsForIds } from "../cognitive-tests/registry";
 import { checkLink, type LinkCheck } from "./server/check-link";
 import EndScreen from "./EndScreen";

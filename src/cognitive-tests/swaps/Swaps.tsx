@@ -5,7 +5,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { withAudioLog } from "../../shared/audio-log";
-import BreakScreen from "../../shared/BreakScreen";
+import BreakScreen from "../../shared/screens/BreakScreen";
 import { createAudioPlayer, readyInTime } from "../../shared/audio-player";
 import { browserFrom } from "../../shared/browser-info";
 import { elapsedClock, realClock } from "../../shared/clock";

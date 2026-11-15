@@ -57,7 +57,7 @@ Add new commands here when they are created.
 
 ```
 src/
-  shared/        audio player, timing, sequence runner, ResultStore, full screen, UI pieces
+  shared/        audio player, timing, sequence runner, ResultStore, full screen; screens/ holds the shared client screens
   client/        client screens (/t/<link-token>); server/ holds the calls to Edge Functions and the live connection
   dashboard/     clinician side (/dashboard): routes, layout, styles and the test list at the top;
                  sign-in/, clients/, new-sequence/, visit/ (a client's page), results/ (sheets, CSV), ui/

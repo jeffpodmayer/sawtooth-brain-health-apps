@@ -3,7 +3,7 @@
 // It leaves full screen, so the client can see their other tabs and go back to the video call.
 
 import { useEffect } from "react";
-import ClientScreen from "../shared/ClientScreen";
+import ClientScreen from "../shared/screens/ClientScreen";
 import { exitFullScreen } from "../shared/full-screen";
 
 // Moves keyboard and screen reader users to the heading when the screen appears.

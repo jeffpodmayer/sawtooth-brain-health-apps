@@ -2,9 +2,9 @@
 
 import { useState, type ReactNode } from "react";
 import { createAudioPlayer, readyInTime } from "../../shared/audio-player";
-import ClientScreen from "../../shared/ClientScreen";
+import ClientScreen from "../../shared/screens/ClientScreen";
 import type { SpokenLine } from "../../shared/test-script";
-import TryAgainScreen from "../../shared/TryAgainScreen";
+import TryAgainScreen from "../../shared/screens/TryAgainScreen";
 import script from "./script.json";
 
 const line = script.sections.check[0] as SpokenLine;

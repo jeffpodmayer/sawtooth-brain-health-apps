@@ -3,12 +3,12 @@
 // It only uses the plug-in contract and the ResultStore, so it never knows how a test works or is scored (ADR-001).
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import BreakScreen from "./BreakScreen";
-import ClientScreen from "./ClientScreen";
+import BreakScreen from "./screens/BreakScreen";
+import ClientScreen from "./screens/ClientScreen";
 import type { ResultStore, SaveOutcome, ScreenSize, TestStatus } from "./result-store";
 import type { TestModule, TestResult } from "./test-module";
-import TryAgainScreen from "./TryAgainScreen";
-import WaitScreen from "./WaitScreen";
+import TryAgainScreen from "./screens/TryAgainScreen";
+import WaitScreen from "./screens/WaitScreen";
 
 type SequenceRunnerProps = {
   sequenceId: string;
