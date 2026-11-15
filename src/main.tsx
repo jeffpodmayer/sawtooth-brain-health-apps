@@ -11,15 +11,6 @@ import ClientPage from "./client/ClientPage.tsx";
 // first request: a second download that failed would leave the client on a blank page.
 const DashboardRoutes = lazy(() => import("./dashboard/DashboardRoutes.tsx"));
 
-// Only the dev server has this page, so the production build leaves it out.
-const DevTestPage = import.meta.env.DEV ? lazy(() => import("./dev/DevTestPage")) : null;
-const DevSequencePage = import.meta.env.DEV ? lazy(() => import("./dev/DevSequencePage")) : null;
-const DevBreakPage = import.meta.env.DEV ? lazy(() => import("./dev/DevBreakPage")) : null;
-const DevTrailPages = import.meta.env.DEV ? lazy(() => import("./dev/DevTrailPages")) : null;
-const DevSwapsForm = import.meta.env.DEV ? lazy(() => import("./dev/DevSwapsForm")) : null;
-const DevSwapsRecall = import.meta.env.DEV ? lazy(() => import("./dev/DevSwapsRecall")) : null;
-const DevProgressPage = import.meta.env.DEV ? lazy(() => import("./dev/DevProgressPage")) : null;
-
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <BrowserRouter>
@@ -34,76 +25,6 @@ createRoot(document.getElementById("root")!).render(
             </Suspense>
           }
         />
-        {DevTestPage && (
-          <Route
-            path="/dev/test/:testId"
-            element={
-              <Suspense>
-                <DevTestPage />
-              </Suspense>
-            }
-          />
-        )}
-        {DevSequencePage && (
-          <Route
-            path="/dev/sequence"
-            element={
-              <Suspense>
-                <DevSequencePage />
-              </Suspense>
-            }
-          />
-        )}
-        {DevBreakPage && (
-          <Route
-            path="/dev/break"
-            element={
-              <Suspense>
-                <DevBreakPage />
-              </Suspense>
-            }
-          />
-        )}
-        {DevTrailPages && (
-          <Route
-            path="/dev/trail-pages"
-            element={
-              <Suspense>
-                <DevTrailPages />
-              </Suspense>
-            }
-          />
-        )}
-        {DevSwapsForm && (
-          <Route
-            path="/dev/swaps-form"
-            element={
-              <Suspense>
-                <DevSwapsForm />
-              </Suspense>
-            }
-          />
-        )}
-        {DevSwapsRecall && (
-          <Route
-            path="/dev/swaps-recall"
-            element={
-              <Suspense>
-                <DevSwapsRecall />
-              </Suspense>
-            }
-          />
-        )}
-        {DevProgressPage && (
-          <Route
-            path="/dev/progress/:token"
-            element={
-              <Suspense>
-                <DevProgressPage />
-              </Suspense>
-            }
-          />
-        )}
       </Routes>
     </BrowserRouter>
   </StrictMode>,
