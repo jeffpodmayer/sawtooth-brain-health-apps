@@ -2,6 +2,7 @@
 
 // The dashboard's font loads with this piece only, so client screens never download it (ADR-047).
 import "@fontsource-variable/atkinson-hyperlegible-next";
+import { useEffect } from "react";
 import { Navigate, Route, Routes } from "react-router";
 import ClientPage from "./ClientPage";
 import ClientsPage from "./ClientsPage";
@@ -10,6 +11,15 @@ import RequireSignIn from "./RequireSignIn";
 import SignInPage from "./SignInPage";
 
 function DashboardRoutes() {
+  // The tab reads "Sawtooth · Dashboard" on every clinician page, so it stands apart from a client's "Sawtooth"
+  // tab during a session. Back to plain "Sawtooth" on leaving.
+  useEffect(() => {
+    document.title = "Sawtooth · Dashboard";
+    return () => {
+      document.title = "Sawtooth";
+    };
+  }, []);
+
   return (
     <Routes>
       <Route path="sign-in" element={<SignInPage />} />

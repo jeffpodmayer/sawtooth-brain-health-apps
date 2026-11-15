@@ -311,7 +311,7 @@ function SequenceForm({ fixedCode, onCreated, onCancel }: Props) {
           Cancel
         </button>
         <button type="submit" disabled={creating || testsLoad.state !== "loaded"} className={buttonClass("primary")}>
-          {creating ? "Creating…" : "Create link"}
+          {creating ? "Creating…" : "Create sequence"}
         </button>
       </div>
     </form>

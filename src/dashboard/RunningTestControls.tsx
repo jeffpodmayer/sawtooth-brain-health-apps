@@ -38,17 +38,23 @@ function RunningTestControls({
 }: Props) {
   const [stopOpen, setStopOpen] = useState(false);
   const [skipOpen, setSkipOpen] = useState(false);
-  const [continuing, setContinuing] = useState(false);
+  // The step Continue was clicked for. Until the button goes away (or the next step's appears), it stays as it
+  // is but faded and disabled, so its label doesn't flicker while the change reaches the server and the page.
+  const [continuedStep, setContinuedStep] = useState<string | null | undefined>(undefined);
+  const continuing = holding && continuedStep === nextStep;
   const [continueError, setContinueError] = useState(false);
 
   // Clicking twice is harmless: the database releases only holds the client has reached.
   async function handleContinue() {
-    setContinuing(true);
+    setContinuedStep(nextStep);
     setContinueError(false);
     const { error } = await supabase.rpc("continue_test", { sequence_test_id: sequenceTestId });
-    setContinuing(false);
-    if (error) setContinueError(true);
-    else onChanged();
+    if (error) {
+      setContinuedStep(undefined);
+      setContinueError(true);
+    } else {
+      onChanged();
+    }
   }
 
   // The database checks it's still the right moment (the same released holds) and that nothing else ended
@@ -87,20 +93,15 @@ function RunningTestControls({
           type="button"
           onClick={handleContinue}
           disabled={continuing}
+          aria-busy={continuing}
           // Heard as "Continue to Part A"; seen as "▶ Part A".
           aria-label={nextStep ? `Continue to ${nextStep}` : undefined}
           className={buttonClass("primary", "small")}
         >
-          {continuing ? (
-            "Continuing…"
-          ) : (
-            <>
-              <svg aria-hidden="true" viewBox="0 0 24 24" className="size-4 fill-current">
-                <path d="M7 4.5v15l12-7.5z" />
-              </svg>
-              {nextStep ?? "Continue"}
-            </>
-          )}
+          <svg aria-hidden="true" viewBox="0 0 24 24" className="size-4 fill-current">
+            <path d="M7 4.5v15l12-7.5z" />
+          </svg>
+          {nextStep ?? "Continue"}
         </button>
       )}
       {skip && (
