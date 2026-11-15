@@ -2,9 +2,8 @@ import "@fontsource/atkinson-hyperlegible/400.css";
 import "@fontsource/atkinson-hyperlegible/700.css";
 import { lazy, StrictMode, Suspense } from "react";
 import { createRoot } from "react-dom/client";
-import { BrowserRouter, Route, Routes } from "react-router";
+import { BrowserRouter, Navigate, Route, Routes } from "react-router";
 import "./index.css";
-import App from "./App.tsx";
 import ClientPage from "./client/ClientPage.tsx";
 
 // The dashboard is its own piece, so a client link never downloads it. The client page loads with the
@@ -15,7 +14,8 @@ createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<App />} />
+        {/* Clients only ever use their own /t/ link, so the bare address is the clinicians' front door. */}
+        <Route path="/" element={<Navigate to="/dashboard" replace />} />
         <Route path="/t/:token" element={<ClientPage />} />
         <Route
           path="/dashboard/*"
